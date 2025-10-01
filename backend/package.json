@@ -1,0 +1,33 @@
+{
+  "name": "ai-agent-app",
+  "version": "1.0.0",
+  "description": "\"AI Agent Calling SAAS\"",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+   "start": "node src/server.js",
+    "dev": "nodemon --watch src src/server.js",
+    "dev:env": "node -r dotenv/config src/server.js dotenv_config_path=.env.development"
+  },
+  "dependencies": {
+    "@clerk/clerk-sdk-node": "^5.0.0",
+    "@fastify/cors": "^10.0.0",
+    "@fastify/sensible": "^6.0.0",
+    "@fastify/swagger": "^9.0.0",
+    "@fastify/swagger-ui": "^5.0.0",
+    "dotenv": "^16.4.0",
+    "fastify": "^5.0.0",
+    "fastify-plugin": "^5.0.0",
+    "mongoose": "^8.0.0",
+    "stripe": "^14.0.0",
+    "svix": "^1.15.0",
+    "zod": "^3.22.4",
+    "zod-to-json-schema": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "nodemon": "^3.1.10"
+  },
+  "author": "ahsan600",
+  "license": "ISC"
+}
