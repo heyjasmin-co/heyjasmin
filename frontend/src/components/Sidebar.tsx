@@ -6,13 +6,14 @@ import phoneIcon from "../assets/image/phoneIcon.png";
 import profileIcon from "../assets/image/profileIcon.png";
 import robotIcon from "../assets/image/robotIcon.png";
 import settingIcons from "../assets/image/settingIcon.png";
+
 import { colorTheme } from "../theme/colorTheme";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
-
+  const phoneNumber = null;
   return (
     <>
       {/* Hamburger button for mobile - fixed position */}
@@ -55,28 +56,32 @@ export default function Sidebar() {
         style={{ fontFamily: "'Outfit', sans-serif" }}
       >
         {/* Sidebar Content */}
-        <div className="flex h-full flex-col rounded-2xl px-5 py-6">
-          {/* Logo */}
-          <NavLink
-            to="/"
-            className="mb-6 flex items-center space-x-3"
-            onClick={() => setIsOpen(false)}
-          >
-            <img src={robotIcon} alt={`Robot Icon`} className="h-15 w-15" />
-            <span
-              style={{
-                fontSize: "22px",
-                lineHeight: "28px",
-                letterSpacing: "-0.04em",
-              }}
-              className="font-semibold tracking-tight"
+        <div className="flex h-full flex-col gap-8 rounded-2xl px-5 py-6">
+          <div>
+            {" "}
+            {/* Logo */}
+            <NavLink
+              to="/"
+              className="mb-3 flex flex-col items-center justify-center space-x-3"
+              onClick={() => setIsOpen(false)}
             >
-              heyjasmin
-            </span>
-          </NavLink>
+              <img src={robotIcon} alt={`Robot Icon`} className="h-15 w-15" />
+              <span
+                style={{
+                  fontSize: "22px",
+                  lineHeight: "28px",
+                  letterSpacing: "-0.04em",
+                }}
+                className="font-semibold tracking-tight"
+              >
+                heyjasmin
+              </span>
+            </NavLink>
+            <hr />
+          </div>
 
           {/* Menu */}
-          <ul className="flex flex-grow flex-col space-y-1.5">
+          <ul className="flex flex-grow flex-col space-y-4">
             {[
               { name: "Guided Setup", icon: fileIcon, to: "/" },
               { name: "Calls", icon: phoneIcon, to: "/calls" },
@@ -89,7 +94,7 @@ export default function Sidebar() {
                   className="group flex items-center rounded-lg px-3 py-2.5 transition-all duration-200"
                   style={({ isActive }) => ({
                     backgroundColor: isActive
-                      ? colorTheme.secondaryColor(1)
+                      ? colorTheme.secondaryColor(0.9)
                       : "transparent",
                     color: isActive ? "white" : "#374151",
                     fontSize: "18px",
@@ -129,32 +134,19 @@ export default function Sidebar() {
 
             {/* Bottom-aligned Log Out */}
             <li className="mt-auto pt-4">
-              {/* Contact Info */}
-              {/* <div
-                className="mb-4 flex flex-col space-y-2 rounded-xl p-3 shadow-lg"
-                style={{
-                  backgroundColor: colorTheme.secondaryColor(0.2),
-                }}
-              >
-                <div className="flex items-center space-x-2 text-sm text-gray-700">
-                  <img
-                    src={settingIcons}
-                    alt="Phone Icon"
-                    className="h-4 w-4"
-                  />
-                  <span>(233) 489-4419</span>
+              {/* JASMIN PHone Number */}
+              {phoneNumber && (
+                <div className="mb-4 flex flex-col gap-3 rounded-xl p-3 sm:p-4">
+                  <div
+                    className="flex justify-center rounded-3xl px-4 py-2 sm:px-6 sm:py-3"
+                    style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
+                  >
+                    <span className="text-md text-center font-bold text-white">
+                      {phoneNumber}
+                    </span>
+                  </div>
                 </div>
-                <hr className="border-gray-700" />
-                <div className="flex items-center justify-between text-sm text-gray-700">
-                  <img
-                    src={settingIcons}
-                    alt="Timer Icon"
-                    className="h-4 w-4"
-                  />
-                  <span>50:00 min left</span>
-                  <img src={settingIcons} alt="Info Icon" className="h-4 w-4" />
-                </div>
-              </div> */}
+              )}
 
               {/* Logout Button */}
               <NavLink
@@ -162,7 +154,7 @@ export default function Sidebar() {
                 className="group flex items-center rounded-lg px-3 py-2.5 transition-all duration-200"
                 style={({ isActive }) => ({
                   backgroundColor: isActive
-                    ? colorTheme.secondaryColor(1)
+                    ? colorTheme.secondaryColor(0.9)
                     : "transparent",
                   color: isActive ? "white" : "#374151",
                   fontSize: "18px",
