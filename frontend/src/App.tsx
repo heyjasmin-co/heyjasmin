@@ -1,18 +1,77 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import CallDetails from "./components/calls/CallDetails";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Main from "./pages/Admin";
-import Dashboard from "./pages/Admin/Dashboard/Dashboard";
+import Login from "./pages/Admin/Auth/Login";
+import Register from "./pages/Admin/Auth/Register";
+import BusinessProfileSetup from "./pages/Admin/BusinessProfileSetup";
+import AccountPage from "./pages/Admin/Dashboard/Account";
+import AccountDetailsPage from "./pages/Admin/Dashboard/Account/AccountDetailsPage";
+import BillingPage from "./pages/Admin/Dashboard/Account/BillingPage";
+import UsersPage from "./pages/Admin/Dashboard/Account/UsersPage";
+import CallsPage from "./pages/Admin/Dashboard/Calls";
+import CallInfo from "./pages/Admin/Dashboard/Calls/CallInfo";
+import Dashboard from "./pages/Admin/Dashboard/GuidedStep";
+import Settings from "./pages/Admin/Dashboard/Settings";
+import AppointmentInfo from "./pages/Admin/Dashboard/Settings/AppointmentInfo";
+import BusinessDetailsPage from "./pages/Admin/Dashboard/Settings/BusinessDetailsPage";
+import LandingPage from "./pages/LandingPage";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Layout with Outlet */}
-        <Route path="/" element={<Main />}>
+        {/* Public routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/admin" element={<Login />} />
+        <Route path="/admin/sign-in" element={<Login />} />
+        <Route path="/admin/sign-up" element={<Register />} />
+
+        {/* Protected routes */}
+        <Route
+          path="/admin/setup"
+          element={
+            <ProtectedRoute>
+              <BusinessProfileSetup />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <Main />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
-          <Route path="calls" element={<Dashboard />} />
-          <Route path="settings" element={<Dashboard />} />
-          <Route path="account" element={<Dashboard />} />
+
+          {/* Calls nested routes */}
+          <Route path="calls" element={<CallsPage />}>
+            <Route index element={<CallInfo />} />
+            <Route path="call-details/:callId" element={<CallDetails />} />
+          </Route>
+
+          {/* Settings nested routes */}
+          <Route path="settings" element={<Settings />}>
+            <Route index element={<Navigate to="business-info" replace />} />
+            <Route path="business-info" element={<BusinessDetailsPage />} />
+            <Route path="appointments" element={<AppointmentInfo />} />
+          </Route>
+
+          {/* Account nested routes */}
+          <Route path="account" element={<AccountPage />}>
+            <Route index element={<Navigate to="account-settings" replace />} />
+            <Route path="account-settings" element={<AccountDetailsPage />} />
+            <Route path="users" element={<UsersPage />} />
+            <Route path="billing" element={<BillingPage />} />
+          </Route>
         </Route>
+
+        {/* Fallback */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

@@ -2,7 +2,6 @@ import { Textarea, TextInput } from "flowbite-react";
 import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
-import businessIcon from "../../assets/image/businessIcon.png";
 import { colorTheme } from "../../theme/colorTheme";
 
 type BusinessDetailsProps = {
@@ -40,7 +39,7 @@ function BusinessDetails({
             className="flex h-8 w-8 items-center justify-center rounded-full"
             style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
           >
-            <img src={businessIcon} alt="Business Icon" className="h-6 w-6" />
+            <i className={`fa-solid fa-shop text-white`}></i>
           </div>
           <h5 className="text-lg font-bold text-gray-900">
             Business Information

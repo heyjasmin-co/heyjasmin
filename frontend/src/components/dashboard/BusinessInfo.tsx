@@ -1,5 +1,4 @@
 import { useState } from "react";
-import businessIcon from "../../assets/image/businessIcon.png";
 import editIcon from "../../assets/image/editIcon.png";
 import infoIcon from "../../assets/image/infoIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
@@ -94,7 +93,7 @@ function BusinessInfo({
             className="flex h-10 w-10 items-center justify-center rounded-full"
             style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
           >
-            <img src={businessIcon} alt="Business Icon" className="h-6 w-6" />
+            <i className="fa-solid fa-briefcase text-white"></i>
           </div>
           <h5 className="text-lg font-bold text-gray-900">
             Business Information

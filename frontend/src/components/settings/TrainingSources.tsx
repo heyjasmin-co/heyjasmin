@@ -3,10 +3,9 @@ import { useState } from "react";
 import cancelIcon from "../../assets/image/cancelIcon.png";
 import completeIcon from "../../assets/image/completeIcon.png";
 import editIcon from "../../assets/image/editIcon.png";
-import infoIcon from "../../assets/image/infoIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
-import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
+
 type TrainingSourcesProps = {
   businessProfile: string;
   businessWebsite: string;
@@ -43,24 +42,11 @@ function TrainingSources({
           >
             <i className="fa-solid fa-wand-magic-sparkles text-white"></i>
           </div>
-
           <h5 className="text-lg font-bold text-gray-900">Training Sources</h5>
         </div>
 
-        {/* Info */}
-        <div className="flex gap-2 px-4 py-3">
-          <img src={infoIcon} alt="Training Icon" className="h-6 w-6" />
-
-          <p className="text-sm text-gray-700">
-            {appName} uses these sources to learn about your business, helping
-            her answer caller questions effectively. You can update these
-            sources to retrain {appName} anytime.
-          </p>
-        </div>
-
-        {/* Sources & Edit */}
+        {/* Sources */}
         <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
-          {/* Sources */}
           <div className="flex w-full flex-col gap-4">
             {/* Google Profile */}
             <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-start">
@@ -83,13 +69,13 @@ function TrainingSources({
                     }}
                   />
                 ) : profileValue ? (
-                  <div className="flex items-center gap-2 break-words text-gray-600">
+                  <div className="flex items-center gap-2 text-gray-600">
                     <img
                       src={completeIcon}
                       alt="Website Icon"
                       className="h-5 w-5 shrink-0"
                     />
-                    <span className="text-sm font-semibold break-words">
+                    <span className="overflow-hidden text-sm font-semibold break-all">
                       {profileValue}
                     </span>
                   </div>
@@ -127,13 +113,13 @@ function TrainingSources({
                     }}
                   />
                 ) : websiteValue ? (
-                  <div className="flex items-center gap-2 break-words text-gray-600">
+                  <div className="flex items-center gap-2 text-gray-600">
                     <img
                       src={completeIcon}
                       alt="Website Icon"
                       className="h-5 w-5 shrink-0"
                     />
-                    <span className="text-sm font-semibold break-words">
+                    <span className="overflow-hidden text-sm font-semibold break-all">
                       {websiteValue}
                     </span>
                   </div>
@@ -152,8 +138,10 @@ function TrainingSources({
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Edit / Save Button */}
+        {/* Actions */}
+        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:justify-end sm:gap-4">
           {isEditing ? (
             <div
               onClick={handleSave}

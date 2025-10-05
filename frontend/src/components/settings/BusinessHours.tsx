@@ -1,7 +1,6 @@
 import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
-import sparklesIcon from "../../assets/image/sparklesIcon.png";
 import { colorTheme } from "../../theme/colorTheme";
 
 function BusinessHours() {
@@ -53,7 +52,7 @@ function BusinessHours() {
             className="mb-2 flex h-8 w-8 items-center justify-center rounded-full sm:mb-0"
             style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
           >
-            <img src={sparklesIcon} alt="Business Icon" className="h-6 w-6" />
+            <i className="fa-solid fa-clock text-white"></i>
           </div>
           <h5 className="text-lg font-bold text-gray-900"> Business Hours:</h5>
         </div>
