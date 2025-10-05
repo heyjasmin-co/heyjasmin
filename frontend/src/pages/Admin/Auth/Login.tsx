@@ -41,7 +41,7 @@ export default function Login() {
 
           {/* Clerk Sign In (centered, larger fields) */}
           <SignIn
-            afterSignInUrl="/admin/setup"
+            afterSignInUrl="/admin/dashboard"
             appearance={{
               elements: {
                 card: "shadow-none border-none bg-transparent w-full",
