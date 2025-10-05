@@ -3,7 +3,7 @@ import Sidebar from "../../components/Sidebar";
 
 function Main() {
   return (
-    <div className="flex h-screen gap-4 p-5">
+    <div className="flex h-screen gap-4 overflow-hidden p-5">
       <Sidebar />
       <Outlet />
     </div>

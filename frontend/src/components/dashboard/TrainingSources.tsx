@@ -5,7 +5,6 @@ import completeIcon from "../../assets/image/completeIcon.png";
 import editIcon from "../../assets/image/editIcon.png";
 import infoIcon from "../../assets/image/infoIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
-import sparklesIcon from "../../assets/image/sparklesIcon.png";
 import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
 type TrainingSourcesProps = {
@@ -42,7 +41,7 @@ function TrainingSources({
             className="flex h-8 w-8 items-center justify-center rounded-full"
             style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
           >
-            <img src={sparklesIcon} alt="Training Icon" className="h-6 w-6" />
+            <i className="fa-solid fa-wand-magic-sparkles text-white"></i>
           </div>
 
           <h5 className="text-lg font-bold text-gray-900">Training Sources</h5>
