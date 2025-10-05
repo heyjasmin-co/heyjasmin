@@ -87,7 +87,7 @@ export default function Register() {
 
           {/* Clerk Sign Up */}
           <SignUp
-            afterSignUpUrl="/admin/setup"
+            afterSignInUrl="/admin/dashboard"
             appearance={{
               elements: {
                 card: "shadow-none border-none bg-transparent w-full",
