@@ -1,12 +1,12 @@
 import { useState } from "react";
-import celebIcon from "../../../assets/image/celebIcon.png";
-import nextIcon from "../../../assets/image/nextIcon.png";
-import Breadcrumb from "../../../components/dashboard/Breadcrumb";
-import BusinessInfo from "../../../components/dashboard/BusinessInfo";
-import InfoCard from "../../../components/dashboard/InfoCard";
-import TalkToAgent from "../../../components/dashboard/TalkToAgent";
-import TrainingSources from "../../../components/dashboard/TrainingSources";
-import { appName } from "../../../theme/appName";
+import celebIcon from "../../../../assets/image/celebIcon.png";
+import nextIcon from "../../../../assets/image/nextIcon.png";
+import Breadcrumb from "../../../../components/dashboard/Breadcrumb";
+import BusinessInfo from "../../../../components/dashboard/BusinessInfo";
+import InfoCard from "../../../../components/dashboard/InfoCard";
+import TalkToAgent from "../../../../components/dashboard/TalkToAgent";
+import TrainingSources from "../../../../components/dashboard/TrainingSources";
+import { appName } from "../../../../theme/appName";
 
 export default function Dashboard() {
   const [guideStep, setGuideStep] = useState(0);
@@ -51,11 +51,12 @@ export default function Dashboard() {
         )}
 
         {/* Talk to Jasmin */}
+
         {guideStep !== 2 && (
           <div className="flex flex-col gap-3 px-4 sm:flex-row sm:justify-end">
             <button
               onClick={handleStep}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
             >
               <span className="text-xl font-bold">
                 {guideStep == 0 && `Talk to ${appName}`}
