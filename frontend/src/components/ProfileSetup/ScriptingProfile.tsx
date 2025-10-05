@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import completeIcon from "../../assets/image/completeIcon.png";
 import sparklesIcon from "../../assets/image/sparklesIcon.png";
+import { useUserData } from "../../context/UserDataContext";
 import { appName } from "../../theme/appName";
 import LeftInfoPanel from "./LeftInfoPanel";
 
@@ -16,6 +17,7 @@ export default function ScriptingProfile({
 }) {
   const [loading] = useState(false);
   const navigate = useNavigate();
+  const user = useUserData();
   const trainingSteps = [
     { label: "Analyzing your website for data." },
     { label: "Processing your business information." },
@@ -23,6 +25,7 @@ export default function ScriptingProfile({
     { label: "Generating your custom Rosie agent." },
   ];
   const handleClaimAgent = () => {
+    user.setUserData((pv) => ({ ...pv, hasCompletedSetup: true }));
     navigate("/admin/dashboard");
   };
   return (
