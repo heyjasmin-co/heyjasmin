@@ -25,7 +25,12 @@ export default function ScriptingProfile({
     { label: "Generating your custom Rosie agent." },
   ];
   const handleClaimAgent = () => {
-    user.setUserData((pv) => ({ ...pv, hasCompletedSetup: true }));
+    user.setUserData((prev) => {
+      if (prev) {
+        return { ...prev, hasCompletedSetup: true };
+      }
+      return prev;
+    });
     navigate("/admin/dashboard");
   };
   return (

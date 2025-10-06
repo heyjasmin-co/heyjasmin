@@ -26,7 +26,13 @@ const UserDataContext = createContext<UserDataContextType | undefined>(
 
 export function UserDataProvider({ children }: { children: React.ReactNode }) {
   const { user, isSignedIn } = useUser();
-  const [userData, setUserData] = useState<UserData | null>(null);
+  const [userData, setUserData] = useState<UserData | null>({
+    id: "ahsan-123",
+    email: "ahsan@gmail.com",
+    hasSubscription: true,
+    hasCompletedSetup: false,
+    subscriptionStatus: "none",
+  });
   const [loading, setLoading] = useState(true);
 
   const fetchUserData = async () => {
