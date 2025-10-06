@@ -61,7 +61,7 @@ export default function Login() {
           <div className="mt-8 text-center text-base text-gray-500">
             Don’t have an account?{" "}
             <a
-              href="/sign-up"
+              href="/admin/sign-up"
               className="font-medium hover:underline"
               style={{ color: colorTheme.primary(1) }}
             >
