@@ -107,7 +107,7 @@ export default function Register() {
           <div className="mt-8 text-center text-base text-gray-500">
             Already have an account?{" "}
             <a
-              href="/login"
+              href="/admin/login"
               className="font-medium hover:underline"
               style={{ color: colorTheme.primary(1) }}
             >
