@@ -2,6 +2,7 @@ import { useClerk } from "@clerk/clerk-react";
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import robotIcon from "../assets/image/robotIcon.png";
+import websiteLogo from "../assets/image/websiteLogo.png";
 import { colorTheme } from "../theme/colorTheme";
 
 export default function Sidebar() {
@@ -64,10 +65,7 @@ export default function Sidebar() {
             className="flex flex-col items-center"
             onClick={() => setIsOpen(false)}
           >
-            <img src={robotIcon} alt="Robot Icon" className="h-14 w-14" />
-            <span className="text-2xl font-semibold tracking-tight">
-              heyjasmin
-            </span>
+            <img src={websiteLogo} alt="Website Icon" className="h-35" />
           </NavLink>
           <hr />
 
