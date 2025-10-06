@@ -1,7 +1,6 @@
 import { useClerk } from "@clerk/clerk-react";
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import robotIcon from "../assets/image/robotIcon.png";
 import websiteLogo from "../assets/image/websiteLogo.png";
 import { colorTheme } from "../theme/colorTheme";
 
