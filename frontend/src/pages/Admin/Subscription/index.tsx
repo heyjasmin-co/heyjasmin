@@ -74,11 +74,16 @@ export default function SubscriptionPage() {
   const user = useUserData();
   const navigate = useNavigate();
 
-  const handleSelectPlan = (id: number) => {
-    setSelectedPlan(id);
-    user.setUserData((prev) => ({ ...prev, hasSubscription: true }));
-    navigate("/admin/dashboard");
-  };
+const handleSelectPlan = (id: number) => {
+  setSelectedPlan(id);
+  user.setUserData((prev) => {
+    if (prev) {
+      return { ...prev, hasSubscription: true };
+    }
+    return prev; 
+  });
+  navigate("/admin/dashboard");
+};
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 sm:p-6 lg:p-8">
