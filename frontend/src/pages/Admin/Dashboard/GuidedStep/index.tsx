@@ -44,9 +44,7 @@ export default function Dashboard() {
           <InfoCard
             icon={celebIcon}
             title={`Ready to Launch`}
-            subtitle={
-              "Well done! Forward your business number to Rosie so she can start answering your calls."
-            }
+            subtitle={` Well done! Forward your business number to ${appName} so she can start answering your calls.`}
           />
         )}
 

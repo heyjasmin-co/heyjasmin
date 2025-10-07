@@ -1,5 +1,6 @@
 import { useUser } from "@clerk/clerk-react";
 import { createContext, useContext, useEffect, useState } from "react";
+import apiClient from "../lib/axios";
 
 export interface UserData {
   id: string;
@@ -46,10 +47,10 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
 
       // Replace with your actual API endpoint
-      const response = await fetch(`/api/users/${user.id}`);
-      const data = await response.json();
+      const response = await apiClient(`/api/users/me`);
+      console.log(response.data);
 
-      setUserData(data);
+      // setUserData(data);
     } catch (error) {
       console.error("Failed to fetch user data:", error);
 

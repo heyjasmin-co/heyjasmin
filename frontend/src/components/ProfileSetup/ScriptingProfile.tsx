@@ -22,7 +22,7 @@ export default function ScriptingProfile({
     { label: "Analyzing your website for data." },
     { label: "Processing your business information." },
     { label: "Optimizing your data for AI." },
-    { label: "Generating your custom Rosie agent." },
+    { label: "Generating your custom Jasmin agent." },
   ];
   const handleClaimAgent = () => {
     user.setUserData((prev) => {

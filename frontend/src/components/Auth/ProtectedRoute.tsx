@@ -28,12 +28,12 @@ export default function ProtectedRoute({
     return <Navigate to="/admin/sign-in" state={{ from: location }} replace />;
   }
 
-  if (requireSubscription && userData && !userData.hasSubscription) {
-    return <Navigate to="/admin/subscription" replace />;
-  }
-
   if (requireSetup && userData && !userData.hasCompletedSetup) {
     return <Navigate to="/admin/setup" replace />;
+  }
+
+  if (requireSubscription && userData && !userData.hasSubscription) {
+    return <Navigate to="/admin/subscription" replace />;
   }
 
   return <>{children}</>;
