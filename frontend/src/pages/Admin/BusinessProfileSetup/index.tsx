@@ -1,10 +1,21 @@
 import { useState } from "react";
 import ScriptingProfile from "../../../components/ProfileSetup/ScriptingProfile";
 import WebsiteProfileSetup from "../../../components/ProfileSetup/WebsiteProfileSetup";
+import { useApiClient } from "../../../lib/axios";
 
 export default function Index() {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 2;
+  const apiClient = useApiClient();
+  const handleScrapeData = async (websiteUrl: string) => {
+    setCurrentStep(2);
+    console.log(websiteUrl);
+    await apiClient.post(`/scrape`, {
+      websiteUrl,
+    });
+    // const websiteData = await extractBusinessData(websiteUrl);
+    // console.log(websiteData);
+  };
   return (
     <div className="flex min-h-screen items-center justify-center overflow-y-auto p-4 sm:p-6 lg:p-8">
       {/* Centered container */}
@@ -13,7 +24,7 @@ export default function Index() {
           <WebsiteProfileSetup
             totalSteps={totalSteps}
             currentStep={currentStep}
-            setCurrentStep={setCurrentStep}
+            handleScrapeData={handleScrapeData}
           />
         </div>
       )}

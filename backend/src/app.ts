@@ -1,17 +1,18 @@
 import { clerkPlugin } from '@clerk/fastify'
+import dotenv from 'dotenv'
+dotenv.config()
+
 import Fastify from 'fastify'
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod'
 import config from './config/index'
 import { createContext } from './context'
-import corsPlugin from './plugins/cors'
 import mongoosePlugin from './plugins/mongoose'
-import sensiblePlugin from './plugins/sensible'
 import swaggerPlugin from './plugins/swagger'
 import routes from './routes/index'
 import { AppError } from './utils/errors'
 
-export const createApp = async (opts = {}) => {
-	const app = Fastify({
+export const createApp = async () => {
+	const app = await Fastify({
 		logger: {
 			level: config.LOG_LEVEL || 'info',
 			transport:
@@ -27,22 +28,23 @@ export const createApp = async (opts = {}) => {
 					  },
 		},
 		bodyLimit: 1048576,
-		...opts,
 	})
 
 	app.setValidatorCompiler(validatorCompiler)
 	app.setSerializerCompiler(serializerCompiler)
 
-	await app.register(clerkPlugin)
-
-	await app.register(corsPlugin)
-	await app.register(sensiblePlugin)
+	await app.register(require('@fastify/cors'))
+	await app.register(require('@fastify/sensible'))
 	await app.register(mongoosePlugin)
 	await app.register(swaggerPlugin)
 
-	app.addHook('preHandler', createContext)
-
+	await app.register(clerkPlugin, {
+		publishableKey: process.env.CLERK_PUBLISHABLE_KEY!,
+		secretKey: process.env.CLERK_SECRET_KEY!,
+	})
 	await app.register(routes)
+
+	app.addHook('preHandler', createContext)
 
 	app.setErrorHandler((error, request, reply) => {
 		if (error.validation) {

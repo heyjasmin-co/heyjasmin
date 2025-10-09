@@ -1,6 +1,6 @@
 import { useUser } from "@clerk/clerk-react";
 import { createContext, useContext, useEffect, useState } from "react";
-import apiClient from "../lib/axios";
+import { useApiClient } from "../lib/axios";
 
 export interface UserData {
   id: string;
@@ -27,6 +27,7 @@ const UserDataContext = createContext<UserDataContextType | undefined>(
 
 export function UserDataProvider({ children }: { children: React.ReactNode }) {
   const { user, isSignedIn } = useUser();
+  const apiClient = useApiClient();
   const [userData, setUserData] = useState<UserData | null>({
     id: "ahsan-123",
     email: "ahsan@gmail.com",

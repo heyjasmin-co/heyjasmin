@@ -1,34 +1,36 @@
 import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 
-const apiClient = axios.create({
-  baseURL: process.env.VITE_PUBLIC_API_URL || "http://localhost:3000/api/v1",
-  timeout: 10000,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+export const useApiClient = () => {
+  const { getToken } = useAuth();
+  const apiClient = axios.create({
+    baseURL:
+      import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:3000/api/v1",
+    timeout: 10000,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
-apiClient.interceptors.request.use(
-  async (config) => {
-    const { getToken } = useAuth();
-    let token;
+  apiClient.interceptors.request.use(
+    async (config) => {
+      let token;
+      if (config.url?.includes("/me")) {
+        token = await getToken({ skipCache: true });
+      } else {
+        token = await getToken();
+      }
 
-    if (config.url?.includes("/me")) {
-      token = await getToken({ skipCache: true });
-    } else {
-      token = await getToken();
-    }
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    },
+  );
 
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
-
-export default apiClient;
+  return apiClient;
+};

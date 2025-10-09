@@ -1,16 +1,17 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { UserService } from '../services'
-import { getUserByClerkIdParamsSchema } from './types'
 
-export async function getUserByClerkIdHandler(
-	request: FastifyRequest<{
-		Params: typeof getUserByClerkIdParamsSchema._type
-	}>,
-	reply: FastifyReply
-) {
+export async function getMeHandler(request: FastifyRequest, reply: FastifyReply) {
 	try {
 		const userService = new UserService()
-		const user = await userService.getUserByClerkId(request.params)
+		const clerkId = (request as any).context?.clerkId
+		if (!clerkId) {
+			return reply.status(401).send({
+				success: false,
+				error: 'Authentication required',
+			})
+		}
+		const user = await userService.getUserByClerkId({ clerkId })
 		if (!user) {
 			return reply.status(404).send({
 				success: false,
