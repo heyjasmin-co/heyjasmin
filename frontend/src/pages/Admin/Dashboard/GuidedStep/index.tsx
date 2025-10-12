@@ -1,6 +1,7 @@
 import { useState } from "react";
 import celebIcon from "../../../../assets/image/celebIcon.png";
 import nextIcon from "../../../../assets/image/nextIcon.png";
+import websiteIcon from "../../../../assets/image/websiteIcon.png";
 import Breadcrumb from "../../../../components/dashboard/Breadcrumb";
 import BusinessInfo from "../../../../components/dashboard/BusinessInfo";
 import InfoCard from "../../../../components/dashboard/InfoCard";
@@ -28,7 +29,7 @@ export default function Dashboard() {
           <>
             {/* Info Card */}
             <InfoCard
-              icon={celebIcon}
+              icon={websiteIcon}
               title={`Welcome to ${appName}!`}
               subtitle={
                 "Use this quick setup guide to get your agent ready to handle calls in just a few minutes. 🎉"

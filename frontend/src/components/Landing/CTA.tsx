@@ -5,15 +5,15 @@ function CTA() {
     <section
       className="px-4 py-16 text-center sm:px-6 lg:px-8"
       style={{
-        backgroundColor: colorTheme.primary(1),
+        backgroundColor: colorTheme.primary(0.3),
       }}
     >
       <div className="mx-auto max-w-3xl">
-        <h2 className="mb-4 text-3xl font-bold text-white sm:text-4xl">
+        <h2 className="mb-4 text-3xl font-bold text-black sm:text-4xl">
           Jasmin always answers.
         </h2>
-        <p className="mb-8 text-lg text-purple-100">
-          First 5 days free trial. No credit card required.
+        <p className="mb-8 text-lg text-black">
+          Start risk-free: 7-day trial with all features
         </p>
         <a
           href="/admin"

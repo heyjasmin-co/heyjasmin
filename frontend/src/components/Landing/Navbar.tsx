@@ -1,4 +1,5 @@
 import { useState } from "react";
+import websiteIcon from "../../assets/image/websiteIcon.png";
 import { colorTheme } from "../../theme/colorTheme";
 
 function Navbar() {
@@ -9,12 +10,17 @@ function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <div
-          className="cursor-pointer text-2xl font-bold"
+          className="flex cursor-pointer items-center justify-center text-xl font-bold transition-all duration-200 hover:opacity-90 sm:text-2xl md:text-3xl"
           style={{
             color: colorTheme.secondaryColor(1),
           }}
         >
-          Jasmin
+          <img
+            src={websiteIcon}
+            alt="Website Icon"
+            className="h-10 w-10 object-contain sm:h-14 sm:w-14 md:h-16 md:w-16"
+          />
+          <span className="truncate">heyjasmin</span>
         </div>
 
         {/* Desktop Menu */}
@@ -43,7 +49,7 @@ function Navbar() {
 
           <a
             href="/admin"
-            className="rounded-full px-5 py-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl active:scale-95"
+            className="rounded-full px-5 py-2 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95"
             style={{
               backgroundColor: colorTheme.primary(1),
               color: "white",
@@ -53,7 +59,7 @@ function Navbar() {
           </a>
           <a
             href="/admin"
-            className="rounded-full px-5 py-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl active:scale-95"
+            className="rounded-full px-5 py-2 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95"
             style={{
               backgroundColor: colorTheme.secondaryColor(0.9),
               color: "white",

@@ -1,5 +1,5 @@
+import { motion } from "framer-motion";
 import { useState } from "react";
-import { colorTheme } from "../../theme/colorTheme";
 
 type Subscription = {
   id: number;
@@ -60,30 +60,46 @@ function Pricing() {
     },
   ]);
 
+  const cardVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
-    <section id="pricing" className="px-6 py-20">
+    <section id="pricing" className="bg-gray-50 px-6 py-20">
       <div className="mx-auto max-w-7xl text-center">
-        <h2 className="mb-16 text-4xl font-extrabold text-gray-900">
+        <h2 className="mb-16 text-4xl font-extrabold text-gray-900 sm:text-5xl">
           Choose Your Plan
         </h2>
+
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {subscriptions.map((plan) => {
-            const isPopular = plan.id === 2; // Smart Plan
+            const isPopular = plan.id === 2;
 
             return (
-              <div
+              <motion.div
                 key={plan.id}
-                className={`relative flex h-full min-h-[460px] flex-col rounded-3xl border p-10 shadow-lg transition hover:shadow-2xl ${
+                className={`relative flex h-full min-h-[460px] flex-col rounded-3xl border p-8 shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-xl sm:p-10 ${
                   isPopular
-                    ? "scale-105 border-purple-600 bg-gradient-to-b from-purple-50 to-white shadow-2xl"
-                    : "border-gray-300 bg-white"
+                    ? "border-purple-400 bg-gradient-to-b from-purple-50 to-white shadow-2xl"
+                    : "border-gray-200 bg-white"
                 }`}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.6, delay: plan.id * 0.2 }}
+                animate={isPopular ? { scale: [1, 1.05, 1] } : {}}
               >
                 {/* Popular Badge */}
                 {isPopular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-purple-600 px-4 py-1 text-sm font-semibold text-white shadow-md">
+                  <motion.div
+                    className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-purple-600 px-4 py-1 text-sm font-semibold text-white shadow-md"
+                    animate={{ scale: [1, 1.1, 1], rotate: [0, 3, -3, 0] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                  >
                     Most Popular
-                  </div>
+                  </motion.div>
                 )}
 
                 <h3
@@ -100,11 +116,12 @@ function Pricing() {
                 >
                   {plan.price}
                 </p>
-                <ul className="mb-8 space-y-4 text-left text-gray-700">
+
+                <ul className="mb-8 space-y-4 text-left">
                   {plan.features.map((f, i) => (
                     <li key={i} className="flex items-center gap-3">
                       <svg
-                        className="h-5 w-5 text-cyan-600"
+                        className="h-5 w-5 flex-shrink-0 text-purple-500"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -114,7 +131,9 @@ function Pricing() {
                           clipRule="evenodd"
                         />
                       </svg>
-                      <span className="text-sm md:text-base">{f}</span>
+                      <span className="text-sm text-gray-700 md:text-base">
+                        {f}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -122,21 +141,18 @@ function Pricing() {
                 {/* Redirect Button */}
                 <a
                   href="/admin"
-                  className={`mt-auto block rounded-full px-6 py-3 text-center font-semibold shadow-md transition hover:scale-105 hover:shadow-xl ${
-                    isPopular ? "bg-purple-600 text-white" : "text-white"
+                  style={{
+                    color: "white",
+                  }}
+                  className={`mt-auto block rounded-full px-6 py-3 text-center font-semibold shadow-md transition hover:scale-105 hover:shadow-lg ${
+                    isPopular
+                      ? "bg-purple-600 text-white"
+                      : "bg-purple-500 text-white"
                   }`}
-                  style={
-                    !isPopular
-                      ? {
-                          backgroundColor: colorTheme.secondaryColor(0.9),
-                          color: "white",
-                        }
-                      : { color: "white" }
-                  }
                 >
                   {plan.id === 0 ? "Start Free Trial" : "Choose Plan"}
                 </a>
-              </div>
+              </motion.div>
             );
           })}
         </div>
