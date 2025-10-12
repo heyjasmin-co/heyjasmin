@@ -115,10 +115,6 @@ export default function HeroSection() {
               {/* Inner Glass Reflection */}
               <div className="pointer-events-none absolute inset-0 rounded-[1.8rem] bg-gradient-to-tr from-white/10 via-transparent to-transparent" />
 
-              {/* Speaker Notch */}
-              <div className="absolute top-3 left-1/2 h-[6px] w-[60px] -translate-x-1/2 rounded-full bg-gray-700/60" />
-              <div className="absolute top-5 left-1/2 h-[3px] w-[35px] -translate-x-1/2 rounded-full bg-gray-500/40" />
-
               {/* Screen Glow */}
               <motion.div
                 className="relative flex h-32 w-32 items-center justify-center rounded-full sm:h-40 sm:w-40"
@@ -152,10 +148,32 @@ export default function HeroSection() {
               {/* Screen Overlay Glow */}
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
 
-              {/* Bottom Text */}
-              <div className="absolute bottom-6 w-full text-center text-xs font-semibold tracking-wide text-gray-200 sm:text-sm">
-                Appointment booked
-              </div>
+              {/* Notification Bubble */}
+              <motion.div
+                animate={{
+                  y: [-40, 0, 0, -20, -40], // slide in, pause, bounce, then go back
+                  scale: [0.9, 1, 1, 1.05, 0.9], // subtle bounce
+                  opacity: [0, 1, 1, 1, 0],
+                }}
+                transition={{
+                  duration: 2, // total duration for one loop
+                  times: [0, 0.2, 0.7, 0.85, 1], // control when keyframes happen
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute top-6 left-1/2 flex -translate-x-1/2 items-center justify-start gap-3 rounded-2xl px-4 py-2 shadow-xl backdrop-blur-md sm:h-10 sm:w-[220px]"
+                style={{ backgroundColor: "white" }}
+              >
+                {/* Bell icon */}
+                <div className="flex h-6 w-6 animate-pulse items-center justify-center rounded-full bg-black">
+                  <i className="fa-solid fa-bell text-sm text-white"></i>
+                </div>
+
+                {/* Notification Text */}
+                <span className="text-xs font-semibold text-black sm:text-sm">
+                  Appointment booked
+                </span>
+              </motion.div>
             </div>
           </div>
         </div>
