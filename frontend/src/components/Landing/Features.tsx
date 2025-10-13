@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { colorTheme } from "../../theme/colorTheme";
-
 function Features() {
   const mainFeatures = [
     {

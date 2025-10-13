@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
+import waveImage from "../../assets/image/waveImage.png";
 import websiteIcon from "../../assets/image/websiteIcon.png";
 import { colorTheme } from "../../theme/colorTheme";
 
@@ -11,7 +12,7 @@ export default function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-purple-50 via-white to-pink-50 px-4 pt-20 pb-12 sm:px-6 md:pt-28 md:pb-20 lg:px-8 lg:pt-32 lg:pb-24">
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 text-center md:grid-cols-2 md:text-left">
-        {/* Left Side — Text */}
+        {/* Left Side */}
         <div>
           <h1 className="mb-5 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-5xl lg:text-6xl">
             Every call answered. <br className="hidden sm:block" />
@@ -66,10 +67,20 @@ export default function HeroSection() {
 
         {/* Right Side — Animated Phone */}
         <div className="flex justify-center md:justify-end">
-          <div className="relative">
-            {/* Signal Wave Behind Phone */}
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              {/* Layered glowing pulse waves */}
+          <div className="relative flex min-h-[500px] items-center justify-center">
+            {/* Wave Image Behind Everything */}
+            <img
+              src={waveImage}
+              alt="Wavelength Background"
+              className=""
+              style={{
+                width: "500px",
+                height: "500px",
+              }}
+            />
+
+            {/* Glowing Pulses */}
+            <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center">
               {[0, 1, 2].map((i) => (
                 <motion.div
                   key={i}
@@ -97,7 +108,6 @@ export default function HeroSection() {
                 />
               ))}
 
-              {/* Soft ambient center glow */}
               <div
                 className="absolute rounded-full opacity-40 blur-3xl"
                 style={{
@@ -110,9 +120,8 @@ export default function HeroSection() {
               />
             </div>
 
-            {/* Phone Container */}
-            <div className="relative flex h-[350px] w-[180px] items-center justify-center overflow-hidden rounded-[2rem] border-[3px] border-gray-800 bg-gradient-to-b from-[#222] to-[#111] shadow-[0_10px_40px_rgba(0,0,0,0.4)] sm:h-[400px] sm:w-[200px] md:h-[440px] md:w-[230px] lg:h-[480px] lg:w-[250px]">
-              {/* Inner Glass Reflection */}
+            {/* Phone */}
+            <div className="absolute z-20 flex h-[350px] w-[180px] items-center justify-center overflow-hidden rounded-[2rem] border-[3px] border-gray-800 bg-gradient-to-b from-[#222] to-[#111] shadow-[0_10px_40px_rgba(0,0,0,0.4)] sm:h-[400px] sm:w-[200px] md:h-[440px] md:w-[230px] lg:h-[480px] lg:w-[250px]">
               <div className="pointer-events-none absolute inset-0 rounded-[1.8rem] bg-gradient-to-tr from-white/10 via-transparent to-transparent" />
 
               {/* Screen Glow */}
@@ -145,31 +154,27 @@ export default function HeroSection() {
                 />
               </motion.div>
 
-              {/* Screen Overlay Glow */}
+              {/* Overlay & Notification */}
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
 
-              {/* Notification Bubble */}
               <motion.div
                 animate={{
-                  y: [-40, 0, 0, -20, -40], // slide in, pause, bounce, then go back
-                  scale: [0.9, 1, 1, 1.05, 0.9], // subtle bounce
+                  y: [-40, 0, 0, -20, -40],
+                  scale: [0.9, 1, 1, 1.05, 0.9],
                   opacity: [0, 1, 1, 1, 0],
                 }}
                 transition={{
-                  duration: 2, // total duration for one loop
-                  times: [0, 0.2, 0.7, 0.85, 1], // control when keyframes happen
+                  duration: 2,
+                  times: [0, 0.2, 0.7, 0.85, 1],
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
                 className="absolute top-6 left-1/2 flex -translate-x-1/2 items-center justify-start gap-3 rounded-2xl px-4 py-2 shadow-xl backdrop-blur-md sm:h-10 sm:w-[220px]"
                 style={{ backgroundColor: "white" }}
               >
-                {/* Bell icon */}
                 <div className="flex h-6 w-6 animate-pulse items-center justify-center rounded-full bg-black">
                   <i className="fa-solid fa-bell text-sm text-white"></i>
                 </div>
-
-                {/* Notification Text */}
                 <span className="text-xs font-semibold text-black sm:text-sm">
                   Appointment booked
                 </span>

@@ -1,46 +1,53 @@
 import websiteIcon from "../../assets/image/websiteIcon.png";
 import { colorTheme } from "../../theme/colorTheme";
 
+import clinicImage from "../../assets/image/industries/clinicImage.jpeg";
+import constructionImage from "../../assets/image/industries/constructionImage.jpeg";
+import legalPracticesImage from "../../assets/image/industries/legalPracticesImage.jpeg";
+import realestateImage from "../../assets/image/industries/realestateImage.jpeg";
+import repairImage from "../../assets/image/industries/repairImage.jpeg";
+import spaImage from "../../assets/image/industries/spaImage.jpeg";
+
+import waveImage from "../../assets/image/waveImage.png";
 function Industries() {
   const industries = [
     {
       name: "Healthcare Clinics",
-      image:
-        "https://images.unsplash.com/photo-1588072432836-e10032774350?w=300",
+      image: clinicImage,
       icon: "fa-solid fa-stethoscope",
     },
     {
       name: "Legal Practices",
-      image:
-        "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=300",
+      image: legalPracticesImage,
       icon: "fa-solid fa-scale-balanced",
     },
     {
       name: "Constructions",
-      image:
-        "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=300",
+      image: constructionImage,
       icon: "fa-solid fa-hard-hat",
     },
     {
       name: "Salons & Spas",
-      image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=300",
+      image: spaImage,
       icon: "fa-solid fa-scissors",
     },
     {
       name: "Automotive Repair",
-      image:
-        "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=300",
+      image: repairImage,
       icon: "fa-solid fa-wrench",
     },
     {
       name: "Real Estate",
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=300",
+      image: realestateImage,
       icon: "fa-solid fa-building",
     },
   ];
 
   return (
-    <section className="relative flex flex-col items-center justify-center gap-10 px-6 py-12 sm:px-8 lg:py-20 xl:flex-row">
+    <section
+      id="industries"
+      className="relative flex flex-col items-center justify-center gap-10 px-6 py-12 sm:px-8 lg:py-20 xl:flex-row"
+    >
       {/* LEFT TEXT */}
       <div className="flex flex-col items-center text-center lg:items-start lg:text-left xl:w-[45%]">
         <h2 className="mb-6 text-5xl font-extrabold text-gray-900 sm:text-4xl md:text-5xl">
@@ -63,6 +70,17 @@ function Industries() {
       {/* RIGHT SECTION */}
       <div className="relative hidden h-[300px] w-[300px] flex-col items-center justify-center sm:flex sm:h-[400px] sm:w-[400px] md:h-[500px] md:w-[500px] lg:h-[600px] lg:w-[600px] xl:h-[680px] xl:w-[680px]">
         {/* Center Circle */}
+        <img
+          src={waveImage}
+          alt="Wavelength Background"
+          className="object-contain"
+          style={{
+            width: "clamp(250px, 70%, 650px)",
+            height: "clamp(250px, 70%, 650px)",
+            maxWidth: "100%",
+            maxHeight: "100%",
+          }}
+        />
         <div
           className="absolute top-1/2 left-1/2 z-10 flex items-center justify-center rounded-full shadow-2xl ring-2 ring-purple-100"
           style={{
