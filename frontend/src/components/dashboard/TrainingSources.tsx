@@ -21,7 +21,7 @@ function TrainingSources({ businessWebsite }: TrainingSourcesProps) {
       style={{ fontFamily: "'Outfit', sans-serif" }}
     >
       <div className="h-full w-full divide-y divide-gray-200">
-        {/* Header */}
+        {/* Header Section*/}
         <div className="flex items-center space-x-3 px-4 py-3">
           <div
             className="flex h-8 w-8 items-center justify-center rounded-full"
