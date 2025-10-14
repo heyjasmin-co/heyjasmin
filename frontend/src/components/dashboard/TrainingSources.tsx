@@ -12,7 +12,7 @@ type TrainingSourcesProps = {
 };
 
 function TrainingSources({ businessWebsite }: TrainingSourcesProps) {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing] = useState(false);
   const [websiteValue, setWebsiteValue] = useState(businessWebsite);
 
   return (
