@@ -1,3 +1,4 @@
+import { FastifyRequest } from 'fastify'
 import { IUser } from '../../../models'
 import { getUserByClerkIdParamsSchema } from '../handlers/types'
 
@@ -14,3 +15,13 @@ export type CreateUserInput = {
 	profileImage: string
 }
 export type CreateUserOutput = IUser
+
+//
+export type MeUserInput = FastifyRequest
+export type MeUserOutput = {
+	dbUserId?: string | null
+	clerkId?: string | null
+	businessId?: string | null
+	isSetupComplete?: boolean | null
+	hasSubscription?: boolean | null
+}

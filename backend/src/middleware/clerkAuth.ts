@@ -2,7 +2,6 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 import { ForbiddenError, UnauthorizedError } from '../utils/errors'
 
 export async function authenticate(request: FastifyRequest, reply: FastifyReply) {
-	console.log(request.context, 'request.context')
 	if (!request.context?.clerkId) {
 		throw new UnauthorizedError('Clerk Authentication required')
 	}

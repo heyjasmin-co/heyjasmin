@@ -16,7 +16,7 @@ export default function ProtectedRoute({
   const { userData, loading } = useUserData();
   const location = useLocation();
 
-  if (!isLoaded || loading) {
+  if (!isLoaded || loading || !userData) {
     return (
       <div className="flex h-screen items-center justify-center text-gray-600">
         Loading...
@@ -28,12 +28,15 @@ export default function ProtectedRoute({
     return <Navigate to="/admin/sign-in" state={{ from: location }} replace />;
   }
 
-  if (requireSetup && userData && !userData.hasCompletedSetup) {
+  if (requireSetup && userData && !userData.isSetupComplete) {
     return <Navigate to="/admin/setup" replace />;
   }
 
   if (requireSubscription && userData && !userData.hasSubscription) {
     return <Navigate to="/admin/subscription" replace />;
+  }
+  if (requireSubscription && userData && userData.isSetupComplete) {
+    return <Navigate to="/admin/dashboard" replace />;
   }
 
   return <>{children}</>;

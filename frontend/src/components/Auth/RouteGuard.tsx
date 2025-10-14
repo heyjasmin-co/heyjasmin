@@ -5,8 +5,8 @@ import { useUserData } from "../../context/UserDataContext";
 export function RouteGuard({ children }: { children: React.ReactNode }) {
   const { isSignedIn, isLoaded } = useUser();
   const { userData, loading } = useUserData();
-
-  if (!isLoaded || loading) {
+  
+  if (!isLoaded || loading || !userData) {
     return (
       <div className="flex h-screen items-center justify-center text-gray-600">
         Loading...
@@ -18,12 +18,11 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
     return <Navigate to="/admin/sign-in" replace />;
   }
 
+  if (!userData?.isSetupComplete) {
+    return <Navigate to="/admin/setup" replace />;
+  }
   if (!userData?.hasSubscription) {
     return <Navigate to="/admin/subscription" replace />;
-  }
-
-  if (!userData?.hasCompletedSetup) {
-    return <Navigate to="/admin/setup" replace />;
   }
 
   return <>{children}</>;
