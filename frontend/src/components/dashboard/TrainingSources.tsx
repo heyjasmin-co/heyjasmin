@@ -2,32 +2,18 @@ import { FloatingLabel } from "flowbite-react";
 import { useState } from "react";
 import cancelIcon from "../../assets/image/cancelIcon.png";
 import completeIcon from "../../assets/image/completeIcon.png";
-import editIcon from "../../assets/image/editIcon.png";
 import infoIcon from "../../assets/image/infoIcon.png";
-import saveIcon from "../../assets/image/saveIcon.png";
 import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
 type TrainingSourcesProps = {
   businessProfile: string;
   businessWebsite: string;
-  onSave?: (profile: string, website: string) => void;
+  onSave?: (website: string) => void;
 };
 
-function TrainingSources({
-  businessProfile,
-  businessWebsite,
-  onSave,
-}: TrainingSourcesProps) {
+function TrainingSources({ businessWebsite }: TrainingSourcesProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [profileValue, setProfileValue] = useState(businessProfile);
   const [websiteValue, setWebsiteValue] = useState(businessWebsite);
-
-  const handleSave = () => {
-    setIsEditing(false);
-    if (onSave) {
-      onSave(profileValue, websiteValue);
-    }
-  };
 
   return (
     <div
@@ -62,7 +48,7 @@ function TrainingSources({
         <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
           {/* Sources */}
           <div className="flex w-full flex-col gap-4">
-            {/* Google Profile */}
+            {/* Google Profile
             <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-start">
               <span className="sm:text-md text-md shrink-0 font-bold text-gray-800 sm:w-40">
                 Google Profile:
@@ -104,7 +90,7 @@ function TrainingSources({
                   </div>
                 )}
               </div>
-            </div>
+            </div> */}
 
             {/* Business Website */}
             <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-start">
@@ -153,7 +139,7 @@ function TrainingSources({
             </div>
           </div>
 
-          {/* Edit / Save Button */}
+          {/* Edit / Save Button
           {isEditing ? (
             <div
               onClick={handleSave}
@@ -174,7 +160,7 @@ function TrainingSources({
               <img src={editIcon} alt="Edit Icon" className="h-5 w-5" />
               <span>Edit</span>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>

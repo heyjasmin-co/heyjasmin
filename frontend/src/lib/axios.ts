@@ -1,12 +1,13 @@
 import { useAuth } from "@clerk/clerk-react";
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 
-export const useApiClient = () => {
+export const useApiClient = (timeout: number = 10000): AxiosInstance => {
   const { getToken } = useAuth();
+
   const apiClient = axios.create({
     baseURL:
       import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:3000/api/v1",
-    timeout: 10000,
+    timeout,
     headers: {
       "Content-Type": "application/json",
     },
@@ -14,12 +15,9 @@ export const useApiClient = () => {
 
   apiClient.interceptors.request.use(
     async (config) => {
-      let token;
-      if (config.url?.includes("/me")) {
-        token = await getToken({ skipCache: true });
-      } else {
-        token = await getToken();
-      }
+      const token = await getToken({
+        skipCache: config.url?.includes("/me"),
+      });
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -27,10 +25,10 @@ export const useApiClient = () => {
 
       return config;
     },
-    (error) => {
-      return Promise.reject(error);
-    },
+    (error) => Promise.reject(error),
   );
 
   return apiClient;
 };
+
+export const useScrapeApiClient = () => useApiClient(90000);
