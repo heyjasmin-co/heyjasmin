@@ -1,58 +1,85 @@
+import { motion } from "framer-motion";
 import { colorTheme } from "../../theme/colorTheme";
 
 function HowWorks() {
+  const steps = [
+    {
+      id: 1,
+      title: "Train Jasmin on your business",
+      desc: "Give Jasmin a quick intro — just your Google Business Profile, website or business details. She learns who you are and how to represent your brand instantly.",
+      step: 1,
+    },
+    {
+      id: 2,
+      title: "Customize and confirm",
+      desc: "Fine-tune Jasmin's responses, FAQs, and tone. In just a few clicks, she's aligned with your brand voice.",
+      step: 2,
+    },
+    {
+      id: 3,
+      title: "Start capturing calls and leads",
+      desc: "Once you're ready, forward your calls to Jasmin — she'll start instantly.",
+      step: 3,
+    },
+  ];
+
   return (
     <section
       id="how-it-works"
-      className="px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
-      style={{
-        backgroundColor: colorTheme.primary(1),
-        color: "white",
-      }}
+      className="px-6 py-24"
+      style={{ backgroundColor: colorTheme.primary(0.3), color: "white" }}
     >
-      <div className="mx-auto max-w-5xl text-center">
-        <h2 className="mb-12 text-3xl font-bold text-white sm:text-4xl">
-          How It Works
-        </h2>
-        <div className="space-y-8">
-          {[
-            {
-              step: "1",
-              title: "Train Jasmin on your business",
-              desc: "Use your Google Business profile, website address, or simple business information to get started.",
-            },
-            {
-              step: "2",
-              title: "Confirm Jasmin has things right",
-              desc: "Jasmin will be trained on your specific business information. Make adjustments and add custom questions.",
-            },
-            {
-              step: "3",
-              title: "Forward your calls to Jasmin",
-              desc: "No need to change your existing business number. Just forward calls to Jasmin when you want her to answer.",
-            },
-            {
-              step: "4",
-              title: "Jasmin answers and takes messages",
-              desc: "When a call comes in, Jasmin will answer, answer questions, and take messages. You'll be notified by email and/or text.",
-            },
-          ].map((item) => (
-            <div key={item.step} className="flex items-start gap-6">
+      <div className="mx-auto max-w-7xl text-center">
+        {/* Header */}
+        <div className="mb-16">
+          <h2 className="mb-6 text-4xl font-extrabold text-black sm:text-5xl">
+            Effortless setup.{" "}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{
+                backgroundImage: `linear-gradient(to right, ${colorTheme.secondaryColor(
+                  1,
+                )}, #9b6bff)`,
+              }}
+            >
+              Intelligent results
+            </span>
+          </h2>
+          <p className="mx-auto max-w-2xl text-lg text-black md:text-xl">
+            Your AI receptionist, ready to answer every call — 24/7. Here's how
+            easy it is to get started with Jasmin.
+          </p>
+        </div>
+
+        {/* Steps Cards */}
+        <div className="grid gap-12 lg:grid-cols-3">
+          {steps.map((step, idx) => (
+            <motion.div
+              key={step.id}
+              className="relative flex flex-col items-center rounded-3xl bg-white p-8 text-center shadow-2xl transition-transform hover:scale-105"
+              whileHover={{ y: -5 }}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: idx * 0.2 }}
+            >
+              {/* Icon / Step Number */}
               <div
-                className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full text-xl font-bold text-white"
+                className="absolute -top-10 flex h-20 w-20 items-center justify-center rounded-full text-3xl font-bold text-white shadow-lg"
                 style={{
-                  backgroundColor: colorTheme.secondaryColor(1),
+                  background: colorTheme.secondaryColor(1),
                 }}
               >
-                {item.step}
+                {step.step}
               </div>
-              <div className="flex-1 text-left">
-                <h3 className="mb-2 text-xl font-bold text-white">
-                  {item.title}
+
+              <div className="mt-12">
+                <h3 className="mb-4 text-xl font-bold text-gray-900">
+                  {step.title}
                 </h3>
-                <p className="text-white/80">{item.desc}</p>
+                <p className="text-gray-600">{step.desc}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

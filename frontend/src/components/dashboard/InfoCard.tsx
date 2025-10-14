@@ -18,8 +18,8 @@ function InfoCard({ icon, title, subtitle }: InfoCardProps) {
       <div className="flex flex-col items-center space-y-3 text-center">
         {/* Icon */}
         {icon && (
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-purple-100">
-            <img src={icon} alt={`Robot Icon`} className="h-15 w-15" />
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-purple-100">
+            <img src={icon} alt={`Robot Icon`} className="object-contain" />
           </div>
         )}
 

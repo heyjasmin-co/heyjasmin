@@ -3,6 +3,7 @@ import BusinessDetails from "../../../../components/settings/BusinessDetails";
 import BusinessHours from "../../../../components/settings/BusinessHours";
 import CoreService from "../../../../components/settings/CoreService";
 import TitleCard from "../../../../components/TitleCard";
+import { appName } from "../../../../theme/appName";
 
 export default function BusinessDetailsPage() {
   return (
@@ -10,7 +11,7 @@ export default function BusinessDetailsPage() {
       <div className="flex flex-col gap-5">
         <TitleCard
           title="Business Information"
-          subtitle="This business information gives Rosie the context to handle your calls."
+          subtitle={`This business information gives ${appName} the context to handle your calls.`}
         />
 
         <TrainingSources businessProfile={""} businessWebsite={""} />

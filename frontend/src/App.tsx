@@ -33,21 +33,21 @@ export default function App() {
           <Route path="/admin/sign-in" element={<Login />} />
           <Route path="/admin/sign-up" element={<Register />} />
 
-          {/* Subscription page - requires auth only */}
+          {/* Subscription page - requires auth + subscription */}
           <Route
             path="/admin/subscription"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requireSetup>
                 <SubscriptionPage />
               </ProtectedRoute>
             }
           />
 
-          {/* Setup page - requires auth + subscription */}
+          {/* Setup page - requires auth only */}
           <Route
             path="/admin/setup"
             element={
-              <ProtectedRoute requireSubscription>
+              <ProtectedRoute>
                 <BusinessProfileSetup />
               </ProtectedRoute>
             }
