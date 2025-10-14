@@ -11,7 +11,6 @@ interface IBusiness extends Document {
 	name: string
 	overview?: string
 	address?: string
-	profile: string
 	website: string
 	services: string[]
 	businessHours: IBusinessHour[]
@@ -47,10 +46,6 @@ const businessSchema = new Schema<IBusiness>(
 		address: {
 			type: String,
 			default: '',
-		},
-		profile: {
-			type: String,
-			required: true,
 		},
 		website: {
 			type: String,

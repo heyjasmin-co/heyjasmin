@@ -3,14 +3,12 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useApiClient } from "../lib/axios";
 
 export interface UserData {
-  id: string;
-  email: string;
+  dbUserId: string | null;
+  clerkId: string | null;
+  businessId: string | null;
+  isSetupComplete: boolean;
   hasSubscription: boolean;
-  hasCompletedSetup: boolean;
   subscriptionStatus: "trial" | "active" | "expired" | "none";
-  businessName?: string;
-  websiteUrl?: string;
-  trialEndsAt?: Date;
 }
 
 interface UserDataContextType {
@@ -28,12 +26,14 @@ const UserDataContext = createContext<UserDataContextType | undefined>(
 export function UserDataProvider({ children }: { children: React.ReactNode }) {
   const { user, isSignedIn } = useUser();
   const apiClient = useApiClient();
+
   const [userData, setUserData] = useState<UserData | null>({
-    id: "ahsan-123",
-    email: "ahsan@gmail.com",
-    hasSubscription: true,
-    hasCompletedSetup: false,
-    subscriptionStatus: "none",
+    dbUserId: null,
+    clerkId: null,
+    businessId: null,
+    isSetupComplete: false,
+    hasSubscription: false,
+    subscriptionStatus: "trial",
   });
   const [loading, setLoading] = useState(true);
 
@@ -47,21 +47,19 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
 
-      // Replace with your actual API endpoint
-      const response = await apiClient(`/api/users/me`);
-      console.log(response.data);
-
-      // setUserData(data);
+      const response = await apiClient(`/users/me`);
+      setUserData(response.data.data);
     } catch (error) {
       console.error("Failed to fetch user data:", error);
 
       // Fallback data for development
       setUserData({
-        id: user.id,
-        email: user.emailAddresses[0]?.emailAddress || "",
+        dbUserId: null,
+        clerkId: null,
+        businessId: null,
+        isSetupComplete: false,
         hasSubscription: false,
-        hasCompletedSetup: false,
-        subscriptionStatus: "none",
+        subscriptionStatus: "trial",
       });
     } finally {
       setLoading(false);

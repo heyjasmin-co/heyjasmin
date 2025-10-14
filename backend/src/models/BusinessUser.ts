@@ -1,11 +1,9 @@
-import mongoose, { Document, Schema, Model } from 'mongoose'
+import mongoose, { Document, Model, Schema } from 'mongoose'
 
 interface IBusinessUser extends Document {
 	businessId: mongoose.Types.ObjectId
 	userId: mongoose.Types.ObjectId
 	role: 'editor' | 'admin' | 'viewer'
-	invitedBy?: mongoose.Types.ObjectId
-	invitedAt?: Date
 	status: 'active' | 'pending' | 'removed'
 	createdAt: Date
 	updatedAt: Date
@@ -29,14 +27,7 @@ const businessUserSchema = new Schema<IBusinessUser>(
 			default: 'viewer',
 			required: true,
 		},
-		invitedBy: {
-			type: Schema.Types.ObjectId,
-			ref: 'User',
-		},
-		invitedAt: {
-			type: Date,
-			default: Date.now,
-		},
+
 		status: {
 			type: String,
 			enum: ['active', 'pending', 'removed'],

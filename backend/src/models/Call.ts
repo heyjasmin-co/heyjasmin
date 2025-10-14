@@ -1,6 +1,6 @@
 import mongoose, { Document, Model, Schema } from 'mongoose'
 
- interface ICall extends Document {
+interface ICall extends Document {
 	businessId: mongoose.Schema.Types.ObjectId
 	callId: string
 	callerPhone: string

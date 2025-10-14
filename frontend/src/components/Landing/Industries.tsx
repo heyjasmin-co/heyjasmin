@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import websiteIcon from "../../assets/image/websiteIcon.png";
 import { colorTheme } from "../../theme/colorTheme";
 
@@ -12,9 +13,9 @@ import waveImage from "../../assets/image/waveImage.png";
 function Industries() {
   const industries = [
     {
-      name: "Healthcare Clinics",
+      name: "Real Estate",
       image: clinicImage,
-      icon: "fa-solid fa-stethoscope",
+      icon: "fa-solid fa-building",
     },
     {
       name: "Legal Practices",
@@ -22,7 +23,7 @@ function Industries() {
       icon: "fa-solid fa-scale-balanced",
     },
     {
-      name: "Constructions",
+      name: "Home Service",
       image: constructionImage,
       icon: "fa-solid fa-hard-hat",
     },
@@ -37,7 +38,7 @@ function Industries() {
       icon: "fa-solid fa-wrench",
     },
     {
-      name: "Real Estate",
+      name: "Property Management",
       image: realestateImage,
       icon: "fa-solid fa-building",
     },
@@ -81,22 +82,34 @@ function Industries() {
             maxHeight: "100%",
           }}
         />
-        <div
-          className="absolute top-1/2 left-1/2 z-10 flex items-center justify-center rounded-full shadow-2xl ring-2 ring-purple-100"
+        <motion.div
+          className="absolute flex h-20 w-20 items-center justify-center rounded-full sm:h-30 sm:w-30 md:h-40 md:w-40"
           style={{
-            transform: "translate(-50%, -50%)",
-            width: "clamp(80px, 20%, 160px)",
-            height: "clamp(80px, 20%, 160px)",
-            backgroundColor: "#403BC1",
-            boxShadow: "0 0 50px 15px rgba(139,92,246,0.3)",
+            background: `radial-gradient(circle, ${colorTheme.secondaryColor(
+              1,
+            )} 0%, ${colorTheme.secondaryColor(0.9)} 60%)`,
+            boxShadow: `0 0 40px 10px ${colorTheme.secondaryColor(0.4)}`,
+          }}
+          animate={{
+            scale: [1, 1.1, 1],
+            boxShadow: [
+              `0 0 20px 5px ${colorTheme.secondaryColor(0.4)}`,
+              `0 0 50px 20px ${colorTheme.secondaryColor(0.6)}`,
+              `0 0 20px 5px ${colorTheme.secondaryColor(0.4)}`,
+            ],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut",
           }}
         >
           <img
             src={websiteIcon}
-            alt="Website Logo"
-            className="h-[80%] w-[80%] object-cover"
+            alt="Website Icon"
+            className="object-contain sm:h-64 sm:w-64"
           />
-        </div>
+        </motion.div>
 
         {/* Cards */}
         {industries.map((industry, idx) => {
