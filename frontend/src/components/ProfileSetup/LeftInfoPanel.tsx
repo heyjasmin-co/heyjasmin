@@ -24,7 +24,6 @@ export default function LeftInfoPanel({
   heading,
   listItems,
   trialText,
-  setCurrentStep,
   progressBar = true,
 }: LeftInfoPanelProps) {
   return (
@@ -37,14 +36,14 @@ export default function LeftInfoPanel({
       {/* Top: Stepper */}
       {progressBar && (
         <div className="mb-6 flex items-center gap-3 lg:mb-8">
-          {currentStep === totalSteps && setCurrentStep && (
+          {/* {currentStep === totalSteps && setCurrentStep && !loading && (
             <button
               onClick={() => setCurrentStep(1)}
               className="flex items-center justify-center rounded-full bg-white/20 p-2 text-white transition hover:bg-white/30"
             >
               <i className="fa-solid fa-arrow-left text-sm"></i>
             </button>
-          )}
+          )} */}
 
           <span className="min-w-[36px] text-right text-sm font-medium">
             {currentStep}/{totalSteps}

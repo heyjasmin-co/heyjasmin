@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import completeIcon from "../../../assets/image/completeIcon.png";
 import LeftInfoPanel from "../../../components/ProfileSetup/LeftInfoPanel";
 import { useApiClient } from "../../../lib/axios";
+import { errorToast, successToast } from "../../../utils/react-toast";
 
 type UserBusiness = {
   _id: string;
@@ -19,13 +20,12 @@ type FormValues = {
 export default function SelectBusinessPage() {
   const { register, handleSubmit, watch, setValue } = useForm<FormValues>();
   const apiClient = useApiClient();
-  const navigate = useNavigate();
   const [userBusinesses, setUserBusinesses] = useState<UserBusiness[]>([]);
   const [loading, setLoading] = useState({
     apiLoading: false,
     selectBusinessLoading: false,
   });
-
+  const navigate = useNavigate();
   const selectedBusiness = watch("businessId");
 
   useEffect(() => {
@@ -39,6 +39,9 @@ export default function SelectBusinessPage() {
         if (businesses.length === 1) {
           const onlyBusinessId = businesses[0].businessId;
           setValue("businessId", onlyBusinessId);
+        }
+        if (businesses.length === 0) {
+          navigate("/admin/setup");
         }
       } catch (error) {
         console.error(error);
@@ -55,10 +58,14 @@ export default function SelectBusinessPage() {
     setLoading((pv) => ({ ...pv, selectBusinessLoading: true }));
     try {
       await apiClient.post(`/users/select-business`, { businessId });
-      // TODO: Add redirect or success toast
+
+      successToast("Business selected successfully.");
+
+      await new Promise((res) => setTimeout(res, 2000));
       window.location.href = "/admin/dashboard";
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      errorToast(error.response.data.error);
     } finally {
       setLoading((pv) => ({ ...pv, selectBusinessLoading: false }));
     }

@@ -4,12 +4,14 @@ import { NavLink, useLocation } from "react-router-dom";
 import websiteLogo from "../assets/image/websiteLogo.png";
 import { useApiClient } from "../lib/axios";
 import { colorTheme } from "../theme/colorTheme";
+import { errorToast, successToast } from "../utils/react-toast";
 
 export default function Sidebar() {
   const { signOut } = useClerk();
   const [isOpen, setIsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const location = useLocation();
   const apiClient = useApiClient();
   const toggleSidebar = () => setIsOpen(!isOpen);
@@ -17,11 +19,20 @@ export default function Sidebar() {
   const isPathActive = (path: string) => location.pathname.startsWith(path);
 
   const handleSignOut = async () => {
-    await Promise.all([
-      apiClient.post("/users/logout"),
-      signOut({ redirectUrl: "/admin/sign-in" }),
-    ]);
+    setLoading(true);
+    try {
+      await apiClient.post("/users/logout");
+      successToast("User logged out successfully.");
+
+      await new Promise((res) => setTimeout(res, 2000));
+      await signOut({ redirectUrl: "/admin/sign-in" });
+    } catch {
+      errorToast("Failed to log out. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
     <>
       {/* Hamburger for mobile */}
@@ -284,13 +295,27 @@ export default function Sidebar() {
 
             {/* Logout */}
             <li className="mt-auto pt-4">
-              <div
-                className="group flex cursor-pointer items-center rounded-lg px-2 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-red-50 hover:text-red-600 active:scale-95 sm:text-base"
+              <button
                 onClick={handleSignOut}
+                disabled={loading}
+                className={`group flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium transition-all duration-200 sm:text-base ${
+                  loading
+                    ? "cursor-not-allowed bg-gray-100 text-gray-400"
+                    : "text-gray-700 hover:bg-red-50 hover:text-red-600 active:scale-95"
+                }`}
               >
-                <i className="fa-solid fa-right-from-bracket text-base text-gray-500 transition-colors group-hover:text-red-600 sm:text-lg"></i>
-                <span className="ml-3">Log Out</span>
-              </div>
+                {loading ? (
+                  <>
+                    <i className="fa-solid fa-spinner fa-spin text-sm sm:text-base"></i>
+                    <span>Logging out...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fa-solid fa-right-from-bracket text-sm sm:text-base"></i>
+                    <span>Log Out</span>
+                  </>
+                )}
+              </button>
             </li>
           </ul>
         </div>

@@ -13,9 +13,7 @@ export const websiteScrape = async (ctx: FastifyRequest, args: WebsiteScrapeInpu
 
 	return await runTransaction(async (session) => {
 		const scrapedContent = await scrapeWebsiteContent(websiteUrl)
-		if (!scrapedContent) {
-			throw new Error('Failed to scrape website content')
-		}
+		if (!scrapedContent) throw new Error('Failed to scrape website content')
 
 		const data = await extractBusinessData(websiteUrl, scrapedContent)
 		if ((data as ExtractError).error) {
@@ -23,14 +21,12 @@ export const websiteScrape = async (ctx: FastifyRequest, args: WebsiteScrapeInpu
 		}
 
 		const businessData = data as BusinessData
-
 		if (!businessData.name || !businessData.description) {
 			throw new Error('Failed to extract valid business data (missing name or description)')
 		}
 
 		const ownerUserId = new mongoose.Types.ObjectId(ctx.context?.dbUserId!)
 
-		// Create Business
 		const newBusiness = new Business({
 			name: businessData.name,
 			overview: businessData.description!,
@@ -41,25 +37,27 @@ export const websiteScrape = async (ctx: FastifyRequest, args: WebsiteScrapeInpu
 			ownerUserId,
 			isSetupComplete: true,
 		})
+
+		await newBusiness.save({ session })
+
 		const businessMember = new BusinessUser({
 			userId: ownerUserId,
 			businessId: newBusiness._id,
 			role: 'admin',
 		})
-		const [business] = await Promise.all([
-			newBusiness.save({ session }),
-			businessMember.save({ session }),
-			clerkClient.users.updateUserMetadata(ctx.context?.clerkId!, {
-				publicMetadata: {
-					dbUserId: ctx.context?.dbUserId!,
-					clerkId: ctx.context?.clerkId!,
-					businessId: (newBusiness._id as any).toString(),
-					role: 'admin',
-					selectedClientId: null,
-				},
-			}),
-		])
 
-		return business
+		await businessMember.save({ session })
+
+		await clerkClient.users.updateUserMetadata(ctx.context?.clerkId!, {
+			publicMetadata: {
+				dbUserId: ctx.context?.dbUserId!,
+				clerkId: ctx.context?.clerkId!,
+				businessId: (newBusiness._id as any).toString(),
+				role: 'admin',
+				selectedClientId: null,
+			},
+		})
+
+		return newBusiness
 	})
 }
