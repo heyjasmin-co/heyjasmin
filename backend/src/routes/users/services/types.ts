@@ -1,6 +1,6 @@
 import { FastifyRequest } from 'fastify'
-import { IUser } from '../../../models'
-import { getUserByClerkIdParamsSchema } from '../handlers/types'
+import { IBusiness, IBusinessUser, IUser } from '../../../models'
+import { getUserByClerkIdParamsSchema, selectUserBusinessSchema } from '../handlers/types'
 
 //
 export type GetUserByClerkIdInput = typeof getUserByClerkIdParamsSchema._type
@@ -25,3 +25,16 @@ export type MeUserOutput = {
 	isSetupComplete?: boolean | null
 	hasSubscription?: boolean | null
 }
+
+//
+export type GetUserBusinessesInput = FastifyRequest
+export type GetUserBusinessesOutput = {
+	_id: string
+	role: IBusinessUser['role']
+	businessId: string
+	businessName: IBusiness['name']
+}[]
+
+//
+export type SelectUserBusinessInput = typeof selectUserBusinessSchema._type
+export type SelectUserBusinessOutput = void

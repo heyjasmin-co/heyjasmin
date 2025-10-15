@@ -1,4 +1,5 @@
 import mongoose, { Document, Model, Schema } from 'mongoose'
+import aggregatePaginate from 'mongoose-aggregate-paginate-v2'
 
 interface IBusinessUser extends Document {
 	businessId: mongoose.Types.ObjectId
@@ -40,6 +41,7 @@ const businessUserSchema = new Schema<IBusinessUser>(
 )
 
 businessUserSchema.index({ businessId: 1, userId: 1 }, { unique: true })
+businessUserSchema.plugin(aggregatePaginate)
 
 const BusinessUser: Model<IBusinessUser> = mongoose.model<IBusinessUser>('BusinessUser', businessUserSchema)
 

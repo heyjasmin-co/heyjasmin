@@ -2,6 +2,7 @@ import { useClerk } from "@clerk/clerk-react";
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import websiteLogo from "../assets/image/websiteLogo.png";
+import { useApiClient } from "../lib/axios";
 import { colorTheme } from "../theme/colorTheme";
 
 export default function Sidebar() {
@@ -10,13 +11,16 @@ export default function Sidebar() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const location = useLocation();
-
+  const apiClient = useApiClient();
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   const isPathActive = (path: string) => location.pathname.startsWith(path);
 
   const handleSignOut = async () => {
-    await signOut({ redirectUrl: "/admin/sign-in" });
+    await Promise.all([
+      apiClient.post("/users/logout"),
+      signOut({ redirectUrl: "/admin/sign-in" }),
+    ]);
   };
   return (
     <>

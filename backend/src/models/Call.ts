@@ -1,4 +1,5 @@
 import mongoose, { Document, Model, Schema } from 'mongoose'
+import aggregatePaginate from 'mongoose-aggregate-paginate-v2'
 
 interface ICall extends Document {
 	businessId: mongoose.Schema.Types.ObjectId
@@ -90,6 +91,7 @@ const callSchema = new Schema<ICall>(
 
 callSchema.index({ businessId: 1, callStartTime: -1 })
 callSchema.index({ businessId: 1, status: 1 })
+callSchema.plugin(aggregatePaginate)
 
 const Call: Model<ICall> = mongoose.model<ICall>('Call', callSchema)
 

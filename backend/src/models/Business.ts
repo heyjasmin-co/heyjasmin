@@ -1,4 +1,5 @@
 import mongoose, { Document, Model, Schema } from 'mongoose'
+import aggregatePaginate from 'mongoose-aggregate-paginate-v2'
 
 interface IBusinessHour {
 	day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
@@ -148,6 +149,7 @@ const businessSchema = new Schema<IBusiness>(
 
 businessSchema.index({ name: 1 })
 businessSchema.index({ ownerUserId: 1 })
+businessSchema.plugin(aggregatePaginate)
 
 const Business: Model<IBusiness> = mongoose.model<IBusiness>('Business', businessSchema)
 

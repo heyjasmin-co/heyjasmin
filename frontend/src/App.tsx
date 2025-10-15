@@ -18,6 +18,7 @@ import Dashboard from "./pages/Admin/Dashboard/GuidedStep";
 import Settings from "./pages/Admin/Dashboard/Settings";
 import AppointmentInfo from "./pages/Admin/Dashboard/Settings/AppointmentInfo";
 import BusinessDetailsPage from "./pages/Admin/Dashboard/Settings/BusinessDetailsPage";
+import SelectBusiness from "./pages/Admin/SelectBusiness";
 import SubscriptionPage from "./pages/Admin/Subscription";
 import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
@@ -33,13 +34,21 @@ export default function App() {
           <Route path="/admin/sign-in" element={<Login />} />
           <Route path="/admin/sign-up" element={<Register />} />
 
+          <Route
+            path="/admin/select-business"
+            element={
+              <ProtectedRoute>
+                <SelectBusiness />
+              </ProtectedRoute>
+            }
+          />
           {/* Subscription page - requires auth + subscription */}
           <Route
             path="/admin/subscription"
             element={
-              <ProtectedRoute requireSetup>
-                <SubscriptionPage />
-              </ProtectedRoute>
+              // <ProtectedRoute requireSetup>
+              <SubscriptionPage />
+              // </ProtectedRoute>
             }
           />
 
@@ -47,9 +56,9 @@ export default function App() {
           <Route
             path="/admin/setup"
             element={
-              <ProtectedRoute>
-                <BusinessProfileSetup />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <BusinessProfileSetup />
+              // </ProtectedRoute>
             }
           />
 

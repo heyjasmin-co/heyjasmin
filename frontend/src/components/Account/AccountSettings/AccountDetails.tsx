@@ -1,6 +1,16 @@
+import { useClerk } from "@clerk/clerk-react";
+import { useApiClient } from "../../../lib/axios";
 import { colorTheme } from "../../../theme/colorTheme";
 
 function AccountDetails() {
+  const apiClient = useApiClient();
+  const { signOut } = useClerk();
+  const handleSignOut = async () => {
+    await Promise.all([
+      apiClient.post("/users/logout"),
+      signOut({ redirectUrl: "/admin/sign-in" }),
+    ]);
+  };
   return (
     <div
       className="w-full rounded-xl border border-gray-200 bg-white shadow-lg"
@@ -32,7 +42,10 @@ function AccountDetails() {
           </div>
 
           {/* Logout Button */}
-          <button className="flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-5 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 focus:ring-2 focus:ring-purple-400 focus:ring-offset-1 active:scale-95 sm:text-base">
+          <button
+            onClick={handleSignOut}
+            className="flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-5 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 focus:ring-2 focus:ring-purple-400 focus:ring-offset-1 active:scale-95 sm:text-base"
+          >
             <i className="fa-solid fa-right-from-bracket text-sm sm:text-base"></i>
             <span>Log Out</span>
           </button>
