@@ -1,10 +1,10 @@
 import { FastifyInstance } from 'fastify'
 import { authenticate } from '../../middleware/clerkAuth'
-import { getUserBusinessesHandler } from './handlers/getUserBusinesses'
-import { getUserByClerkIdHandler } from './handlers/getUserByClerkId'
+import { getUserBusinessesHandler } from './handlers/get-user-businesses'
+import { getUserByClerkIdHandler } from './handlers/get-user-by-clerk-id'
 import { logoutHandler } from './handlers/logout'
 import { meHandler } from './handlers/me'
-import { selectUserBusinessHandler } from './handlers/selectUserBusiness'
+import { selectUserBusinessHandler } from './handlers/select-user-business'
 import { getUserByClerkIdParamsSchema, selectUserBusinessSchema } from './handlers/types'
 
 export default async function userRoutes(fastify: FastifyInstance) {

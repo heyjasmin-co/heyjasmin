@@ -1,4 +1,5 @@
 import { FastifyInstance } from 'fastify'
+import businessRoute from './businesses'
 import websiteScrapeRoutes from './scrape-website'
 import userRoutes from './users/index'
 import clerkWebhook from './webhooks/clerk'
@@ -36,5 +37,6 @@ export default async function routes(fastify: FastifyInstance) {
 	await fastify.register(userRoutes, { prefix: '/api/v1/users' })
 	await fastify.register(stripeWebhook, { prefix: '/api/v1/webhooks-stripe' })
 	await fastify.register(clerkWebhook, { prefix: '/api/v1/webhooks-clerk' })
+	await fastify.register(businessRoute, { prefix: '/api/v1/businesses' })
 	await fastify.register(websiteScrapeRoutes, { prefix: '/api/v1/scrape' })
 }
