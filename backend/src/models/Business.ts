@@ -23,6 +23,8 @@ interface IBusiness extends Document {
 	subscriptionEndDate?: Date | null
 	ownerUserId: mongoose.Types.ObjectId
 	aiAgentSettings: {
+		agentId?: string
+		agentNumber?: string
 		trainingData?: Record<string, any>
 		voiceSettings?: Record<string, any>
 		customInstructions?: string
@@ -122,6 +124,14 @@ const businessSchema = new Schema<IBusiness>(
 
 		// AI Agent Settings
 		aiAgentSettings: {
+			agentId: {
+				type: String,
+				default: null,
+			},
+			agentNumber: {
+				type: String,
+				default: null,
+			},
 			trainingData: {
 				type: Schema.Types.Mixed,
 				default: {},

@@ -1,19 +1,14 @@
 import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
+import { IBusinessHour } from "../../pages/Admin/Dashboard/GuidedStep/types";
 import { colorTheme } from "../../theme/colorTheme";
-
-function BusinessHours() {
+type BusinessHoursProps = {
+  hours: IBusinessHour[];
+};
+function BusinessHours({ hours }: BusinessHoursProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [businessHours, setBusinessHours] = useState([
-    { day: "Monday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Tuesday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Wednesday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Thursday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Friday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Saturday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Sunday", start: "08:00", end: "20:00", isOpen: false },
-  ]);
+  const [businessHours, setBusinessHours] = useState(hours);
 
   const handleToggleDay = (index: number) => {
     if (!isEditing) return;

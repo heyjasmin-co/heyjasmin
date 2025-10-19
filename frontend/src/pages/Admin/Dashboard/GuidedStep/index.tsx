@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import celebIcon from "../../../../assets/image/celebIcon.png";
 import loadingGif from "../../../../assets/image/loadingGif.gif";
@@ -19,9 +20,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [businessDetails, setBusinessDetails] =
     useState<BusinessDetailsType | null>(null);
-  useEffect(() => {
-    fetchBusinessDetails();
-  }, []);
 
   const fetchBusinessDetails = async () => {
     setLoading(true);
@@ -31,6 +29,7 @@ export default function Dashboard() {
         message: string;
         data: BusinessDetailsType;
       }>("/businesses/" + userData?.businessId);
+
       setBusinessDetails(response.data.data);
       successToast(response.data.message);
     } catch (error: any) {
@@ -46,6 +45,18 @@ export default function Dashboard() {
     }
     setGuideStep(guideStep + 1);
   };
+
+  // UseEffect
+  useEffect(() => {
+    fetchBusinessDetails();
+  }, []);
+  useEffect(() => {
+    if (businessDetails) {
+      if (businessDetails.aiAgentSettings.agentNumber) {
+        setGuideStep(1);
+      }
+    }
+  }, [businessDetails]);
   return (
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
       {/* Container */}
@@ -74,7 +85,7 @@ export default function Dashboard() {
                   <TrainingSources businessWebsite={businessDetails.website} />
                   <BusinessInfo
                     businessDetails={businessDetails}
-                    handleStep={handleStep}
+                    setBusinessDetails={setBusinessDetails}
                   />
                 </>
               )}

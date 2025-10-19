@@ -2,16 +2,12 @@ import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { colorTheme } from "../../theme/colorTheme";
-
-function CoreService() {
+type BusinessServiceProps = {
+  businessServices: string[];
+};
+function CoreService({ businessServices }: BusinessServiceProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [services, setServices] = useState<string[]>([
-    "Bed Bug Control",
-    "Rodent Control",
-    "Ant Control",
-    "Wasp Control",
-    "Spider Control",
-  ]);
+  const [services, setServices] = useState<string[]>(businessServices);
 
   const [newService, setNewService] = useState("");
 

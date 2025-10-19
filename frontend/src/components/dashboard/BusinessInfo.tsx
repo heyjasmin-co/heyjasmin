@@ -4,21 +4,28 @@ import editIcon from "../../assets/image/editIcon.png";
 import infoIcon from "../../assets/image/infoIcon.png";
 import nextIcon from "../../assets/image/nextIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
+import { useUserData } from "../../context/UserDataContext";
+import { useApiClient } from "../../lib/axios";
 import { BusinessDetailsType } from "../../pages/Admin/Dashboard/GuidedStep/types";
 import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
+import { errorToast, successToast } from "../../utils/react-toast";
 import { convertTo24Hour, formatTime } from "../../utils/time";
 
 type BusinessInfoProps = {
   businessDetails: BusinessDetailsType;
-  handleStep: () => void;
+  setBusinessDetails: React.Dispatch<
+    React.SetStateAction<BusinessDetailsType | null>
+  >;
 };
 
-function BusinessInfo({ businessDetails, handleStep }: BusinessInfoProps) {
+function BusinessInfo({
+  businessDetails,
+  setBusinessDetails,
+}: BusinessInfoProps) {
+  //States
   const [isEditing, setIsEditing] = useState(false);
-  const [businessName, setBusinessName] = useState<string>(
-    businessDetails.name ?? "",
-  );
+  const [name, setName] = useState<string>(businessDetails.name ?? "");
   const [overview, setOverview] = useState<string>(
     businessDetails.overview ?? "",
   );
@@ -49,6 +56,10 @@ function BusinessInfo({ businessDetails, handleStep }: BusinessInfoProps) {
           : hour.end,
     })),
   );
+  const [loading, setLoading] = useState(false);
+  // Hooks
+  const apiClient = useApiClient();
+  const { userData } = useUserData();
 
   // Handles
   const handleAddService = () => {
@@ -80,28 +91,48 @@ function BusinessInfo({ businessDetails, handleStep }: BusinessInfoProps) {
   };
 
   const handleTalkToAgent = async () => {
-    const errors: any = {};
-    if (businessName.trim() === "") {
-      errors.businessName = "Business name is required.";
+    try {
+      setLoading(true);
+      const errors: any = {};
+      if (name.trim() === "") {
+        errors.businessName = "Business name is required.";
+      }
+      if (overview.trim() === "") {
+        errors.overview = "Business description is required.";
+      }
+      if (address.trim() === "") {
+        errors.address = "Business address is required.";
+      }
+      if (Object.keys(errors).length) {
+        setErrors(errors);
+        return;
+      } else {
+        setErrors({
+          businessName: null,
+          overview: null,
+          address: null,
+        });
+      }
+      const updateData = {
+        name,
+        overview,
+        address,
+        services,
+        businessHours,
+      };
+      const response = await apiClient.patch<{
+        success: boolean;
+        message: string;
+        data: BusinessDetailsType;
+      }>("/businesses/" + userData?.businessId, updateData);
+      setBusinessDetails(response.data.data);
+      successToast(response.data.message);
+    } catch (error: any) {
+      console.error(error);
+      errorToast(error.response.data.error);
+    } finally {
+      setLoading(false);
     }
-    if (overview.trim() === "") {
-      errors.overview = "Business description is required.";
-    }
-    if (address.trim() === "") {
-      errors.address = "Business address is required.";
-    }
-    if (Object.keys(errors).length) {
-      setErrors(errors);
-      return;
-    } else {
-      setErrors({
-        businessName: null,
-        overview: null,
-        address: null,
-      });
-    }
-    //TODO: Create Update Business API
-    handleStep();
   };
 
   return (
@@ -139,8 +170,8 @@ function BusinessInfo({ businessDetails, handleStep }: BusinessInfoProps) {
             <div className="w-full">
               <input
                 type="text"
-                value={businessName}
-                onChange={(e) => setBusinessName(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your business name"
                 className={`w-full rounded-lg border px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none ${
                   errors.businessName ? "border-red-400" : "border-gray-300"
@@ -342,8 +373,11 @@ function BusinessInfo({ businessDetails, handleStep }: BusinessInfoProps) {
         {/* Talk to Agent Button */}
         <div className="flex flex-col gap-3 px-4 py-5 sm:flex-row sm:justify-end">
           <button
+            disabled={loading}
             onClick={handleTalkToAgent}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
+            className={`flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto ${
+              loading && "cursor-not-allowed bg-gray-100 text-gray-400"
+            }`}
           >
             <span className="text-xl font-bold">{`Talk to ${appName}`}</span>
             <img src={nextIcon} alt="Next Icon" className="h-6 w-6" />

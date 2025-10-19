@@ -1,29 +1,105 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Textarea, TextInput } from "flowbite-react";
 import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
+import { useUserData } from "../../context/UserDataContext";
+import { useApiClient } from "../../lib/axios";
+import { BusinessDetailsType } from "../../pages/Admin/Dashboard/GuidedStep/types";
 import { colorTheme } from "../../theme/colorTheme";
+import { errorToast, successToast } from "../../utils/react-toast";
+
+type UpdateBusinessInformationResponse = {
+  name: string;
+  overview: string;
+  address: string;
+};
 
 type BusinessDetailsProps = {
-  businessProfile: string;
-  businessWebsite: string;
-  onSave?: (profile: string, website: string) => void;
+  businessOverview: string;
+  businessName: string;
+  businessAddress: string;
+  setBusinessDetails: React.Dispatch<
+    React.SetStateAction<BusinessDetailsType | null>
+  >;
 };
 
 function BusinessDetails({
-  businessProfile,
-  businessWebsite,
-  onSave,
+  businessOverview,
+  businessName,
+  businessAddress,
+  setBusinessDetails,
 }: BusinessDetailsProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [businessName, setBusinessName] = useState(businessProfile);
-  const [overview, setOverview] = useState("");
-  const [address, setAddress] = useState(businessWebsite);
+  const [name, setName] = useState(businessName);
+  const [overview, setOverview] = useState(businessOverview);
+  const [address, setAddress] = useState(businessAddress);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{
+    businessName: string | null;
+    overview: string | null;
+    address: string | null;
+  }>({
+    businessName: null,
+    overview: null,
+    address: null,
+  });
 
-  const handleSave = () => {
-    setIsEditing(false);
-    if (onSave) {
-      onSave(businessName, address);
+  const apiClient = useApiClient();
+  const { userData } = useUserData();
+
+  const handleSave = async () => {
+    const validationErrors: any = {};
+    if (name.trim() === "")
+      validationErrors.businessName = "Business name is required.";
+    if (overview.trim() === "")
+      validationErrors.overview = "Business description is required.";
+    if (address.trim() === "")
+      validationErrors.address = "Business address is required.";
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors({
+      businessName: null,
+      overview: null,
+      address: null,
+    });
+
+    setLoading(true);
+    try {
+      const updateData = { name, overview, address };
+
+      const response = await apiClient.patch<{
+        success: boolean;
+        message: string;
+        data: UpdateBusinessInformationResponse;
+      }>(`/businesses/business-info/${userData?.businessId}`, updateData);
+
+      const updated = response.data.data;
+
+      setBusinessDetails((pv) => {
+        if (!pv) return null;
+
+        return {
+          ...pv,
+          name: updated.name,
+          overview: updated.overview || "",
+          address: updated.address || "",
+        };
+      });
+
+      successToast(response.data.message);
+    } catch (error: any) {
+      console.error(error);
+      errorToast(
+        error?.response?.data?.error || "Failed to update business info.",
+      );
+    } finally {
+      setIsEditing(false);
+      setLoading(false);
     }
   };
 
@@ -39,7 +115,7 @@ function BusinessDetails({
             className="flex h-8 w-8 items-center justify-center rounded-full"
             style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
           >
-            <i className={`fa-solid fa-shop text-white`}></i>
+            <i className="fa-solid fa-shop text-white"></i>
           </div>
           <h5 className="text-lg font-bold text-gray-900">
             Business Information
@@ -56,16 +132,21 @@ function BusinessDetails({
             <div className="min-w-0 flex-1">
               {isEditing ? (
                 <TextInput
-                  value={businessName}
-                  style={{ backgroundColor: "white", color: "black" }}
-                  onChange={(e) => setBusinessName(e.target.value)}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your business name"
+                  style={{ backgroundColor: "white", color: "black" }}
                   className="w-full rounded-lg text-sm text-gray-800 shadow-sm transition-all focus:border-purple-500 focus:ring-2 focus:ring-purple-400"
                 />
               ) : (
                 <span className="block text-sm font-medium break-words whitespace-normal text-gray-600">
-                  {businessName || "No Business Name"}
+                  {name || "No Business Name"}
                 </span>
+              )}
+              {errors.businessName && (
+                <p className="mt-1 text-xs font-medium text-red-600">
+                  {errors.businessName}
+                </p>
               )}
             </div>
           </div>
@@ -90,6 +171,11 @@ function BusinessDetails({
                   {overview || "No Overview Provided"}
                 </span>
               )}
+              {errors.overview && (
+                <p className="mt-1 text-xs font-medium text-red-600">
+                  {errors.overview}
+                </p>
+              )}
             </div>
           </div>
 
@@ -112,6 +198,11 @@ function BusinessDetails({
                   {address || "No Address Provided"}
                 </span>
               )}
+              {errors.address && (
+                <p className="mt-1 text-xs font-medium text-red-600">
+                  {errors.address}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -120,17 +211,22 @@ function BusinessDetails({
         <div className="flex flex-col gap-3 px-4 py-2 sm:flex-row sm:items-start sm:gap-6">
           <div className="flex w-full flex-col justify-end sm:flex-row sm:justify-end">
             {isEditing ? (
-              <div
+              <button
+                disabled={loading}
                 onClick={handleSave}
                 className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-700 active:scale-95 sm:w-auto"
+                style={{
+                  cursor: loading ? "not-allowed" : "pointer",
+                  backgroundColor: loading ? "grey" : "",
+                }}
               >
                 <img
                   src={saveIcon}
                   alt="Save Icon"
                   className="h-5 w-5 opacity-90"
                 />
-                <span>Save</span>
-              </div>
+                <span>{loading ? "Saving..." : "Save"}</span>
+              </button>
             ) : (
               <div
                 onClick={() => setIsEditing(true)}

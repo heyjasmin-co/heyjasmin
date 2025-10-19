@@ -20,12 +20,18 @@ export type BusinessDetailsType = {
   subscriptionStartDate?: Date | null;
   subscriptionEndDate?: Date | null;
   ownerUserId: string;
-  aiAgentSettings: any;
+  aiAgentSettings: {
+    agentId?: string;
+    agentNumber?: string;
+    trainingData?: Record<string, any>;
+    voiceSettings?: Record<string, any>;
+    customInstructions?: string;
+  };
   isSetupComplete: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
-interface IBusinessHour {
+export interface IBusinessHour {
   day:
     | "Monday"
     | "Tuesday"
