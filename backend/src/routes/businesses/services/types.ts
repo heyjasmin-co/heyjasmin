@@ -2,7 +2,9 @@ import { IBusiness } from '../../../models'
 import {
 	GetBusinessDetailsByIdParamsSchemaInput,
 	UpdateBusinessDetailsByIdBodySchemaInput,
+	UpdateBusinessHoursByIdBodySchemaInput,
 	UpdateBusinessInformationByIdBodySchemaInput,
+	UpdateBusinessServicesByIdBodySchemaInput,
 } from '../handlers/types'
 
 export type GetBusinessDetailsInput = GetBusinessDetailsByIdParamsSchemaInput
@@ -19,3 +21,11 @@ export type UpdateBusinessInformationByIdOutput = {
 	overview?: string
 	address?: string
 } | null
+
+//
+export type UpdateBusinessServicesByIdInput = UpdateBusinessServicesByIdBodySchemaInput
+export type UpdateBusinessServicesByIdOutput = string[] | null
+
+//
+export type UpdateBusinessHoursByIdInput = UpdateBusinessHoursByIdBodySchemaInput
+export type UpdateBusinessHoursByIdOutput = IBusiness['businessHours'] | null

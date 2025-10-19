@@ -11,8 +11,8 @@ import TrainingSources from "../../../../components/dashboard/TrainingSources";
 import { useUserData } from "../../../../context/UserDataContext";
 import { useApiClient } from "../../../../lib/axios";
 import { appName } from "../../../../theme/appName";
+import { BusinessDetailsType } from "../../../../types/BusinessTypes";
 import { errorToast, successToast } from "../../../../utils/react-toast";
-import { BusinessDetailsType } from "./types";
 export default function Dashboard() {
   const [guideStep, setGuideStep] = useState(0);
   const apiClient = useApiClient();

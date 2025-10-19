@@ -2,9 +2,13 @@ import { useClerk } from "@clerk/clerk-react";
 import { useState } from "react";
 import { useApiClient } from "../../../lib/axios";
 import { colorTheme } from "../../../theme/colorTheme";
+import { UserDetailsType } from "../../../types/UsersTypes";
 import { errorToast, successToast } from "../../../utils/react-toast";
 
-function AccountDetails() {
+type AccountDetailsProps = {
+  accountInformation: UserDetailsType;
+};
+function AccountDetails({ accountInformation }: AccountDetailsProps) {
   const apiClient = useApiClient();
   const { signOut } = useClerk();
   const [loading, setLoading] = useState(false);
@@ -50,7 +54,7 @@ function AccountDetails() {
               backgroundColor: colorTheme.secondaryColor(0.08),
             }}
           >
-            imahsan600@gmail.com
+            {accountInformation.email}
           </div>
 
           {/* Logout Button */}

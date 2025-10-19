@@ -6,9 +6,9 @@ import nextIcon from "../../assets/image/nextIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
 import { useApiClient } from "../../lib/axios";
-import { BusinessDetailsType } from "../../pages/Admin/Dashboard/GuidedStep/types";
 import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
+import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
 import { convertTo24Hour, formatTime } from "../../utils/time";
 

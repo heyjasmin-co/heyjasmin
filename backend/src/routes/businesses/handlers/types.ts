@@ -61,3 +61,30 @@ export const updateBusinessInformationByIdParamsSchema = z.object({
 })
 export type UpdateBusinessInformationByIdBodySchemaInput = z.infer<typeof updateBusinessInformationByIdBodySchema> &
 	z.infer<typeof updateBusinessInformationByIdParamsSchema>
+
+// Update Business Services
+export const updateBusinessServicesByIdBodySchema = z.object({
+	services: z.array(z.string().trim()),
+})
+export const updateBusinessServicesByIdParamsSchema = z.object({
+	businessId: z.string(),
+})
+export type UpdateBusinessServicesByIdBodySchemaInput = z.infer<typeof updateBusinessServicesByIdBodySchema> &
+	z.infer<typeof updateBusinessServicesByIdParamsSchema>
+
+// Update Business Hours
+export const updateBusinessHoursByIdBodySchema = z.object({
+	businessHours: z.array(
+		z.object({
+			day: z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']),
+			start: z.string(),
+			end: z.string(),
+			isOpen: z.boolean(),
+		})
+	),
+})
+export const updateBusinessHoursByIdParamsSchema = z.object({
+	businessId: z.string(),
+})
+export type UpdateBusinessHoursByIdBodySchemaInput = z.infer<typeof updateBusinessHoursByIdBodySchema> &
+	z.infer<typeof updateBusinessHoursByIdParamsSchema>

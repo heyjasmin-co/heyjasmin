@@ -15,5 +15,9 @@ export const updateBusinessInformationById = async (
 		throw new Error(`No business found with the provided ID: ${businessId}`)
 	}
 
-	return updateBusinessInformation
+	return {
+		name: updateBusinessInformation.name,
+		overview: updateBusinessInformation.overview,
+		address: updateBusinessInformation.address,
+	}
 }

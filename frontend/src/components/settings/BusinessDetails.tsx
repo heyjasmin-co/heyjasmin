@@ -5,8 +5,8 @@ import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
 import { useApiClient } from "../../lib/axios";
-import { BusinessDetailsType } from "../../pages/Admin/Dashboard/GuidedStep/types";
 import { colorTheme } from "../../theme/colorTheme";
+import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
 
 type UpdateBusinessInformationResponse = {
@@ -76,7 +76,7 @@ function BusinessDetails({
         success: boolean;
         message: string;
         data: UpdateBusinessInformationResponse;
-      }>(`/businesses/business-info/${userData?.businessId}`, updateData);
+      }>(`/businesses/information/${userData?.businessId}`, updateData);
 
       const updated = response.data.data;
 
@@ -90,7 +90,10 @@ function BusinessDetails({
           address: updated.address || "",
         };
       });
-
+      localStorage.setItem(
+        "businessDetails",
+        JSON.stringify(response.data.data),
+      );
       successToast(response.data.message);
     } catch (error: any) {
       console.error(error);

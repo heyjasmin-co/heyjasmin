@@ -1,5 +1,4 @@
 import { ClerkProvider } from "@clerk/clerk-react";
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ToastContainer } from "react-toastify";
 import App from "./App.tsx";
@@ -12,13 +11,13 @@ if (!PUBLISHABLE_KEY) {
 }
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <ClerkProvider
-      redirectUrl={"/admin/dashboard"}
-      publishableKey={PUBLISHABLE_KEY}
-    >
-      <App />
-      <ToastContainer />
-    </ClerkProvider>
-  </StrictMode>,
+  // <StrictMode>
+  <ClerkProvider
+    redirectUrl={"/admin/dashboard"}
+    publishableKey={PUBLISHABLE_KEY}
+  >
+    <App />
+    <ToastContainer />
+  </ClerkProvider>,
+  // </StrictMode>
 );

@@ -1,14 +1,24 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
-import { IBusinessHour } from "../../pages/Admin/Dashboard/GuidedStep/types";
+import { useUserData } from "../../context/UserDataContext";
+import { useApiClient } from "../../lib/axios";
 import { colorTheme } from "../../theme/colorTheme";
+import { BusinessDetailsType, IBusinessHour } from "../../types/BusinessTypes";
+import { errorToast, successToast } from "../../utils/react-toast";
 type BusinessHoursProps = {
   hours: IBusinessHour[];
+  setBusinessDetails: React.Dispatch<
+    React.SetStateAction<BusinessDetailsType | null>
+  >;
 };
-function BusinessHours({ hours }: BusinessHoursProps) {
+function BusinessHours({ hours, setBusinessDetails }: BusinessHoursProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [businessHours, setBusinessHours] = useState(hours);
+  const [saving, setSaving] = useState(false);
+  const apiClient = useApiClient();
+  const { userData } = useUserData();
 
   const handleToggleDay = (index: number) => {
     if (!isEditing) return;
@@ -33,6 +43,36 @@ function BusinessHours({ hours }: BusinessHoursProps) {
     const ampm = h >= 12 ? "PM" : "AM";
     const displayHour = h % 12 || 12;
     return `${displayHour}:${minute} ${ampm}`;
+  };
+
+  const handleSave = async () => {
+    if (!userData?.businessId) return;
+    setSaving(true);
+    try {
+      const response = await apiClient.patch<{
+        success: boolean;
+        message: string;
+        data: IBusinessHour[];
+      }>(`/businesses/hours/${userData.businessId}`, { businessHours });
+
+      const updateHours = response.data.data;
+      setBusinessDetails((pv) => {
+        if (!pv) return null;
+
+        return {
+          ...pv,
+          businessHours: updateHours,
+        };
+      });
+      successToast(response.data.message);
+      setIsEditing(false);
+    } catch (error: any) {
+      errorToast(
+        error?.response?.data?.error || "Failed to update business hours.",
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -131,17 +171,22 @@ function BusinessHours({ hours }: BusinessHoursProps) {
         {/* Actions */}
         <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:justify-end sm:gap-4">
           {isEditing ? (
-            <div
-              onClick={() => setIsEditing(false)}
+            <button
+              disabled={saving}
+              onClick={handleSave}
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-700 active:scale-95 sm:w-auto"
+              style={{
+                cursor: saving ? "not-allowed" : "pointer",
+                backgroundColor: saving ? "grey" : "",
+              }}
             >
               <img
                 src={saveIcon}
                 alt="Save Icon"
                 className="h-5 w-5 opacity-90"
               />
-              <span>Save</span>
-            </div>
+              <span>{saving ? "Saving..." : "Save"}</span>
+            </button>
           ) : (
             <div
               onClick={() => setIsEditing(true)}
