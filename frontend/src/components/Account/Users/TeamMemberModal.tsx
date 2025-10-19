@@ -98,15 +98,21 @@ function TeamMemberModal({
               type="text"
               placeholder="Full Name"
               value={name}
+              disabled={editMode}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className={`w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none ${
+                editMode ? "cursor-not-allowed bg-gray-200" : "bg-white"
+              }`}
             />
             <input
               type="email"
               placeholder="Email Address"
               value={email}
+              disabled={editMode}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className={`w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none ${
+                editMode ? "cursor-not-allowed bg-gray-200" : "bg-white"
+              }`}
             />
             <select
               value={role}

@@ -14,7 +14,7 @@ export default function AccountDetailsPage() {
   const [loading, setLoading] = useState(false);
   const [accountInformation, setAccountInformation] =
     useState<UserDetailsType | null>(null);
-  const fetchBusinessDetails = async () => {
+  const fetchAccountDetails = async () => {
     try {
       setLoading(true);
       const response = await apiClient.get<{
@@ -35,7 +35,7 @@ export default function AccountDetailsPage() {
   };
   // UseEffect
   useEffect(() => {
-    fetchBusinessDetails();
+    fetchAccountDetails();
   }, []);
   return (
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
