@@ -24,6 +24,7 @@ export type MeUserOutput = {
 	businessId?: string | null
 	isSetupComplete?: boolean | null
 	hasSubscription?: boolean | null
+	role?: string | null
 }
 
 //
