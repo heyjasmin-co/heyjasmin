@@ -3,7 +3,7 @@ import aggregatePaginate from 'mongoose-aggregate-paginate-v2'
 
 interface IBusinessUserInvitation extends Document {
 	businessId: mongoose.Types.ObjectId
-	clerKInvitationId: string
+	clerkInvitationId: string
 	email: string
 	role: 'editor' | 'admin' | 'viewer'
 	status: 'active' | 'pending' | 'removed'
@@ -18,7 +18,7 @@ const businessUserInvitationSchema = new Schema<IBusinessUserInvitation>(
 			ref: 'Business',
 			required: true,
 		},
-		clerKInvitationId: {
+		clerkInvitationId: {
 			type: String,
 			required: true,
 		},
@@ -44,7 +44,7 @@ const businessUserInvitationSchema = new Schema<IBusinessUserInvitation>(
 	}
 )
 
-businessUserInvitationSchema.index({ businessId: 1, clerKInvitationId: 1 }, { unique: true })
+businessUserInvitationSchema.index({ businessId: 1, clerkInvitationId: 1 }, { unique: true })
 businessUserInvitationSchema.plugin(aggregatePaginate)
 
 const BusinessUserInvitation: Model<IBusinessUserInvitation> = mongoose.model<IBusinessUserInvitation>(

@@ -31,6 +31,7 @@ export const acceptBusinessUserInvitationByIdBodySchema = z.object({
 	role: z.string(),
 	clerkOrganizationId: z.string(),
 	clerkUserId: z.string(),
+	email: z.string(),
 })
 
 export type AcceptBusinessUserInvitationByIdSchemaInput = z.infer<typeof acceptBusinessUserInvitationByIdBodySchema>

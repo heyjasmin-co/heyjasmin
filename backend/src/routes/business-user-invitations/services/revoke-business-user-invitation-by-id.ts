@@ -12,7 +12,7 @@ export const revokeBusinessUserInvitationById = async (
 	const businessUserInvitation = await BusinessUserInvitation.aggregate([
 		{
 			$match: {
-				clerKInvitationId: invitationId,
+				clerkInvitationId: invitationId,
 			},
 		},
 		{
@@ -50,7 +50,7 @@ export const revokeBusinessUserInvitationById = async (
 			invitationId,
 		}),
 		BusinessUserInvitation.findOneAndDelete({
-			clerKInvitationId: invitationId,
+			clerkInvitationId: invitationId,
 		}),
 	])
 

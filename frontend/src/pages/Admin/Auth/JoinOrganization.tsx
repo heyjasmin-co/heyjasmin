@@ -33,6 +33,7 @@ export default function JoinOrganization() {
         clerkOrganizationId,
         role,
         clerkUserId,
+        email,
       });
 
       // Redirect to dashboard on success

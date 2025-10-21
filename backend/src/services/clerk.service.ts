@@ -118,7 +118,7 @@ export const handleBusinessUserInvitationCreated = async (args: ClerkOrganizatio
 
 	await BusinessUserInvitation.findOneAndDelete(
 		{
-			clerKInvitationId: invitationId,
+			clerkInvitationId: invitationId,
 		},
 		{ session }
 	)

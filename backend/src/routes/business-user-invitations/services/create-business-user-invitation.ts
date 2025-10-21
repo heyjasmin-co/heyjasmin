@@ -78,7 +78,7 @@ export const createBusinessUserInvitationById = async (
 		businessId,
 		email,
 		role,
-		clerKInvitationId: response.id,
+		clerkInvitationId: response.id,
 		status: 'pending',
 	})
 

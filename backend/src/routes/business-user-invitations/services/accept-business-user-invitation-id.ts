@@ -9,10 +9,10 @@ export const acceptBusinessUserInvitationById = async (
 	request: FastifyRequest,
 	args: AcceptBusinessUserInvitationInput
 ): Promise<AcceptBusinessUserInvitationOutput> => {
-	const { businessId, role, userId, clerkOrganizationId, clerkUserId } = args
+	const { businessId, role, userId, clerkOrganizationId, email, clerkUserId } = args
 	return await runTransaction(async (session) => {
 		// Find business
-		const business = await Business.findById(businessId, { session })
+		const business = await Business.findById(businessId)
 		if (!business?._id) {
 			throw new Error('Business not found')
 		}
@@ -26,13 +26,13 @@ export const acceptBusinessUserInvitationById = async (
 		}
 
 		// Check if user already exists in the business
-		const existingBusinessUser = await BusinessUser.findOne({ businessId, userId }, { session })
+		const existingBusinessUser = await BusinessUser.findOne({ businessId, userId })
 		if (existingBusinessUser?._id) {
 			throw new Error('User is already in the business')
 		}
 
 		// Verify the user exists
-		const user = await User.findById(userId, { session })
+		const user = await User.findById(userId)
 		if (!user?._id) {
 			throw new Error('User not found')
 		}
@@ -77,7 +77,8 @@ export const acceptBusinessUserInvitationById = async (
 		const savedBusinessUser = await newBusinessUser.save({ session })
 		await BusinessUserInvitation.findOneAndDelete(
 			{
-				clerKInvitationId: business.clerkOrganizationId,
+				businessId,
+				email,
 			},
 			{ session }
 		)
