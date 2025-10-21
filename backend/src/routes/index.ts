@@ -1,10 +1,11 @@
 import { FastifyInstance } from 'fastify'
 import businessRoute from './businesses'
-import businessUsersRoute from './businessUsers'
+import businessUsersRoute from './business-users'
 import websiteScrapeRoutes from './scrape-website'
 import userRoutes from './users/index'
 import clerkWebhook from './webhooks/clerk'
 import stripeWebhook from './webhooks/stripe'
+import businessUserInvitationsRoute from './business-user-invitations'
 
 export default async function routes(fastify: FastifyInstance) {
 	fastify.get(
@@ -40,5 +41,6 @@ export default async function routes(fastify: FastifyInstance) {
 	await fastify.register(clerkWebhook, { prefix: '/api/v1/webhooks-clerk' })
 	await fastify.register(businessRoute, { prefix: '/api/v1/businesses' })
 	await fastify.register(businessUsersRoute, { prefix: '/api/v1/business-users' })
+	await fastify.register(businessUserInvitationsRoute, { prefix: '/api/v1/business-user-invitations' })
 	await fastify.register(websiteScrapeRoutes, { prefix: '/api/v1/scrape' })
 }

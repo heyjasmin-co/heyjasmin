@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import loadingGif from "../../../../assets/image/loadingGif.gif";
 import TrainingSources from "../../../../components/dashboard/TrainingSources";
+import Loading from "../../../../components/Loading";
 import BusinessDetails from "../../../../components/settings/BusinessDetails";
 import BusinessHours from "../../../../components/settings/BusinessHours";
 import BusinessTitleCard from "../../../../components/settings/BusinessTitleCard";
@@ -59,18 +59,13 @@ export default function BusinessDetailsPage() {
     fetchBusinessDetails();
   }, []);
   useEffect(() => {
-     localStorage.setItem(
-          "businessDetails",
-          JSON.stringify(businessDetails),
-        );
+    localStorage.setItem("businessDetails", JSON.stringify(businessDetails));
   }, [businessDetails]);
- 
+
   return (
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
       {loading && !BusinessDetails ? (
-        <div className="w-hull bg-blue flex h-full items-center justify-center">
-          <img src={loadingGif} />
-        </div>
+        <Loading />
       ) : (
         <div className="flex flex-col gap-5">
           {businessDetails && checkBusinessDetails && (

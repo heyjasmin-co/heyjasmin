@@ -5,6 +5,7 @@ import CallDetails from "./components/calls/CallDetails";
 import { RouteGuard } from "./components/Auth/RouteGuard";
 import { UserDataProvider } from "./context/UserDataContext";
 import Main from "./pages/Admin";
+import JoinOrganization from "./pages/Admin/Auth/JoinOrganization";
 import Login from "./pages/Admin/Auth/Login";
 import Register from "./pages/Admin/Auth/Register";
 import BusinessProfileSetup from "./pages/Admin/BusinessProfileSetup";
@@ -33,6 +34,16 @@ export default function App() {
           <Route path="/admin" element={<Login />} />
           <Route path="/admin/sign-in" element={<Login />} />
           <Route path="/admin/sign-up" element={<Register />} />
+
+          {/* Handle organization invitations for existing users */}
+          <Route
+            path="/admin/join-organization"
+            element={
+              // <ProtectedRoute>
+              <JoinOrganization />
+              // </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/admin/select-business"

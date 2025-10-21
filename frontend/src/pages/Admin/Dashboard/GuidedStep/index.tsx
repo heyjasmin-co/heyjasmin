@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import celebIcon from "../../../../assets/image/celebIcon.png";
-import loadingGif from "../../../../assets/image/loadingGif.gif";
 import websiteIcon from "../../../../assets/image/websiteIcon.png";
 import Breadcrumb from "../../../../components/dashboard/Breadcrumb";
 import BusinessInfo from "../../../../components/dashboard/BusinessInfo";
 import InfoCard from "../../../../components/dashboard/InfoCard";
 import TalkToAgent from "../../../../components/dashboard/TalkToAgent";
 import TrainingSources from "../../../../components/dashboard/TrainingSources";
+import Loading from "../../../../components/Loading";
 import { useUserData } from "../../../../context/UserDataContext";
 import { useApiClient } from "../../../../lib/axios";
 import { appName } from "../../../../theme/appName";
@@ -61,9 +61,7 @@ export default function Dashboard() {
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
       {/* Container */}
       {loading && !businessDetails ? (
-        <div className="w-hull bg-blue flex h-full items-center justify-center">
-          <img src={loadingGif} />
-        </div>
+        <Loading />
       ) : (
         <div className="mx-auto flex w-full max-w-3xl flex-col space-y-6">
           {/* Breadcrumb */}

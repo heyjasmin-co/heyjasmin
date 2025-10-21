@@ -22,6 +22,9 @@ const config = {
 
 	//OPEN_AI
 	apiKey: process.env.OPEN_ROUTER_API,
+
+	//Frontend
+	frontend_url: process.env.FRONTEND_URL,
 }
 
 export default config

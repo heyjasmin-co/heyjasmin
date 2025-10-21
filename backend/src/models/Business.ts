@@ -29,6 +29,7 @@ interface IBusiness extends Document {
 		voiceSettings?: Record<string, any>
 		customInstructions?: string
 	}
+	clerkOrganizationId: string
 	isSetupComplete: boolean
 	createdAt: Date
 	updatedAt: Date
@@ -150,6 +151,12 @@ const businessSchema = new Schema<IBusiness>(
 		isSetupComplete: {
 			type: Boolean,
 			default: false,
+		},
+
+		//Clerk Organization Id
+		clerkOrganizationId: {
+			type: String,
+			required: true,
 		},
 	},
 	{

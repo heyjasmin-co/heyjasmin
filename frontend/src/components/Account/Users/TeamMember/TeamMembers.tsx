@@ -1,9 +1,9 @@
 import { useState } from "react";
-import infoIcon from "../../../assets/image/infoIcon.png";
-import { appName } from "../../../theme/appName";
-import { colorTheme } from "../../../theme/colorTheme";
-import { BusinessUsersDetailsType } from "../../../types/BusinessUsersTypes";
-import { capitalizeString } from "../../../utils/string-utils";
+import infoIcon from "../../../../assets/image/infoIcon.png";
+import { appName } from "../../../../theme/appName";
+import { colorTheme } from "../../../../theme/colorTheme";
+import { BusinessUsersDetailsType } from "../../../../types/BusinessUsersTypes";
+import { capitalizeString } from "../../../../utils/string-utils";
 import TeamMemberModal from "./TeamMemberModal";
 import TeamMemberRemoveModal from "./TeamMemberRemoveModal";
 
@@ -104,7 +104,7 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
             >
               <i className="fa-solid fa-users text-white"></i>
             </div>
-            <h5 className="text-lg font-bold text-gray-900">Team Members</h5>
+            <h5 className="text-lg font-bold text-gray-900">Team Members </h5>
           </div>
 
           {/* Info */}
@@ -120,7 +120,7 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
             {/* Add User */}
             <div className="flex flex-row items-center justify-between gap-3">
               <span className="text-lg font-bold text-gray-800">Users</span>
-              <div className="flex w-full justify-end sm:w-auto">
+              {/* <div className="flex w-full justify-end sm:w-auto">
                 <button
                   onClick={handleModal}
                   className="flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95"
@@ -128,7 +128,7 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
                   <i className="fa-solid fa-plus text-white"></i>
                   <span>Add</span>
                 </button>
-              </div>
+              </div> */}
             </div>
 
             {/* Team Member Table */}

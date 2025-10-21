@@ -44,3 +44,4 @@ export interface IBusinessHour {
   end: string;
   isOpen: boolean;
 }
+

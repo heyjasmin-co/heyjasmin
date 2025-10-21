@@ -1,53 +1,55 @@
 import { useEffect, useState } from "react";
-import infoIcon from "../../../assets/image/infoIcon.png";
-import { appName } from "../../../theme/appName";
-import { colorTheme } from "../../../theme/colorTheme";
+import infoIcon from "../../../../assets/image/infoIcon.png";
+import { appName } from "../../../../theme/appName";
+import { colorTheme } from "../../../../theme/colorTheme";
+import { BusinessUserInvitationsType } from "../../../../types/BusinessUserInvitationsTypes";
 
-interface TeamMemberModalProps {
+interface TeamMemberInvitationModalProps {
   handleModel: () => void;
-  editMode: boolean;
-  memberData?: { name: string; email: string; role: string }; // For edit mode
-  onSubmit: (member: { name: string; email: string; role: string }) => void;
+  memberData?: BusinessUserInvitationsType;
+  onSubmit: (member: { email: string; role: string }) => Promise<void>;
 }
 
-function TeamMemberModal({
+function TeamMemberInvitationModal({
   handleModel,
-  editMode,
   memberData,
   onSubmit,
-}: TeamMemberModalProps) {
-  const [name, setName] = useState("");
+}: TeamMemberInvitationModalProps) {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState("Admin");
+  const [role, setRole] = useState("admin");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (editMode && memberData) {
-      setName(memberData.name);
+    if (memberData) {
       setEmail(memberData.email);
       setRole(memberData.role);
     }
-  }, [editMode, memberData]);
+  }, [memberData]);
 
-  const handleAddMember = () => {
-    if (!name.trim() || !email.trim()) {
-      setError("Name and Email are required.");
+  const handleAddMember = async () => {
+    setLoading(true);
+    if (!email.trim()) {
+      setError("Email are required.");
+      setLoading(false);
+
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError("Please enter a valid email address.");
+      setLoading(false);
       return;
     }
 
-    // Call parent callback
-    onSubmit({ name: name.trim(), email: email.trim(), role });
-    setName("");
+    await onSubmit({ email: email.trim(), role });
     setEmail("");
     setRole("Admin");
     setError("");
-    handleModel(); // Close modal
+    setLoading(false);
+
+    handleModel();
   };
 
   return (
@@ -65,9 +67,7 @@ function TeamMemberModal({
             >
               <i className="fa-solid fa-user-plus text-sm text-white"></i>
             </div>
-            <h5 className="text-lg font-bold text-gray-900">
-              {editMode ? "Edit Member" : "Add Member"}
-            </h5>
+            <h5 className="text-lg font-bold text-gray-900">Add Member</h5>
           </div>
           <button
             onClick={handleModel}
@@ -85,16 +85,15 @@ function TeamMemberModal({
             className="h-6 w-6 flex-shrink-0"
           />
           <p className="text-sm text-gray-700">
-            {editMode
-              ? `Edit the member details for the ${appName} admin dashboard.`
-              : `Add new members to the ${appName} admin dashboard by entering their email and assigning a role.`}
+            Add new members to the {appName} admin dashboard by entering their
+            email and assigning a role.
           </p>
         </div>
 
         {/* Form Section */}
         <div className="flex flex-col gap-4 px-4 py-4">
           <div className="flex flex-col gap-3">
-            <input
+            {/* <input
               type="text"
               placeholder="Full Name"
               value={name}
@@ -103,25 +102,22 @@ function TeamMemberModal({
               className={`w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none ${
                 editMode ? "cursor-not-allowed bg-gray-200" : "bg-white"
               }`}
-            />
+            /> */}
             <input
               type="email"
               placeholder="Email Address"
               value={email}
-              disabled={editMode}
               onChange={(e) => setEmail(e.target.value)}
-              className={`w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none ${
-                editMode ? "cursor-not-allowed bg-gray-200" : "bg-white"
-              }`}
+              className={`w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none`}
             />
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
               className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
             >
-              <option>Admin</option>
-              <option>Editor</option>
-              <option>Viewer</option>
+              <option value={"admin"}>Admin</option>
+              <option value={"editor"}>Editor</option>
+              <option value={"viewer"}>Viewer</option>
             </select>
           </div>
 
@@ -130,10 +126,11 @@ function TeamMemberModal({
           <div className="flex justify-end">
             <button
               onClick={handleAddMember}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
+              disabled={loading}
+              className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-md transition-all ${loading ? "cursor-not-allowed bg-gray-300" : "bg-purple-600 hover:bg-purple-700 active:scale-95"}`}
             >
               <i className="fa-solid fa-plus text-white"></i>
-              <span>{editMode ? "Save Changes" : "Add Member"}</span>
+              <span>{loading ? "Adding..." : "Add Member"}</span>
             </button>
           </div>
         </div>
@@ -142,4 +139,4 @@ function TeamMemberModal({
   );
 }
 
-export default TeamMemberModal;
+export default TeamMemberInvitationModal;

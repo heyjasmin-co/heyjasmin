@@ -1,7 +1,8 @@
-import infoIcon from "../../../assets/image/infoIcon.png";
-import { colorTheme } from "../../../theme/colorTheme";
-import { BusinessUsersDetailsType } from "../../../types/BusinessUsersTypes";
-import { capitalizeString } from "../../../utils/string-utils";
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+import infoIcon from "../../../../assets/image/infoIcon.png";
+import { colorTheme } from "../../../../theme/colorTheme";
+import { BusinessUsersDetailsType } from "../../../../types/BusinessUsersTypes";
+import { capitalizeString } from "../../../../utils/string-utils";
 
 interface TeamMemberRemoveModalProps {
   handleRemoveModel: () => void;

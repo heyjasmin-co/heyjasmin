@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import loadingGif from "../../../../assets/image/loadingGif.gif";
 import AccountDetails from "../../../../components/Account/AccountSettings/AccountDetails";
+import Loading from "../../../../components/Loading";
 import TitleCard from "../../../../components/TitleCard";
 import { useUserData } from "../../../../context/UserDataContext";
 import { useApiClient } from "../../../../lib/axios";
@@ -40,9 +40,7 @@ export default function AccountDetailsPage() {
   return (
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
       {loading && !accountInformation ? (
-        <div className="bg-blue flex h-full w-full items-center justify-center">
-          <img src={loadingGif} alt="Loading..." className="h-10 w-10" />
-        </div>
+        <Loading />
       ) : accountInformation ? (
         <div className="flex flex-col gap-5">
           <TitleCard

@@ -17,7 +17,6 @@ export const me = async (request: MeUserInput): Promise<MeUserOutput> => {
 	let isSetupComplete = null
 	if (context.businessId) {
 		const businessUser = await BusinessUser.findOne({
-			userId: context.dbUserId,
 			businessId: context.businessId,
 		}).populate<{ businessId: IBusiness }>({
 			path: 'businessId',

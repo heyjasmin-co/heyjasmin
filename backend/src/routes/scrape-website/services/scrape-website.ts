@@ -38,26 +38,30 @@ export const websiteScrape = async (ctx: FastifyRequest, args: WebsiteScrapeInpu
 			isSetupComplete: true,
 		})
 
-		await newBusiness.save({ session })
-
 		const businessMember = new BusinessUser({
 			userId: ownerUserId,
 			businessId: newBusiness._id,
 			role: 'admin',
 		})
 
+		const [org] = await Promise.all([
+			clerkClient.organizations.createOrganization({
+				name: businessData.name,
+				createdBy: ctx.context?.clerkId!,
+			}),
+			clerkClient.users.updateUserMetadata(ctx.context?.clerkId!, {
+				publicMetadata: {
+					dbUserId: ctx.context?.dbUserId!,
+					clerkId: ctx.context?.clerkId!,
+					businessId: (newBusiness._id as any).toString(),
+					role: 'admin',
+					selectedClientId: null,
+				},
+			}),
+		])
+		newBusiness.clerkOrganizationId = org.id
+		await newBusiness.save({ session })
 		await businessMember.save({ session })
-
-		await clerkClient.users.updateUserMetadata(ctx.context?.clerkId!, {
-			publicMetadata: {
-				dbUserId: ctx.context?.dbUserId!,
-				clerkId: ctx.context?.clerkId!,
-				businessId: (newBusiness._id as any).toString(),
-				role: 'admin',
-				selectedClientId: null,
-			},
-		})
-
 		return newBusiness
 	})
 }
