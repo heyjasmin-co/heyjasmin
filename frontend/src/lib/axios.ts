@@ -1,8 +1,17 @@
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useOrganizationList } from "@clerk/clerk-react";
 import axios, { AxiosInstance } from "axios";
+import { useEffect } from "react";
 
 export const useApiClient = (timeout: number = 10000): AxiosInstance => {
   const { getToken } = useAuth();
+  const { setActive } = useOrganizationList();
+
+  // Clear active organization on mount
+  useEffect(() => {
+    if (setActive) {
+      setActive({ organization: null });
+    }
+  }, [setActive]);
 
   const apiClient = axios.create({
     baseURL:
@@ -30,5 +39,4 @@ export const useApiClient = (timeout: number = 10000): AxiosInstance => {
 
   return apiClient;
 };
-
 export const useScrapeApiClient = () => useApiClient(90000);

@@ -7,7 +7,6 @@ import { UserService } from './routes/users/services'
 export const createContext = async (request: FastifyRequest, reply: FastifyReply) => {
 	try {
 		const auth = getAuth(request)
-
 		const context = {
 			dbUserId: (auth.sessionClaims?.dbUserId as string) || null,
 			clerkId: auth.userId || null,

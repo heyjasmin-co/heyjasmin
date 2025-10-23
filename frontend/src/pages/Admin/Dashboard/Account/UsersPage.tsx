@@ -36,7 +36,7 @@ export default function UsersPage() {
           data: BusinessUserInvitationsType[];
         }>("/business-user-invitations/" + userData?.businessId),
       ]);
-      console.log("businessUserInvitations", businessUserInvitations);
+      
       setBusinessUsers(businessUsers.data.data);
       setBusinessUserInvitations(businessUserInvitations.data.data);
       successToast("Business User Information fetch Successfully");

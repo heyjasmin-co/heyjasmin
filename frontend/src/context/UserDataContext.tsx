@@ -76,7 +76,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     fetchUserData();
-  }, [user, isSignedIn]);
+  }, [isSignedIn]);
 
   return (
     <UserDataContext.Provider

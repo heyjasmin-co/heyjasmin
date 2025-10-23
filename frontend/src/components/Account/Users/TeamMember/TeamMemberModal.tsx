@@ -1,26 +1,31 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 import { useEffect, useState } from "react";
 import infoIcon from "../../../../assets/image/infoIcon.png";
 import { appName } from "../../../../theme/appName";
 import { colorTheme } from "../../../../theme/colorTheme";
+import { BusinessUserType } from "../../../../types/BusinessUsersTypes";
 
 interface TeamMemberModalProps {
   handleModel: () => void;
   editMode: boolean;
-  memberData?: { name: string; email: string; role: string }; // For edit mode
-  onSubmit: (member: { name: string; email: string; role: string }) => void;
+  memberData?: BusinessUserType;
+  handleSubmit: (member: {
+    businessUserId: string;
+    role: string;
+  }) => Promise<void>;
 }
 
 function TeamMemberModal({
   handleModel,
   editMode,
   memberData,
-  onSubmit,
+  handleSubmit,
 }: TeamMemberModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("Admin");
   const [error, setError] = useState("");
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (editMode && memberData) {
       setName(memberData.name);
@@ -29,25 +34,34 @@ function TeamMemberModal({
     }
   }, [editMode, memberData]);
 
-  const handleAddMember = () => {
-    if (!name.trim() || !email.trim()) {
-      setError("Name and Email are required.");
-      return;
-    }
+  const handleAddMember = async (member: {
+    businessUserId: string;
+    role: string;
+  }) => {
+    try {
+      setLoading(true);
+      if (!name.trim() || !email.trim()) {
+        setError("Name and Email are required.");
+        return;
+      }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setError("Please enter a valid email address.");
+        return;
+      }
 
-    // Call parent callback
-    onSubmit({ name: name.trim(), email: email.trim(), role });
-    setName("");
-    setEmail("");
-    setRole("Admin");
-    setError("");
-    handleModel(); // Close modal
+      await handleSubmit(member);
+      setName("");
+      setEmail("");
+      setRole("Admin");
+      setError("");
+      handleModel();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -129,11 +143,25 @@ function TeamMemberModal({
 
           <div className="flex justify-end">
             <button
-              onClick={handleAddMember}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
+              type="button"
+              disabled={loading}
+              onClick={() => {
+                if (!memberData?._id || !memberData?.role) return;
+                handleAddMember({
+                  businessUserId: memberData._id,
+                  role: memberData.role,
+                });
+              }}
+              className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-md transition-all sm:w-auto ${loading ? "cursor-not-allowed bg-purple-400" : "bg-purple-600 hover:bg-purple-700 active:scale-95"}`}
             >
               <i className="fa-solid fa-plus text-white"></i>
-              <span>{editMode ? "Save Changes" : "Add Member"}</span>
+              <span>
+                {editMode
+                  ? loading
+                    ? "Saving..."
+                    : "Save Changes"
+                  : "Add Member"}
+              </span>
             </button>
           </div>
         </div>

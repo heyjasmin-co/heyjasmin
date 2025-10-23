@@ -64,7 +64,7 @@ export default function BusinessDetailsPage() {
 
   return (
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
-      {loading && !BusinessDetails ? (
+      {loading && !businessDetails ? (
         <Loading />
       ) : (
         <div className="flex flex-col gap-5">

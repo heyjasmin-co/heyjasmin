@@ -1,4 +1,4 @@
-import { useUser } from "@clerk/clerk-react";
+import { useAuth, useOrganization, useUser } from "@clerk/clerk-react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useUserData } from "../../context/UserDataContext";
 
@@ -15,7 +15,9 @@ export default function ProtectedRoute({
   const { isSignedIn, isLoaded } = useUser();
   const { userData, loading } = useUserData();
   const location = useLocation();
-
+  const { userId, orgId, orgRole } = useAuth();
+  const { organization } = useOrganization();
+  console.log({ orgId, userId, organization, orgRole });
   if (!isLoaded || loading || !userData) {
     return (
       <div className="flex h-screen items-center justify-center text-gray-600">

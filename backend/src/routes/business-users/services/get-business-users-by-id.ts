@@ -47,6 +47,7 @@ export const getBusinessUsersById = async (request: FastifyRequest, args: GetBus
 						},
 					},
 				},
+				clerkOrganizationId: '$business.clerkOrganizationId',
 				businessName: '$business.name',
 			},
 		},

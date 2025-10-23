@@ -18,6 +18,7 @@ function TeamMemberInvitationRemoveModal({
 }: TeamMemberInvitationRemoveModalProps) {
   const [loading, setLoading] = useState(false);
   const handleRemove = async (clerkInvitationId: string) => {
+    console.log("clerkInvitationId", clerkInvitationId);
     if (clerkInvitationId) {
       setLoading(true);
       await handleRemoveMember(clerkInvitationId);
@@ -26,7 +27,7 @@ function TeamMemberInvitationRemoveModal({
       handleRemoveModel();
     }
   };
-
+console.log("memberData",memberData)
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 sm:p-6">
       <div
@@ -81,7 +82,7 @@ function TeamMemberInvitationRemoveModal({
         {/* Actions */}
         <div className="flex justify-end gap-3 px-4 py-3">
           <button
-            onClick={() => handleRemove(memberData?.clerkInvitationId!)}
+            onClick={() => handleRemove(memberData?.clerKInvitationId!)}
             disabled={loading}
             className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-md transition-all ${loading ? "cursor-not-allowed bg-gray-300" : "bg-red-600 hover:bg-red-700 active:scale-95"}`}
           >

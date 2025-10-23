@@ -28,7 +28,7 @@ function Features() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-20 text-center">
-          <h2 className="mb-6 text-5xl leading-tight font-extrabold text-black sm:text-6xl">
+          {/* <h2 className="mb-6 text-5xl leading-tight font-extrabold text-black sm:text-6xl">
             Why Choose{" "}
             <span
               className="bg-clip-text text-transparent"
@@ -40,15 +40,14 @@ function Features() {
             >
               Jasmin
             </span>
-          </h2>
-          <p className="mx-auto max-w-3xl text-lg leading-relaxed font-semibold text-black sm:text-2xl">
-            Smarter AI-powered call handling that grows your business
-            seamlessly,{" "}
+          </h2> */}
+          <p className="mx-auto max-w-4xl text-center text-2xl leading-relaxed font-bold text-black sm:text-4xl">
+            Smarter "AI" call handling that grows your business seamlessly,{" "}
             <span
-              className="bg-clip-text text-transparent"
+              className="bg-clip-text font-extrabold text-transparent"
               style={{
                 backgroundImage: `linear-gradient(to right, ${colorTheme.secondaryColor(
-                  1
+                  1,
                 )}, #9b6bff)`,
               }}
             >

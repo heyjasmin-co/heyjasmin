@@ -1,8 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import infoIcon from "../../../../assets/image/infoIcon.png";
+import { useApiClient } from "../../../../lib/axios";
 import { appName } from "../../../../theme/appName";
 import { colorTheme } from "../../../../theme/colorTheme";
-import { BusinessUsersDetailsType } from "../../../../types/BusinessUsersTypes";
+import {
+  BusinessUsersDetailsType,
+  BusinessUserType,
+} from "../../../../types/BusinessUsersTypes";
+import { errorToast, successToast } from "../../../../utils/react-toast";
 import { capitalizeString } from "../../../../utils/string-utils";
 import TeamMemberModal from "./TeamMemberModal";
 import TeamMemberRemoveModal from "./TeamMemberRemoveModal";
@@ -27,6 +33,9 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
   const [removeMode, setRemoveMode] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
+  //
+  const apiClient = useApiClient();
+
   // Handlers
   const handleModal = () => {
     setOpenModal((prev) => !prev);
@@ -46,46 +55,48 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
     setRemoveMode(true);
     setSelectedMember(member);
   };
-  const handleRemoveModel = () => {
+  const handleRemoveModel = async () => {
     setRemoveMode(false);
   };
-  const handleSubmit = (member: {
-    name: string;
-    email: string;
+  const handleSubmit = async (member: {
+    businessUserId: string;
     role: string;
   }) => {
-    if (editMode && selectedMember) {
-      // Update existing member
-      setMembers((prev) =>
-        prev.map((m) =>
-          m._id === selectedMember._id ? { ...m, ...member } : m,
+    try {
+      const { businessUserId, role } = member;
+
+      const response = await apiClient.patch<{
+        message: string;
+        success: boolean;
+        data: BusinessUserType;
+      }>(`/business-users/${businessUserId}`, { role });
+
+      const updatedUser = response.data.data;
+      setMembers((prevMembers) =>
+        prevMembers.map((m) =>
+          m._id === updatedUser._id ? { ...m, ...updatedUser } : m,
         ),
       );
-    } else {
-      // Add new member
-      const newMember: Member = member;
-      setMembers((prev) => [...prev, newMember]);
+      successToast(response.data.message);
+    } catch (error: any) {
+      const message = error.response.data.error;
+      errorToast(message);
     }
   };
-  const handleRemoveMember = (member: {
-    name: string;
-    email: string;
-    role: string;
-  }) => {
-    if (editMode && selectedMember) {
-      // Update existing member
-      setMembers((prev) =>
-        prev.map((m) =>
-          m._id === selectedMember._id ? { ...m, ...member } : m,
-        ),
-      );
-    } else {
-      // Add new member
-      const newMember: Member = {
-        _id: Date.now() + "",
-        ...member,
-      };
-      setMembers((prev) => [...prev, newMember]);
+  const handleRemoveMember = async (businessUserId: string) => {
+    try {
+      const response = await apiClient.delete<{
+        message: string;
+        success: boolean;
+        data: BusinessUserType;
+      }>("/business-users/" + businessUserId);
+      const user = response.data.data;
+
+      setMembers(members.filter((member) => member._id !== user._id));
+      successToast(response.data.message);
+    } catch (error: any) {
+      const message = error.response.data.error;
+      errorToast(message);
     }
   };
 
@@ -205,14 +216,14 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
           handleModel={handleModal}
           editMode={editMode}
           memberData={selectedMember || undefined}
-          onSubmit={handleSubmit}
+          handleSubmit={handleSubmit}
         />
       )}
       {removeMode && (
         <TeamMemberRemoveModal
           handleRemoveModel={handleRemoveModel}
           memberData={selectedMember || undefined}
-          onRemove={handleRemoveMember}
+          handleRemoveMember={handleRemoveMember}
         />
       )}
     </>

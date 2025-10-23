@@ -57,7 +57,6 @@ function SubscriptionCards() {
       price: "Custom",
       subtitle: "🏆 Best for enterprise-level operations",
       features: [
-        "Unlimited minutes",
         "Enterprise-level customization",
         "Full appointment & agent management",
         "Dedicated success manager",

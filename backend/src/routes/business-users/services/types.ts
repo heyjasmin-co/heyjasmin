@@ -1,4 +1,9 @@
-import { GetBusinessUsersByIdParamsSchemaInput } from '../handlers/types'
+import { IBusinessUser } from '../../../models'
+import {
+	DeleteBusinessUserByIdSchemaInput,
+	GetBusinessUsersByIdParamsSchemaInput,
+	UpdateBusinessUserByIdSchemaInput,
+} from '../handlers/types'
 
 export type GetBusinessUsersInput = GetBusinessUsersByIdParamsSchemaInput
 export type GetBusinessUsersOutput =
@@ -11,3 +16,11 @@ export type GetBusinessUsersOutput =
 			businessName: string
 	  }[]
 	| null
+
+//
+export type DeleteBusinessUserInput = DeleteBusinessUserByIdSchemaInput
+export type DeleteBusinessUserOutput = IBusinessUser | null
+
+//
+export type UpdateBusinessUsersByIdInput = UpdateBusinessUserByIdSchemaInput
+export type UpdateBusinessUsersByIdOutput = IBusinessUser | null

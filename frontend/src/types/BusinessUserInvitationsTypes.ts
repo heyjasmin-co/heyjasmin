@@ -2,7 +2,7 @@
 export type BusinessUserInvitationsType = {
   _id: string;
   businessId: string;
-  clerkInvitationId: string;
+  clerKInvitationId: string;
   email: string;
   role: "editor" | "admin" | "viewer";
   status: "active" | "pending" | "removed";

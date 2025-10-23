@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+import { useState } from "react";
 import infoIcon from "../../../../assets/image/infoIcon.png";
 import { colorTheme } from "../../../../theme/colorTheme";
 import { BusinessUsersDetailsType } from "../../../../types/BusinessUsersTypes";
@@ -7,18 +8,26 @@ import { capitalizeString } from "../../../../utils/string-utils";
 interface TeamMemberRemoveModalProps {
   handleRemoveModel: () => void;
   memberData?: BusinessUsersDetailsType[0];
-  onRemove: (member: BusinessUsersDetailsType[0]) => void;
+  handleRemoveMember: (businessUserId: string) => Promise<void>;
 }
 
 function TeamMemberRemoveModal({
   handleRemoveModel,
   memberData,
-  onRemove,
+  handleRemoveMember,
 }: TeamMemberRemoveModalProps) {
-  const handleRemove = () => {
-    if (memberData) {
-      onRemove(memberData);
-      handleRemoveModel(); // Close modal
+  const [loading, setLoading] = useState(false);
+  const handleRemove = async (businessUserId: string) => {
+    try {
+      setLoading(true);
+      if (businessUserId) {
+        await handleRemoveMember(businessUserId);
+        handleRemoveModel();
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,11 +99,16 @@ function TeamMemberRemoveModal({
             Cancel
           </button>
           <button
-            onClick={handleRemove}
-            className="flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-red-700 active:scale-95"
+            disabled={loading}
+            onClick={() => handleRemove(memberData?._id!)}
+            className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-md transition-all active:scale-95 ${
+              loading
+                ? "cursor-not-allowed bg-red-400"
+                : "bg-red-600 hover:bg-red-700"
+            }`}
           >
             <i className="fa-solid fa-trash"></i>
-            <span>Remove Member</span>
+            <span>{loading ? "Removing..." : "Remove Member"}</span>
           </button>
         </div>
       </div>
