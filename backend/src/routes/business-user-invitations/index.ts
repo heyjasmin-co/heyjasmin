@@ -1,4 +1,5 @@
 import { FastifyInstance } from 'fastify'
+import { authenticate } from '../../middleware/clerkAuth'
 import { acceptBusinessUserInvitationByIdHandler } from './handlers/accept-business-user-invitation-id'
 import { createBusinessUserInvitationByIdHandler } from './handlers/create-business-user-invitation-id'
 import { getBusinessUserInvitationsByIdHandler } from './handlers/get-business-user-invitations-by-id'
@@ -13,6 +14,7 @@ import {
 export default async function businessUserInvitationsRoute(fastify: FastifyInstance) {
 	// Get Business User Invitation
 	fastify.get('/:businessId', {
+		preHandler: [authenticate],
 		schema: {
 			tags: ['business-user-invitations'],
 			description: 'Get Business User Invitations Details',
@@ -23,6 +25,7 @@ export default async function businessUserInvitationsRoute(fastify: FastifyInsta
 
 	// Create Business User Invitation
 	fastify.post('/create/:businessId', {
+		preHandler: [authenticate],
 		schema: {
 			tags: ['business-user-invitations'],
 			description: 'Create Business User Invitation',
@@ -33,6 +36,7 @@ export default async function businessUserInvitationsRoute(fastify: FastifyInsta
 	})
 	// Create Business User Invitation
 	fastify.delete('/revoke/:invitationId', {
+		preHandler: [authenticate],
 		schema: {
 			tags: ['business-user-invitations'],
 			description: 'Revoke Business User Invitation',
@@ -43,6 +47,7 @@ export default async function businessUserInvitationsRoute(fastify: FastifyInsta
 
 	// Accept Business User Invitation
 	fastify.post('/accept', {
+		preHandler: [authenticate],
 		schema: {
 			tags: ['business-user-invitations'],
 			description: 'Accept Business User Invitation',

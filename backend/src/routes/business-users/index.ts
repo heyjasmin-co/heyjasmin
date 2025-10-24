@@ -1,4 +1,5 @@
 import { FastifyInstance } from 'fastify'
+import { authenticate } from '../../middleware/clerkAuth'
 import { deleteBusinessUserByIdHandler } from './handlers/delete-business-user-by-id'
 import { getBusinessUsersByIdHandler } from './handlers/get-business-users-by-id'
 import {
@@ -12,6 +13,7 @@ import { updateBusinessUsersByIdHandler } from './handlers/update-business-user-
 export default async function businessUsersRoute(fastify: FastifyInstance) {
 	// Get Business Users by Id
 	fastify.get('/:businessId', {
+		preHandler: [authenticate],
 		schema: {
 			tags: ['business-users'],
 			description: 'Get Business Users Details',
@@ -22,6 +24,7 @@ export default async function businessUsersRoute(fastify: FastifyInstance) {
 
 	// Delete Business User by Id
 	fastify.delete('/:businessUserId', {
+		preHandler: [authenticate],
 		schema: {
 			tags: ['business-users'],
 			description: 'Remove Business User By Id',
@@ -32,6 +35,7 @@ export default async function businessUsersRoute(fastify: FastifyInstance) {
 
 	// Update Business User by Id
 	fastify.patch('/:businessUserId', {
+		preHandler: [authenticate],
 		schema: {
 			tags: ['business-users'],
 			description: 'Update Business User By Id',

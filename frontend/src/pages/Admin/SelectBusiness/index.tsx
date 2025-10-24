@@ -33,7 +33,7 @@ export default function SelectBusinessPage() {
     const fetchUserBusinesses = async () => {
       setLoading((pv) => ({ ...pv, apiLoading: true }));
       try {
-        const response = await apiClient("/users/user-businesses");
+        const response = await apiClient.get("/users/user-businesses");
         const businesses = response.data.data;
         setUserBusinesses(businesses);
 
