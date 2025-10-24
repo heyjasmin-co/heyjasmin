@@ -34,10 +34,7 @@ function TeamMemberModal({
     }
   }, [editMode, memberData]);
 
-  const handleAddMember = async (member: {
-    businessUserId: string;
-    role: string;
-  }) => {
+  const handleAddMember = async (businessUserId: string) => {
     try {
       setLoading(true);
       if (!name.trim() || !email.trim()) {
@@ -51,7 +48,7 @@ function TeamMemberModal({
         return;
       }
 
-      await handleSubmit(member);
+      await handleSubmit({ businessUserId, role: role });
       setName("");
       setEmail("");
       setRole("Admin");
@@ -133,9 +130,9 @@ function TeamMemberModal({
               onChange={(e) => setRole(e.target.value)}
               className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none"
             >
-              <option>Admin</option>
-              <option>Editor</option>
-              <option>Viewer</option>
+              <option value={"admin"}>Admin</option>
+              <option value={"editor"}>Editor</option>
+              <option value={"viewer"}>Viewer</option>
             </select>
           </div>
 
@@ -146,11 +143,7 @@ function TeamMemberModal({
               type="button"
               disabled={loading}
               onClick={() => {
-                if (!memberData?._id || !memberData?.role) return;
-                handleAddMember({
-                  businessUserId: memberData._id,
-                  role: memberData.role,
-                });
+                handleAddMember(memberData?._id!);
               }}
               className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-md transition-all sm:w-auto ${loading ? "cursor-not-allowed bg-purple-400" : "bg-purple-600 hover:bg-purple-700 active:scale-95"}`}
             >

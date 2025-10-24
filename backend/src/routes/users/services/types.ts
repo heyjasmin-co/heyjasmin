@@ -1,6 +1,6 @@
 import { FastifyRequest } from 'fastify'
 import { IBusiness, IBusinessUser, IUser } from '../../../models'
-import { getUserByClerkIdParamsSchema, selectUserBusinessSchema } from '../handlers/types'
+import { getUserByClerkIdParamsSchema, SelectUserBusinessSchemaInput } from '../handlers/types'
 
 //
 export type GetUserByClerkIdInput = typeof getUserByClerkIdParamsSchema._type
@@ -37,5 +37,5 @@ export type GetUserBusinessesOutput = {
 }[]
 
 //
-export type SelectUserBusinessInput = typeof selectUserBusinessSchema._type
+export type SelectUserBusinessInput = SelectUserBusinessSchemaInput
 export type SelectUserBusinessOutput = void

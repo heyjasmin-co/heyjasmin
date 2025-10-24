@@ -27,8 +27,7 @@ export default async function clerkWebhook(fastify: FastifyInstance) {
 		},
 		async (request, reply) => {
 			const { data, type } = request.body as ClerkWebhookBody
-			console.log('data', data)
-			console.log('type', type)
+		
 			try {
 				switch (type) {
 					case 'user.created':

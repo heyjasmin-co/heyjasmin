@@ -62,6 +62,13 @@ export const websiteScrape = async (ctx: FastifyRequest, args: WebsiteScrapeInpu
 		newBusiness.clerkOrganizationId = org.id
 		await newBusiness.save({ session })
 		await businessMember.save({ session })
+
+		await clerkClient.users.updateUser(ctx.context?.clerkId!, {
+			publicMetadata: {
+				businessId: newBusiness._id,
+				role: 'admin',
+			},
+		})
 		return newBusiness
 	})
 }

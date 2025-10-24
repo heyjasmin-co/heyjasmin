@@ -57,8 +57,13 @@ export default function SelectBusinessPage() {
   const handleBusinessSelect = async (businessId: string) => {
     if (!businessId) return;
     setLoading((pv) => ({ ...pv, selectBusinessLoading: true }));
+    const [findRole] = userBusinesses.filter(
+      (business) => business.businessId === businessId,
+    );
     try {
-      await apiClient.post(`/users/select-business`, { businessId });
+      await apiClient.post(`/users/select-business/` + businessId, {
+        role: findRole.role,
+      });
 
       successToast("Business selected successfully.");
 

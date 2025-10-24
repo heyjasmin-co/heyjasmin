@@ -6,7 +6,10 @@ export const getUserByClerkIdParamsSchema = z.object({
 export type GetUserByClerkIdParamsSchemaInput = z.infer<typeof getUserByClerkIdParamsSchema>
 
 //
-export const selectUserBusinessSchema = z.object({
+export const selectUserBusinessParamsSchema = z.object({
 	businessId: z.string(),
 })
-export type SelectUserBusinessSchemaInput = z.infer<typeof selectUserBusinessSchema>
+export const selectUserBusinessBodySchema = z.object({
+	role: z.string(),
+})
+export type SelectUserBusinessSchemaInput = z.infer<typeof selectUserBusinessParamsSchema> & z.infer<typeof selectUserBusinessBodySchema>

@@ -9,11 +9,12 @@ import {
 	updateBusinessUserByIdParamsSchema,
 } from './handlers/types'
 import { updateBusinessUsersByIdHandler } from './handlers/update-business-user-by-id'
+import { createContext } from '../../context'
 
 export default async function businessUsersRoute(fastify: FastifyInstance) {
 	// Get Business Users by Id
 	fastify.get('/:businessId', {
-		preHandler: [authenticate],
+		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['business-users'],
 			description: 'Get Business Users Details',
@@ -24,7 +25,7 @@ export default async function businessUsersRoute(fastify: FastifyInstance) {
 
 	// Delete Business User by Id
 	fastify.delete('/:businessUserId', {
-		preHandler: [authenticate],
+		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['business-users'],
 			description: 'Remove Business User By Id',
@@ -35,7 +36,7 @@ export default async function businessUsersRoute(fastify: FastifyInstance) {
 
 	// Update Business User by Id
 	fastify.patch('/:businessUserId', {
-		preHandler: [authenticate],
+		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['business-users'],
 			description: 'Update Business User By Id',

@@ -32,7 +32,7 @@ export default function ScriptingProfile({
       }
       return prev;
     });
-    navigate("/admin/dashboard");
+    window.location.href = "/admin/dashboard";
   };
   return (
     <div className="flex h-full w-full flex-col rounded-2xl bg-white shadow-2xl lg:h-full lg:flex-row">

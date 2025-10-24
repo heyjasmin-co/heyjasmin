@@ -16,11 +16,12 @@ import { updateBusinessDetailsByIdHandler } from './handlers/update-business-det
 import { updateBusinessHoursByIdHandler } from './handlers/update-business-hours-by-id'
 import { updateBusinessInformationByIdHandler } from './handlers/update-business-information-by-id'
 import { updateBusinessServicesByIdHandler } from './handlers/update-business-services-by-id'
+import { createContext } from '../../context'
 
 export default async function businessRoute(fastify: FastifyInstance) {
 	// Get Business Details by Id
 	fastify.get('/:businessId', {
-		preHandler: [authenticate],
+		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['businesses'],
 			description: 'Get Business Details information',
@@ -31,7 +32,7 @@ export default async function businessRoute(fastify: FastifyInstance) {
 
 	// Update Business Details by Id
 	fastify.patch('/:businessId', {
-		preHandler: [authenticate],
+		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['businesses'],
 			description: 'Update Business Details information',
@@ -43,7 +44,7 @@ export default async function businessRoute(fastify: FastifyInstance) {
 
 	// Update Business Information by Id
 	fastify.patch('/information/:businessId', {
-		preHandler: [authenticate],
+		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['businesses'],
 			description: 'Update Business Information information',
@@ -55,7 +56,7 @@ export default async function businessRoute(fastify: FastifyInstance) {
 
 	// Update Business Services by Id
 	fastify.patch('/services/:businessId', {
-		preHandler: [authenticate],
+		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['businesses'],
 			description: 'Update Business Services',
@@ -67,7 +68,7 @@ export default async function businessRoute(fastify: FastifyInstance) {
 
 	// Update Business Hours by Id
 	fastify.patch('/hours/:businessId', {
-		preHandler: [authenticate],
+		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['businesses'],
 			description: 'Update Business Hours',

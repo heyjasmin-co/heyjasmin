@@ -1,15 +1,17 @@
 import { FastifyInstance } from 'fastify'
+import { createContext } from '../../context'
 import { authenticate } from '../../middleware/clerkAuth'
 import { getUserBusinessesHandler } from './handlers/get-user-businesses'
 import { getUserByClerkIdHandler } from './handlers/get-user-by-clerk-id'
 import { logoutHandler } from './handlers/logout'
 import { meHandler } from './handlers/me'
 import { selectUserBusinessHandler } from './handlers/select-user-business'
-import { getUserByClerkIdParamsSchema, selectUserBusinessSchema } from './handlers/types'
+import { getUserByClerkIdParamsSchema, selectUserBusinessBodySchema, selectUserBusinessParamsSchema } from './handlers/types'
 
 export default async function userRoutes(fastify: FastifyInstance) {
 	// Get current user (me)
 	fastify.get('/me', {
+		preHandler: [createContext],
 		schema: {
 			tags: ['users'],
 			description: 'Get current user information',
@@ -19,7 +21,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
 
 	// Get user by clerk ID
 	fastify.get('/:clerkId', {
-		preHandler: [authenticate],
+		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['users'],
 			description: 'Get user by clerk ID',
@@ -30,7 +32,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
 
 	// Get user businesses
 	fastify.get('/user-businesses', {
-		preHandler: [authenticate],
+		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['users'],
 			description: 'Get user businesses',
@@ -40,7 +42,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
 
 	// Logout User
 	fastify.post('/logout', {
-		preHandler: [authenticate],
+		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['users'],
 			description: 'Logs out the authenticated user',
@@ -49,12 +51,13 @@ export default async function userRoutes(fastify: FastifyInstance) {
 	})
 
 	// Select User Business
-	fastify.post('/select-business', {
-		preHandler: [authenticate],
+	fastify.post('/select-business/:businessId', {
+		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['users'],
 			description: 'Select User Business',
-			body: selectUserBusinessSchema,
+			params: selectUserBusinessParamsSchema,
+			body: selectUserBusinessBodySchema,
 		},
 		handler: selectUserBusinessHandler,
 	})

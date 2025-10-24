@@ -7,7 +7,7 @@ export const getBusinessUserInvitationsById = async (
 	args: GetBusinessUserInvitationsInput
 ): Promise<GetBusinessUserInvitationsOutput> => {
 	const { businessId } = args
-	console.log('businessId', businessId)
+	
 	const businessUserInvitations = await BusinessUserInvitation.find({ businessId })
 
 	return businessUserInvitations as GetBusinessUserInvitationsOutput

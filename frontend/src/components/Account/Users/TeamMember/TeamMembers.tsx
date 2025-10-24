@@ -64,7 +64,6 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
   }) => {
     try {
       const { businessUserId, role } = member;
-
       const response = await apiClient.patch<{
         message: string;
         success: boolean;

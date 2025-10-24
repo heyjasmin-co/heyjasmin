@@ -7,8 +7,14 @@ export const updateBusinessUsersById = async (
 	args: UpdateBusinessUsersByIdInput
 ): Promise<UpdateBusinessUsersByIdOutput> => {
 	const { businessUserId, role } = args
-
-	const businessUser = await BusinessUser.findByIdAndUpdate(businessUserId, { role }, { new: true })
+	const businessUser = await BusinessUser.findByIdAndUpdate(
+		businessUserId,
+		{ role },
+		{
+			new: true,
+			runValidators: true,
+		}
+	)
 
 	return businessUser as UpdateBusinessUsersByIdOutput
 }
