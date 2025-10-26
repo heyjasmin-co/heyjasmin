@@ -27,14 +27,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
   const { user, isSignedIn } = useUser();
   const apiClient = useApiClient();
 
-  const [userData, setUserData] = useState<UserData | null>({
-    dbUserId: null,
-    clerkId: null,
-    businessId: null,
-    isSetupComplete: false,
-    hasSubscription: false,
-    role: undefined,
-  });
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchUserData = async () => {

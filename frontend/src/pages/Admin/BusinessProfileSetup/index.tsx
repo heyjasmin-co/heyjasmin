@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ScriptingProfile from "../../../components/ProfileSetup/ScriptingProfile";
 import WebsiteProfileSetup from "../../../components/ProfileSetup/WebsiteProfileSetup";
+import { useUserData } from "../../../context/UserDataContext";
 import { useScrapeApiClient } from "../../../lib/axios";
 
 export default function Index() {
@@ -9,6 +11,13 @@ export default function Index() {
   const totalSteps = 2;
   const scrapeApiClient = useScrapeApiClient();
   const [loading, setLoading] = useState(false);
+  const { userData } = useUserData();
+  const navigate = useNavigate();
+  useLayoutEffect(() => {
+    if (userData?.businessId) {
+      navigate("/admin/dashboard", { replace: true });
+    }
+  }, [userData, navigate]);
   const handleScrapeData = async (websiteUrl: string) => {
     setLoading(true);
     try {
