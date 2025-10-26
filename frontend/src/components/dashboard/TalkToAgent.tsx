@@ -2,8 +2,12 @@ import infoIcon from "../../assets/image/infoIcon.png";
 import phoneIcon from "../../assets/image/phoneIcon.png";
 import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
+import nextIcon from "../../assets/image/nextIcon.png";
 
-function TalkToAgent() {
+type TalkToAgentProps = {
+  handleStep: () => void;
+};
+function TalkToAgent({ handleStep }: TalkToAgentProps) {
   return (
     <div
       className="w-full rounded-xl border border-gray-200 bg-white shadow-lg"
@@ -44,18 +48,27 @@ function TalkToAgent() {
           </div>
 
           {/* Phone Number */}
-          <div className="flex justify-center sm:justify-start mt-2 sm:mt-0">
+          <div className="mt-2 flex justify-center sm:mt-0 sm:justify-start">
             <div
               className="flex items-center justify-center rounded-3xl px-4 py-2 sm:px-6 sm:py-3"
               style={{
                 backgroundColor: colorTheme.secondaryColor(0.9),
               }}
             >
-              <span className="text-md font-bold text-white text-center">
+              <span className="text-md text-center font-bold text-white">
                 (252) 489-4419
               </span>
             </div>
           </div>
+        </div>
+        <div className="flex flex-col gap-3 px-4 py-5 sm:flex-row sm:justify-end">
+          <button
+            onClick={handleStep}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
+          >
+            <span className="text-xl font-bold">Continue</span>
+            <img src={nextIcon} alt="Next Icon" className="h-6 w-6" />
+          </button>
         </div>
       </div>
     </div>

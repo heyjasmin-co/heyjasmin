@@ -33,18 +33,15 @@ export const createApp = async () => {
 	app.setValidatorCompiler(validatorCompiler)
 	app.setSerializerCompiler(serializerCompiler)
 
-	await app.register(require('@fastify/cors'))
 	await app.register(require('@fastify/sensible'))
 	await app.register(mongoosePlugin)
 	await app.register(swaggerPlugin)
 
-	await app.register(clerkPlugin, {
-		publishableKey: process.env.CLERK_PUBLISHABLE_KEY!,
-		secretKey: process.env.CLERK_SECRET_KEY!,
+	await app.register(clerkPlugin)
+	await app.register(require('@fastify/cors'), {
+		origin: '*',
 	})
 	await app.register(routes)
-
-	app.addHook('preHandler', createContext)
 
 	app.setErrorHandler((error, request, reply) => {
 		if (error.validation) {

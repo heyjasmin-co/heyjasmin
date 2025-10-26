@@ -6,57 +6,61 @@ type Subscription = {
   name: string;
   price: string;
   features: string[];
+  buttonText: string;
 };
 
 function Pricing() {
   const [subscriptions] = useState<Subscription[]>([
     {
       id: 0,
-      name: "Core",
-      price: "$99",
+      name: "Essential",
+      price: "$49/month",
       features: [
-        "200 minutes",
-        "Limited agent customization",
-        "Appointment confirmation",
-        "SMS support only",
+        "Best fit for: Solo pros and small teams who want every call answered.",
+        "Includes 200 minutes per month",
+        "Custom message capture built around your business needs",
+        "Smart call screening that blocks spam",
+        "Instant email & SMS alerts for every call",
       ],
+      buttonText: "Start Free Trial",
     },
     {
       id: 1,
       name: "Pro",
-      price: "$149",
+      price: "$125/month",
       features: [
-        "350 minutes",
-        "Standard agent customization",
-        "Appointment confirmation",
-        "Smart spam detection",
-        "Priority SMS support",
+        "Best fit for: Fast-growing teams ready to automate scheduling and stay connected 24/7.",
+        "Everything in Essential plus:",
+        "Real-time two-way text during active calls",
+        "Call analytics dashboard with insights",
+        "Full calendar sync + appointment link generation",
       ],
+      buttonText: "Start Free Trial",
     },
     {
       id: 2,
-      name: "Smart",
-      price: "$299",
+      name: "Plus",
+      price: "$299/month",
       features: [
-        "600 minutes",
-        "Full agent customization",
-        "Advanced appointment & agent management",
-        "Smart spam detection",
-        "Phone + priority SMS support",
+        "Best fit for: Established businesses needing deeper insights and hands-on support.",
+        "Everything in Pro plus:",
+        "Dedicated account manager for priority support and onboarding",
+        "Deep system integrations connecting AI into your workflows",
       ],
+      buttonText: "Start Free Trial",
     },
     {
       id: 3,
-      name: "Infinity",
-      price: "Custom",
+      name: "Custom",
+      price: "Tailored",
       features: [
-        "Unlimited minutes",
-        "Enterprise-level customization",
-        "Full appointment & agent management",
-        "Dedicated success manager",
-        "24/7 support & SLAs",
-        "Tailored integrations",
+        "Tailored for multi-site businesses & franchises.",
+        "Best fit for: Franchises and multi-location brands with complex, high-volume workflows.",
+        "Unlimited minutes and full enterprise-scale throughput",
+        "Fully custom prompt sets and advanced agent training for your workflow",
+        "Dedicated account manager and integration",
       ],
+      buttonText: "Contact Us",
     },
   ]);
 
@@ -69,12 +73,12 @@ function Pricing() {
     <section id="pricing" className="bg-gray-50 px-6 py-20">
       <div className="mx-auto max-w-7xl text-center">
         <h2 className="mb-16 text-4xl font-extrabold text-gray-900 sm:text-5xl">
-          Choose Your Plan
+          Plans that scale with you
         </h2>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {subscriptions.map((plan) => {
-            const isPopular = plan.id === 2;
+            const isPopular = plan.id === 1;
 
             return (
               <motion.div
@@ -119,9 +123,9 @@ function Pricing() {
 
                 <ul className="mb-8 space-y-4 text-left">
                   {plan.features.map((f, i) => (
-                    <li key={i} className="flex items-center gap-3">
+                    <li key={i} className="flex items-start gap-3">
                       <svg
-                        className="h-5 w-5 flex-shrink-0 text-purple-500"
+                        className="mt-1 h-5 w-5 flex-shrink-0 text-purple-500"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -150,7 +154,7 @@ function Pricing() {
                       : "bg-purple-500 text-white"
                   }`}
                 >
-                  {plan.id === 0 ? "Start Free Trial" : "Choose Plan"}
+                  {plan.buttonText}
                 </a>
               </motion.div>
             );

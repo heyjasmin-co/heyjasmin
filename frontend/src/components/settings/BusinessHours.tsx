@@ -1,19 +1,29 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
+import { useUserData } from "../../context/UserDataContext";
+import { useApiClient } from "../../lib/axios";
 import { colorTheme } from "../../theme/colorTheme";
-
-function BusinessHours() {
+import { BusinessDetailsType, IBusinessHour } from "../../types/BusinessTypes";
+import { errorToast, successToast } from "../../utils/react-toast";
+type BusinessHoursProps = {
+  hours: IBusinessHour[];
+  canEdit: boolean;
+  setBusinessDetails: React.Dispatch<
+    React.SetStateAction<BusinessDetailsType | null>
+  >;
+};
+function BusinessHours({
+  hours,
+  setBusinessDetails,
+  canEdit,
+}: BusinessHoursProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [businessHours, setBusinessHours] = useState([
-    { day: "Monday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Tuesday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Wednesday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Thursday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Friday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Saturday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Sunday", start: "08:00", end: "20:00", isOpen: false },
-  ]);
+  const [businessHours, setBusinessHours] = useState(hours);
+  const [saving, setSaving] = useState(false);
+  const apiClient = useApiClient();
+  const { userData } = useUserData();
 
   const handleToggleDay = (index: number) => {
     if (!isEditing) return;
@@ -38,6 +48,36 @@ function BusinessHours() {
     const ampm = h >= 12 ? "PM" : "AM";
     const displayHour = h % 12 || 12;
     return `${displayHour}:${minute} ${ampm}`;
+  };
+
+  const handleSave = async () => {
+    if (!userData?.businessId) return;
+    setSaving(true);
+    try {
+      const response = await apiClient.patch<{
+        success: boolean;
+        message: string;
+        data: IBusinessHour[];
+      }>(`/businesses/hours/${userData.businessId}`, { businessHours });
+
+      const updateHours = response.data.data;
+      setBusinessDetails((pv) => {
+        if (!pv) return null;
+
+        return {
+          ...pv,
+          businessHours: updateHours,
+        };
+      });
+      successToast(response.data.message);
+      setIsEditing(false);
+    } catch (error: any) {
+      errorToast(
+        error?.response?.data?.error || "Failed to update business hours.",
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -134,29 +174,36 @@ function BusinessHours() {
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:justify-end sm:gap-4">
-          {isEditing ? (
-            <div
-              onClick={() => setIsEditing(false)}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-700 active:scale-95 sm:w-auto"
-            >
-              <img
-                src={saveIcon}
-                alt="Save Icon"
-                className="h-5 w-5 opacity-90"
-              />
-              <span>Save</span>
-            </div>
-          ) : (
-            <div
-              onClick={() => setIsEditing(true)}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
-            >
-              <img src={editIcon} alt="Edit Icon" className="h-5 w-5" />
-              <span>Edit</span>
-            </div>
-          )}
-        </div>
+        {canEdit && (
+          <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:justify-end sm:gap-4">
+            {isEditing ? (
+              <button
+                disabled={saving}
+                onClick={handleSave}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-700 active:scale-95 sm:w-auto"
+                style={{
+                  cursor: saving ? "not-allowed" : "pointer",
+                  backgroundColor: saving ? "grey" : "",
+                }}
+              >
+                <img
+                  src={saveIcon}
+                  alt="Save Icon"
+                  className="h-5 w-5 opacity-90"
+                />
+                <span>{saving ? "Saving..." : "Save"}</span>
+              </button>
+            ) : (
+              <div
+                onClick={() => setIsEditing(true)}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
+              >
+                <img src={editIcon} alt="Edit Icon" className="h-5 w-5" />
+                <span>Edit</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

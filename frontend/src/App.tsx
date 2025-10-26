@@ -5,6 +5,7 @@ import CallDetails from "./components/calls/CallDetails";
 import { RouteGuard } from "./components/Auth/RouteGuard";
 import { UserDataProvider } from "./context/UserDataContext";
 import Main from "./pages/Admin";
+import JoinOrganization from "./pages/Admin/Auth/JoinOrganization";
 import Login from "./pages/Admin/Auth/Login";
 import Register from "./pages/Admin/Auth/Register";
 import BusinessProfileSetup from "./pages/Admin/BusinessProfileSetup";
@@ -18,6 +19,7 @@ import Dashboard from "./pages/Admin/Dashboard/GuidedStep";
 import Settings from "./pages/Admin/Dashboard/Settings";
 import AppointmentInfo from "./pages/Admin/Dashboard/Settings/AppointmentInfo";
 import BusinessDetailsPage from "./pages/Admin/Dashboard/Settings/BusinessDetailsPage";
+import SelectBusiness from "./pages/Admin/SelectBusiness";
 import SubscriptionPage from "./pages/Admin/Subscription";
 import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
@@ -33,13 +35,31 @@ export default function App() {
           <Route path="/admin/sign-in" element={<Login />} />
           <Route path="/admin/sign-up" element={<Register />} />
 
+          {/* Handle organization invitations for existing users */}
+          <Route
+            path="/admin/join-organization"
+            element={
+              // <ProtectedRoute>
+              <JoinOrganization />
+              // </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/select-business"
+            element={
+              <ProtectedRoute>
+                <SelectBusiness />
+              </ProtectedRoute>
+            }
+          />
           {/* Subscription page - requires auth + subscription */}
           <Route
             path="/admin/subscription"
             element={
-              <ProtectedRoute requireSetup>
-                <SubscriptionPage />
-              </ProtectedRoute>
+              // <ProtectedRoute requireSetup>
+              <SubscriptionPage />
+              // </ProtectedRoute>
             }
           />
 
@@ -47,9 +67,9 @@ export default function App() {
           <Route
             path="/admin/setup"
             element={
-              <ProtectedRoute>
-                <BusinessProfileSetup />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <BusinessProfileSetup />
+              // </ProtectedRoute>
             }
           />
 

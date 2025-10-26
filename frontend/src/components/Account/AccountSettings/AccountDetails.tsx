@@ -1,6 +1,32 @@
+import { useClerk } from "@clerk/clerk-react";
+import { useState } from "react";
+import { useApiClient } from "../../../lib/axios";
 import { colorTheme } from "../../../theme/colorTheme";
+import { UserDetailsType } from "../../../types/UsersTypes";
+import { errorToast, successToast } from "../../../utils/react-toast";
 
-function AccountDetails() {
+type AccountDetailsProps = {
+  accountInformation: UserDetailsType;
+};
+function AccountDetails({ accountInformation }: AccountDetailsProps) {
+  const apiClient = useApiClient();
+  const { signOut } = useClerk();
+  const [loading, setLoading] = useState(false);
+
+  const handleSignOut = async () => {
+    setLoading(true);
+    try {
+      await apiClient.post("/users/logout");
+      successToast("User logged out successfully.");
+
+      await new Promise((res) => setTimeout(res, 2000));
+      await signOut({ redirectUrl: "/admin/sign-in" });
+    } catch {
+      errorToast("Failed to log out. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div
       className="w-full rounded-xl border border-gray-200 bg-white shadow-lg"
@@ -28,13 +54,30 @@ function AccountDetails() {
               backgroundColor: colorTheme.secondaryColor(0.08),
             }}
           >
-            imahsan600@gmail.com
+            {accountInformation.email}
           </div>
 
           {/* Logout Button */}
-          <button className="flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-5 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 focus:ring-2 focus:ring-purple-400 focus:ring-offset-1 active:scale-95 sm:text-base">
-            <i className="fa-solid fa-right-from-bracket text-sm sm:text-base"></i>
-            <span>Log Out</span>
+          <button
+            onClick={handleSignOut}
+            disabled={loading}
+            className={`flex items-center justify-center gap-2 rounded-lg px-5 py-2 text-sm font-semibold shadow-md transition-all sm:text-base ${
+              loading
+                ? "cursor-not-allowed bg-gray-300 text-gray-500"
+                : "bg-purple-600 text-white hover:bg-purple-700 focus:ring-2 focus:ring-purple-400 focus:ring-offset-1 active:scale-95"
+            }`}
+          >
+            {loading ? (
+              <>
+                <i className="fa-solid fa-spinner fa-spin text-sm sm:text-base"></i>
+                <span>Logging out...</span>
+              </>
+            ) : (
+              <>
+                <i className="fa-solid fa-right-from-bracket text-sm sm:text-base"></i>
+                <span>Log Out</span>
+              </>
+            )}
           </button>
         </div>
       </div>

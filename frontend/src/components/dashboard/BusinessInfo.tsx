@@ -1,50 +1,69 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import infoIcon from "../../assets/image/infoIcon.png";
+import nextIcon from "../../assets/image/nextIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
+import { useUserData } from "../../context/UserDataContext";
+import { useApiClient } from "../../lib/axios";
 import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
+import { BusinessDetailsType } from "../../types/BusinessTypes";
+import { errorToast, successToast } from "../../utils/react-toast";
+import { convertTo24Hour, formatTime } from "../../utils/time";
 
 type BusinessInfoProps = {
-  businessProfile: string;
-  businessWebsite: string;
-  onSave?: (profile: string, website: string, hours?: any) => void;
+  businessDetails: BusinessDetailsType;
+  canEdit: boolean;
+  setBusinessDetails: React.Dispatch<
+    React.SetStateAction<BusinessDetailsType | null>
+  >;
 };
 
 function BusinessInfo({
-  businessProfile,
-  businessWebsite,
-  onSave,
+  businessDetails,
+  canEdit,
+  setBusinessDetails,
 }: BusinessInfoProps) {
+  //States
   const [isEditing, setIsEditing] = useState(false);
-  const [businessName, setBusinessName] = useState(businessProfile);
-  const [overview, setOverview] = useState("");
-  const [address, setAddress] = useState(businessWebsite);
+  const [name, setName] = useState<string>(businessDetails.name ?? "");
+  const [overview, setOverview] = useState<string>(
+    businessDetails.overview ?? "",
+  );
+  const [address, setAddress] = useState<string>(businessDetails.address ?? "");
 
-  const [services, setServices] = useState<string[]>([
-    "Bed Bug Control",
-    "Rodent Control",
-    "Ant Control",
-    "Wasp Control",
-    "Spider Control",
-  ]);
+  const [services, setServices] = useState<string[]>(businessDetails.services);
   const [newService, setNewService] = useState("");
+  const [errors, setErrors] = useState<{
+    businessName: string | null;
+    overview: string | null;
+    address: string | null;
+  }>({
+    businessName: null,
+    overview: null,
+    address: null,
+  });
 
-  const [businessHours, setBusinessHours] = useState([
-    { day: "Monday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Tuesday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Wednesday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Thursday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Friday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Saturday", start: "08:00", end: "20:00", isOpen: true },
-    { day: "Sunday", start: "08:00", end: "20:00", isOpen: false },
-  ]);
+  const [businessHours, setBusinessHours] = useState(
+    businessDetails.businessHours.map((hour) => ({
+      ...hour,
+      start:
+        hour.start.includes("AM") || hour.start.includes("PM")
+          ? convertTo24Hour(hour.start)
+          : hour.start,
+      end:
+        hour.end.includes("AM") || hour.end.includes("PM")
+          ? convertTo24Hour(hour.end)
+          : hour.end,
+    })),
+  );
+  const [loading, setLoading] = useState(false);
+  // Hooks
+  const apiClient = useApiClient();
+  const { userData } = useUserData();
 
-  const handleSave = () => {
-    setIsEditing(false);
-    if (onSave) onSave(businessName, address, businessHours);
-  };
-
+  // Handles
   const handleAddService = () => {
     if (newService.trim() !== "") {
       setServices([...services, newService.trim()]);
@@ -73,12 +92,49 @@ function BusinessInfo({
     setBusinessHours(updated);
   };
 
-  const formatTime = (time: string) => {
-    const [hour, minute] = time.split(":");
-    const h = parseInt(hour);
-    const ampm = h >= 12 ? "PM" : "AM";
-    const displayHour = h % 12 || 12;
-    return `${displayHour}:${minute} ${ampm}`;
+  const handleTalkToAgent = async () => {
+    try {
+      setLoading(true);
+      const errors: any = {};
+      if (name.trim() === "") {
+        errors.businessName = "Business name is required.";
+      }
+      if (overview.trim() === "") {
+        errors.overview = "Business description is required.";
+      }
+      if (address.trim() === "") {
+        errors.address = "Business address is required.";
+      }
+      if (Object.keys(errors).length) {
+        setErrors(errors);
+        return;
+      } else {
+        setErrors({
+          businessName: null,
+          overview: null,
+          address: null,
+        });
+      }
+      const updateData = {
+        name,
+        overview,
+        address,
+        services,
+        businessHours,
+      };
+      const response = await apiClient.patch<{
+        success: boolean;
+        message: string;
+        data: BusinessDetailsType;
+      }>("/businesses/" + userData?.businessId, updateData);
+      setBusinessDetails(response.data.data);
+      successToast(response.data.message);
+    } catch (error: any) {
+      console.error(error);
+      errorToast(error.response.data.error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -109,45 +165,72 @@ function BusinessInfo({
         {/* Form Section */}
         <div className="flex flex-col gap-5 px-4 py-4">
           {/* Business Name */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
+            <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
               Business Name:
             </span>
-            <input
-              type="text"
-              value={businessName}
-              onChange={(e) => setBusinessName(e.target.value)}
-              placeholder="Enter your business name"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none"
-            />
+            <div className="w-full">
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your business name"
+                className={`w-full rounded-lg border px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none ${
+                  errors.businessName ? "border-red-400" : "border-gray-300"
+                }`}
+              />
+              {errors.businessName && (
+                <p className="mt-1 text-xs font-medium text-red-600">
+                  {errors.businessName}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Business Overview */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
             <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
               Business Overview:
             </span>
-            <textarea
-              value={overview}
-              onChange={(e) => setOverview(e.target.value)}
-              placeholder="Write a short overview of your business"
-              rows={3}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none"
-            />
+            <div className="w-full">
+              <textarea
+                value={overview}
+                onChange={(e) => setOverview(e.target.value)}
+                placeholder="Write a short overview of your business"
+                rows={6}
+                className={`w-full rounded-lg border px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none ${
+                  errors.overview ? "border-red-400" : "border-gray-300"
+                }`}
+              />
+              {errors.overview && (
+                <p className="mt-1 text-xs font-medium text-red-600">
+                  {errors.overview}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Primary Address */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
+            <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
               Primary Address:
             </span>
-            <input
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Enter business address"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none"
-            />
+            <div className="w-full">
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Enter business address"
+                className={`w-full rounded-lg border px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none ${
+                  errors.address ? "border-red-400" : "border-gray-300"
+                }`}
+              />
+              {errors.address && (
+                <p className="mt-1 text-xs font-medium text-red-600">
+                  {errors.address}
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -163,31 +246,37 @@ function BusinessInfo({
                 className="flex max-w-full min-w-0 items-center gap-4 rounded-md bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700"
               >
                 <span className="break-all">{tag}</span>
-                <button
-                  onClick={() => handleRemoveService(index)}
-                  className="text-gray-500 hover:text-red-600"
-                >
-                  ×
-                </button>
+                {canEdit && (
+                  <button
+                    onClick={() => handleRemoveService(index)}
+                    className="text-gray-500 hover:text-red-600"
+                  >
+                    ×
+                  </button>
+                )}
               </div>
             ))}
-            <input
-              type="text"
-              value={newService}
-              onChange={(e) => setNewService(e.target.value)}
-              placeholder="Add service"
-              className="w-40 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none"
-            />
-            <button
-              onClick={handleAddService}
-              className="rounded-md bg-purple-600 px-3 py-1 text-sm font-medium text-white hover:bg-purple-700"
-            >
-              Add
-            </button>
+            {canEdit && (
+              <>
+                <input
+                  type="text"
+                  value={newService}
+                  onChange={(e) => setNewService(e.target.value)}
+                  placeholder="Add service"
+                  className="w-40 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                />
+                <button
+                  onClick={handleAddService}
+                  className="rounded-md bg-purple-600 px-3 py-1 text-sm font-medium text-white hover:bg-purple-700"
+                >
+                  Add
+                </button>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Business Hours Section */}
+        {/* Business Hours */}
         <div className="flex flex-col gap-4 px-4 py-5 sm:flex-row sm:items-start sm:gap-6">
           <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-3">
             Business Hours:
@@ -262,11 +351,14 @@ function BusinessInfo({
               </div>
             ))}
           </div>
-          {/* Save / Edit Buttons */}
+        </div>
+
+        {/* Save / Edit Buttons */}
+        {canEdit && (
           <div className="flex flex-col gap-3 px-4 py-5 sm:flex-row sm:justify-end sm:gap-4">
             {isEditing ? (
               <div
-                onClick={handleSave}
+                onClick={() => setIsEditing(false)}
                 className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-700 active:scale-95 sm:w-auto"
               >
                 <img
@@ -286,7 +378,23 @@ function BusinessInfo({
               </div>
             )}
           </div>
-        </div>
+        )}
+
+        {/* Talk to Agent Button */}
+        {canEdit && (
+          <div className="flex flex-col gap-3 px-4 py-5 sm:flex-row sm:justify-end">
+            <button
+              disabled={loading}
+              onClick={handleTalkToAgent}
+              className={`flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto ${
+                loading && "cursor-not-allowed bg-gray-100 text-gray-400"
+              }`}
+            >
+              <span className="text-xl font-bold">{`Talk to ${appName}`}</span>
+              <img src={nextIcon} alt="Next Icon" className="h-6 w-6" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

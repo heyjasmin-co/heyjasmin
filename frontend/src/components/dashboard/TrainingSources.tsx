@@ -6,9 +6,7 @@ import infoIcon from "../../assets/image/infoIcon.png";
 import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
 type TrainingSourcesProps = {
-  businessProfile: string;
   businessWebsite: string;
-  onSave?: (website: string) => void;
 };
 
 function TrainingSources({ businessWebsite }: TrainingSourcesProps) {

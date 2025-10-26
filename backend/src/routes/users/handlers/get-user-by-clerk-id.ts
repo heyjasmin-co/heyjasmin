@@ -3,7 +3,7 @@ import { UserService } from '../services'
 import { getUserByClerkIdParamsSchema } from './types'
 
 export const getUserByClerkIdHandler = asyncHandler(async (request, reply) => {
-	const params = getUserByClerkIdParamsSchema.parse(request.body)
+	const params = getUserByClerkIdParamsSchema.parse(request.params)
 	const userService = new UserService()
 	const user = await userService.getUserByClerkId(params)
 

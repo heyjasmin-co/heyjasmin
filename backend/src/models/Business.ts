@@ -1,4 +1,5 @@
 import mongoose, { Document, Model, Schema } from 'mongoose'
+import aggregatePaginate from 'mongoose-aggregate-paginate-v2'
 
 interface IBusinessHour {
 	day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
@@ -22,10 +23,13 @@ interface IBusiness extends Document {
 	subscriptionEndDate?: Date | null
 	ownerUserId: mongoose.Types.ObjectId
 	aiAgentSettings: {
+		agentId?: string
+		agentNumber?: string
 		trainingData?: Record<string, any>
 		voiceSettings?: Record<string, any>
 		customInstructions?: string
 	}
+	clerkOrganizationId: string
 	isSetupComplete: boolean
 	createdAt: Date
 	updatedAt: Date
@@ -121,6 +125,14 @@ const businessSchema = new Schema<IBusiness>(
 
 		// AI Agent Settings
 		aiAgentSettings: {
+			agentId: {
+				type: String,
+				default: null,
+			},
+			agentNumber: {
+				type: String,
+				default: null,
+			},
 			trainingData: {
 				type: Schema.Types.Mixed,
 				default: {},
@@ -140,6 +152,12 @@ const businessSchema = new Schema<IBusiness>(
 			type: Boolean,
 			default: false,
 		},
+
+		//Clerk Organization Id
+		clerkOrganizationId: {
+			type: String,
+			required: true,
+		},
 	},
 	{
 		timestamps: true,
@@ -148,6 +166,7 @@ const businessSchema = new Schema<IBusiness>(
 
 businessSchema.index({ name: 1 })
 businessSchema.index({ ownerUserId: 1 })
+businessSchema.plugin(aggregatePaginate)
 
 const Business: Model<IBusiness> = mongoose.model<IBusiness>('Business', businessSchema)
 

@@ -1,22 +1,21 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 import completeIcon from "../../assets/image/completeIcon.png";
 import sparklesIcon from "../../assets/image/sparklesIcon.png";
 import { useUserData } from "../../context/UserDataContext";
 import { appName } from "../../theme/appName";
+import { colorTheme } from "../../theme/colorTheme";
 import LeftInfoPanel from "./LeftInfoPanel";
-
 export default function ScriptingProfile({
   currentStep,
   totalSteps,
   setCurrentStep,
+  loading,
 }: {
   currentStep: number;
+  loading: boolean;
   totalSteps: number;
   setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
 }) {
-  const [loading] = useState(false);
-  const navigate = useNavigate();
   const user = useUserData();
   const trainingSteps = [
     { label: "Analyzing your website for data." },
@@ -31,7 +30,7 @@ export default function ScriptingProfile({
       }
       return prev;
     });
-    navigate("/admin/dashboard");
+    window.location.href = "/admin/dashboard";
   };
   return (
     <div className="flex h-full w-full flex-col rounded-2xl bg-white shadow-2xl lg:h-full lg:flex-row">
@@ -84,30 +83,30 @@ export default function ScriptingProfile({
           </h2>
 
           {/* Progress bar */}
-          <div className="mt-6 h-3 w-full rounded-full bg-gray-200">
-            <div
-              className="h-3 rounded-full bg-gradient-to-r from-purple-600 to-purple-500 transition-all duration-500"
-              style={{
-                width: `${
-                  loading
-                    ? `${((currentStep + 1) / (totalSteps + 1)) * 100}%`
-                    : `${(currentStep / totalSteps) * 100}%`
-                }`,
-              }}
-            ></div>
-          </div>
+          <div className="h-3 w-full rounded-full bg-gray-200"></div>
 
           {/* Training steps */}
           <div className="mt-8 space-y-6">
             {trainingSteps.map((stepItem, index) => (
               <div key={index} className="flex items-start gap-4">
                 <div
-                  className={`mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full ${
-                    loading ? "animate-spin bg-purple-600" : "bg-gray-200"
+                  className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full shadow-md ${
+                    loading ? "animate-spin-slow" : "bg-green-500"
                   }`}
+                  style={{
+                    backgroundColor: loading
+                      ? colorTheme.secondaryColor(1)
+                      : "",
+                  }}
                 >
-                  {!loading && (
-                    <div className="h-2 w-2 rounded-full bg-gray-400"></div>
+                  {loading ? (
+                    <i className="fa-solid fa-spinner animate-spin text-sm text-white"></i>
+                  ) : (
+                    <img
+                      src={completeIcon}
+                      alt="Complete"
+                      className="h-8 w-8 object-contain"
+                    />
                   )}
                 </div>
                 <span
@@ -120,16 +119,18 @@ export default function ScriptingProfile({
           </div>
 
           {/* Train button */}
-          <button
-            onClick={handleClaimAgent}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-8 py-4 text-lg font-semibold text-white shadow-lg transition hover:bg-purple-700 active:scale-95"
-            style={{
-              color: "white",
-            }}
-          >
-            Claim your Agent
-            <img src={sparklesIcon} alt="Sparkles" className="h-6 w-6" />
-          </button>
+          {!loading && (
+            <button
+              onClick={handleClaimAgent}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-8 py-4 text-lg font-semibold text-white shadow-lg transition hover:bg-purple-700 active:scale-95"
+              style={{
+                color: "white",
+              }}
+            >
+              Claim your Agent
+              <img src={sparklesIcon} alt="Sparkles" className="h-6 w-6" />
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -1,17 +1,29 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
+import { useUserData } from "../../context/UserDataContext";
+import { useApiClient } from "../../lib/axios";
 import { colorTheme } from "../../theme/colorTheme";
-
-function CoreService() {
+import { BusinessDetailsType } from "../../types/BusinessTypes";
+import { errorToast, successToast } from "../../utils/react-toast";
+type BusinessServiceProps = {
+  businessServices: string[];
+  canEdit: boolean;
+  setBusinessDetails: React.Dispatch<
+    React.SetStateAction<BusinessDetailsType | null>
+  >;
+};
+function CoreService({
+  businessServices,
+  setBusinessDetails,
+  canEdit,
+}: BusinessServiceProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [services, setServices] = useState<string[]>([
-    "Bed Bug Control",
-    "Rodent Control",
-    "Ant Control",
-    "Wasp Control",
-    "Spider Control",
-  ]);
+  const [services, setServices] = useState<string[]>(businessServices);
+  const [saving, setSaving] = useState(false);
+  const apiClient = useApiClient();
+  const { userData } = useUserData();
 
   const [newService, setNewService] = useState("");
 
@@ -26,6 +38,34 @@ function CoreService() {
     const updated = [...services];
     updated.splice(index, 1);
     setServices(updated);
+  };
+
+  const handleSave = async () => {
+    if (!userData?.businessId) return;
+    setSaving(true);
+    try {
+      const response = await apiClient.patch<{
+        success: boolean;
+        message: string;
+        data: string[];
+      }>(`/businesses/services/${userData.businessId}`, { services });
+
+      const updateService = response.data.data;
+      setBusinessDetails((pv) => {
+        if (!pv) return null;
+
+        return {
+          ...pv,
+          services: updateService,
+        };
+      });
+      successToast(response.data.message);
+      setIsEditing(false);
+    } catch (error: any) {
+      errorToast(error?.response?.data?.error || "Failed to update services.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -103,31 +143,38 @@ function CoreService() {
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:gap-6">
-          <div className="flex w-full flex-col sm:flex-row sm:justify-end">
-            {isEditing ? (
-              <div
-                onClick={() => setIsEditing(false)}
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-700 active:scale-95 sm:w-auto"
-              >
-                <img
-                  src={saveIcon}
-                  alt="Save Icon"
-                  className="h-5 w-5 opacity-90"
-                />
-                <span>Save</span>
-              </div>
-            ) : (
-              <div
-                onClick={() => setIsEditing(true)}
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
-              >
-                <img src={editIcon} alt="Edit Icon" className="h-5 w-5" />
-                <span>Edit</span>
-              </div>
-            )}
+        {canEdit && (
+          <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:gap-6">
+            <div className="flex w-full flex-col sm:flex-row sm:justify-end">
+              {isEditing ? (
+                <button
+                  disabled={saving}
+                  onClick={handleSave}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-700 active:scale-95 sm:w-auto"
+                  style={{
+                    cursor: saving ? "not-allowed" : "pointer",
+                    backgroundColor: saving ? "grey" : "",
+                  }}
+                >
+                  <img
+                    src={saveIcon}
+                    alt="Save Icon"
+                    className="h-5 w-5 opacity-90"
+                  />
+                  <span>{saving ? "Saving..." : "Save"}</span>
+                </button>
+              ) : (
+                <div
+                  onClick={() => setIsEditing(true)}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
+                >
+                  <img src={editIcon} alt="Edit Icon" className="h-5 w-5" />
+                  <span>Edit</span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

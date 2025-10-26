@@ -12,18 +12,21 @@ export const me = async (request: MeUserInput): Promise<MeUserOutput> => {
 			businessId: null,
 			isSetupComplete: false,
 			hasSubscription: false, // TODO: For future
+			role: null,
 		}
 	}
 	let isSetupComplete = null
+	let role: string | null = null
 	if (context.businessId) {
 		const businessUser = await BusinessUser.findOne({
-			userId: context.dbUserId,
 			businessId: context.businessId,
+			userId: context.dbUserId,
 		}).populate<{ businessId: IBusiness }>({
 			path: 'businessId',
 			select: 'name isSetupComplete subscriptionStatus',
 		})
 		isSetupComplete = businessUser?.businessId?.isSetupComplete
+		role = businessUser?.role!
 	}
 
 	return {
@@ -32,5 +35,6 @@ export const me = async (request: MeUserInput): Promise<MeUserOutput> => {
 		businessId: context.businessId,
 		isSetupComplete: isSetupComplete,
 		hasSubscription: false, // TODO: For future
+		role: role ?? context.role,
 	}
 }

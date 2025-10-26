@@ -10,6 +10,7 @@ interface LeftInfoPanelProps {
   currentStep: number;
   totalSteps: number;
   heading: React.ReactNode;
+  progressBar?: boolean;
   listItems: ListItem[];
   trialText?: React.ReactNode;
   primaryColor?: number;
@@ -23,7 +24,7 @@ export default function LeftInfoPanel({
   heading,
   listItems,
   trialText,
-  setCurrentStep,
+  progressBar = true,
 }: LeftInfoPanelProps) {
   return (
     <div
@@ -33,27 +34,29 @@ export default function LeftInfoPanel({
       }}
     >
       {/* Top: Stepper */}
-      <div className="mb-6 flex items-center gap-3 lg:mb-8">
-        {currentStep === totalSteps && setCurrentStep && (
-          <button
-            onClick={() => setCurrentStep(1)}
-            className="flex items-center justify-center rounded-full bg-white/20 p-2 text-white transition hover:bg-white/30"
-          >
-            <i className="fa-solid fa-arrow-left text-sm"></i>
-          </button>
-        )}
+      {progressBar && (
+        <div className="mb-6 flex items-center gap-3 lg:mb-8">
+          {/* {currentStep === totalSteps && setCurrentStep && !loading && (
+            <button
+              onClick={() => setCurrentStep(1)}
+              className="flex items-center justify-center rounded-full bg-white/20 p-2 text-white transition hover:bg-white/30"
+            >
+              <i className="fa-solid fa-arrow-left text-sm"></i>
+            </button>
+          )} */}
 
-        <span className="min-w-[36px] text-right text-sm font-medium">
-          {currentStep}/{totalSteps}
-        </span>
+          <span className="min-w-[36px] text-right text-sm font-medium">
+            {currentStep}/{totalSteps}
+          </span>
 
-        <div className="h-2 flex-1 rounded-full bg-white/40">
-          <div
-            className="h-2 rounded-full bg-white transition-all duration-300"
-            style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-          ></div>
+          <div className="h-2 flex-1 rounded-full bg-white/40">
+            <div
+              className="h-2 rounded-full bg-white transition-all duration-300"
+              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+            ></div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Center: Heading + List */}
       <div className="flex flex-1 flex-col justify-center">

@@ -3,12 +3,12 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useApiClient } from "../lib/axios";
 
 export interface UserData {
-  dbUserId: string | null;
-  clerkId: string | null;
-  businessId: string | null;
-  isSetupComplete: boolean;
-  hasSubscription: boolean;
-  subscriptionStatus: "trial" | "active" | "expired" | "none";
+  dbUserId?: string | null;
+  clerkId?: string | null;
+  businessId?: string | null;
+  isSetupComplete?: boolean | null;
+  hasSubscription?: boolean | null;
+  role?: string | null;
 }
 
 interface UserDataContextType {
@@ -27,14 +27,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
   const { user, isSignedIn } = useUser();
   const apiClient = useApiClient();
 
-  const [userData, setUserData] = useState<UserData | null>({
-    dbUserId: null,
-    clerkId: null,
-    businessId: null,
-    isSetupComplete: false,
-    hasSubscription: false,
-    subscriptionStatus: "trial",
-  });
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchUserData = async () => {
@@ -47,7 +40,11 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
 
-      const response = await apiClient(`/users/me`);
+      const response = await apiClient.get<{
+        message: string;
+        success: boolean;
+        data: UserData;
+      }>(`/users/me`);
       setUserData(response.data.data);
     } catch (error) {
       console.error("Failed to fetch user data:", error);
@@ -59,7 +56,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
         businessId: null,
         isSetupComplete: false,
         hasSubscription: false,
-        subscriptionStatus: "trial",
+        role: null,
       });
     } finally {
       setLoading(false);
@@ -76,7 +73,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     fetchUserData();
-  }, [user, isSignedIn]);
+  }, [isSignedIn]);
 
   return (
     <UserDataContext.Provider
