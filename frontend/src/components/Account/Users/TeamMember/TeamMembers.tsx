@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import infoIcon from "../../../../assets/image/infoIcon.png";
+import { useUserData } from "../../../../context/UserDataContext";
 import { useApiClient } from "../../../../lib/axios";
 import { appName } from "../../../../theme/appName";
 import { colorTheme } from "../../../../theme/colorTheme";
@@ -9,6 +10,7 @@ import {
   BusinessUserType,
 } from "../../../../types/BusinessUsersTypes";
 import { errorToast, successToast } from "../../../../utils/react-toast";
+import { canEdit } from "../../../../utils/role-base";
 import { capitalizeString } from "../../../../utils/string-utils";
 import TeamMemberModal from "./TeamMemberModal";
 import TeamMemberRemoveModal from "./TeamMemberRemoveModal";
@@ -27,37 +29,45 @@ type BusinessUsersProps = {
 
 function TeamMembers({ businessUsers }: BusinessUsersProps) {
   const [members, setMembers] = useState(businessUsers);
-
   const [openModal, setOpenModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [removeMode, setRemoveMode] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-
-  //
+  const { userData } = useUserData();
   const apiClient = useApiClient();
 
   // Handlers
   const handleModal = () => {
     setOpenModal((prev) => !prev);
     if (!openModal) {
-      // Reset when opening modal for add
       setEditMode(false);
       setSelectedMember(null);
     }
   };
 
   const handleEdit = (member: Member) => {
+    if (!canEdit(member.role, userData)) {
+      errorToast("You don't have permission to edit this member.");
+      return;
+    }
     setEditMode(true);
     setSelectedMember(member);
     setOpenModal(true);
   };
+
   const handleDelete = (member: Member) => {
+    if (!canEdit(member.role, userData)) {
+      errorToast("You don't have permission to remove this member.");
+      return;
+    }
     setRemoveMode(true);
     setSelectedMember(member);
   };
+
   const handleRemoveModel = async () => {
     setRemoveMode(false);
   };
+
   const handleSubmit = async (member: {
     businessUserId: string;
     role: string;
@@ -78,10 +88,11 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
       );
       successToast(response.data.message);
     } catch (error: any) {
-      const message = error.response.data.error;
+      const message = error.response?.data?.error || "Something went wrong.";
       errorToast(message);
     }
   };
+
   const handleRemoveMember = async (businessUserId: string) => {
     try {
       const response = await apiClient.delete<{
@@ -94,7 +105,7 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
       setMembers(members.filter((member) => member._id !== user._id));
       successToast(response.data.message);
     } catch (error: any) {
-      const message = error.response.data.error;
+      const message = error.response?.data?.error || "Something went wrong.";
       errorToast(message);
     }
   };
@@ -114,7 +125,7 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
             >
               <i className="fa-solid fa-users text-white"></i>
             </div>
-            <h5 className="text-lg font-bold text-gray-900">Team Members </h5>
+            <h5 className="text-lg font-bold text-gray-900">Team Members</h5>
           </div>
 
           {/* Info */}
@@ -125,23 +136,10 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
             </p>
           </div>
 
-          {/* Actions + Members Table */}
+          {/* Members Table */}
           <div className="flex flex-col gap-6 px-4 py-4">
-            {/* Add User */}
-            <div className="flex flex-row items-center justify-between gap-3">
-              <span className="text-lg font-bold text-gray-800">Users</span>
-              {/* <div className="flex w-full justify-end sm:w-auto">
-                <button
-                  onClick={handleModal}
-                  className="flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95"
-                >
-                  <i className="fa-solid fa-plus text-white"></i>
-                  <span>Add</span>
-                </button>
-              </div> */}
-            </div>
+            <span className="text-lg font-bold text-gray-800">Users</span>
 
-            {/* Team Member Table */}
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 text-sm">
                 <thead className="bg-gray-50">
@@ -158,9 +156,11 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
                     <th className="px-4 py-3 text-left font-semibold text-gray-600">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-600">
-                      Actions
-                    </th>
+                    {userData?.role !== "viewer" && (
+                      <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                        Actions
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -182,25 +182,33 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
                           {capitalizeString(member.status)}
                         </span>
                       </td>
-                      <td className="flex items-center gap-3 px-4 py-3">
-                        {/* Edit Button */}
-                        <button
-                          onClick={() => handleEdit(member)}
-                          className="inline-flex items-center justify-center rounded-md bg-blue-50 p-2 text-blue-600 transition-colors duration-200 hover:bg-blue-100"
-                          title="Edit"
-                        >
-                          <i className="fa-solid fa-pen text-sm"></i>
-                        </button>
 
-                        {/* Delete Button */}
-                        <button
-                          onClick={() => handleDelete(member)}
-                          className="inline-flex items-center justify-center rounded-md bg-red-50 p-2 text-red-600 transition-colors duration-200 hover:bg-red-100"
-                          title="Delete"
-                        >
-                          <i className="fa-solid fa-trash text-sm"></i>
-                        </button>
-                      </td>
+                      {/* Actions */}
+                      {userData?.role !== "viewer" && (
+                        <td className="flex items-center gap-3 px-4 py-3">
+                          {canEdit(member.role, userData) && (
+                            <>
+                              {/* Edit Button */}
+                              <button
+                                onClick={() => handleEdit(member)}
+                                className="inline-flex items-center justify-center rounded-md bg-blue-50 p-2 text-blue-600 transition-colors duration-200 hover:bg-blue-100"
+                                title="Edit"
+                              >
+                                <i className="fa-solid fa-pen text-sm"></i>
+                              </button>
+
+                              {/* Delete Button */}
+                              <button
+                                onClick={() => handleDelete(member)}
+                                className="inline-flex items-center justify-center rounded-md bg-red-50 p-2 text-red-600 transition-colors duration-200 hover:bg-red-100"
+                                title="Delete"
+                              >
+                                <i className="fa-solid fa-trash text-sm"></i>
+                              </button>
+                            </>
+                          )}
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

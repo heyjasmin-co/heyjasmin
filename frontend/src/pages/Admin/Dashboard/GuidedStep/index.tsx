@@ -84,6 +84,7 @@ export default function Dashboard() {
                   <BusinessInfo
                     businessDetails={businessDetails}
                     setBusinessDetails={setBusinessDetails}
+                    canEdit={userData?.role !== "viewer"}
                   />
                 </>
               )}

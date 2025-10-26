@@ -17,6 +17,7 @@ function Pricing() {
       price: "$49/month",
       features: [
         "Best fit for: Solo pros and small teams who want every call answered.",
+        "Includes 200 minutes per month",
         "Custom message capture built around your business needs",
         "Smart call screening that blocks spam",
         "Instant email & SMS alerts for every call",

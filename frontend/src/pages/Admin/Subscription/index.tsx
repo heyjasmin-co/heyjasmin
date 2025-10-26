@@ -22,6 +22,7 @@ const subscriptions: Subscription[] = [
     subtitle:
       "💡 Best for solo pros and small teams who want every call answered.",
     features: [
+      "Includes 200 minutes per month",
       "Custom message capture built around your business needs",
       "Smart call screening that blocks spam",
       "Instant email & SMS alerts for every call",
@@ -87,13 +88,13 @@ export default function SubscriptionPage() {
       <div className="w-full max-w-[1200px]">
         {/* Header */}
         <div className="mb-10 flex flex-col items-center text-center">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="mb-3 flex items-center gap-2">
             <img src={infoIcon} alt="Info" className="h-6 w-6" />
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
               Choose your {appName} Plan
             </h1>
           </div>
-          <p className="text-gray-600 max-w-xl text-sm sm:text-base">
+          <p className="max-w-xl text-sm text-gray-600 sm:text-base">
             All plans come with{" "}
             <span className="font-semibold">5-day free trial</span> and{" "}
             <span className="font-semibold">20 minutes</span> free agent usage
@@ -109,7 +110,7 @@ export default function SubscriptionPage() {
             return (
               <div
                 key={sub.id}
-                className={`relative flex flex-col justify-between rounded-2xl border p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-1`}
+                className={`relative flex flex-col justify-between rounded-2xl border p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md`}
                 style={{
                   backgroundColor: "white",
                   borderColor: isPopular
@@ -132,7 +133,7 @@ export default function SubscriptionPage() {
                   <h5 className="text-lg font-semibold text-gray-900">
                     {sub.name}
                   </h5>
-                  <p className="text-xs text-gray-500 leading-snug">
+                  <p className="text-xs leading-snug text-gray-500">
                     {sub.subtitle}
                   </p>
 
@@ -164,7 +165,7 @@ export default function SubscriptionPage() {
                     {sub.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-1.5">
                         <svg
-                          className="h-4 w-4 text-cyan-600 flex-shrink-0 mt-0.5"
+                          className="mt-0.5 h-4 w-4 flex-shrink-0 text-cyan-600"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -174,7 +175,7 @@ export default function SubscriptionPage() {
                             clipRule="evenodd"
                           />
                         </svg>
-                        <span className="text-xs text-gray-700 leading-snug">
+                        <span className="text-xs leading-snug text-gray-700">
                           {feature}
                         </span>
                       </li>

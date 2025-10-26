@@ -20,6 +20,7 @@ export const me = async (request: MeUserInput): Promise<MeUserOutput> => {
 	if (context.businessId) {
 		const businessUser = await BusinessUser.findOne({
 			businessId: context.businessId,
+			userId: context.dbUserId,
 		}).populate<{ businessId: IBusiness }>({
 			path: 'businessId',
 			select: 'name isSetupComplete subscriptionStatus',

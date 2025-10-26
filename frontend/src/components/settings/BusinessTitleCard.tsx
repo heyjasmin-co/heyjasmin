@@ -9,12 +9,14 @@ function BusinessTitleCard({
   subtitle,
   checkBusinessDetails,
   businessDetails,
+  canEdit,
   setCheckBusinessDetails,
 }: {
   title: string;
   subtitle: string;
   checkBusinessDetails: BusinessDetailsType;
   businessDetails: BusinessDetailsType;
+  canEdit: boolean;
   setCheckBusinessDetails: React.Dispatch<
     React.SetStateAction<BusinessDetailsType | null>
   >;
@@ -52,26 +54,27 @@ function BusinessTitleCard({
         </div>
 
         {/* Button */}
-
-        <button
-          disabled={!hasChanges || loading}
-          onClick={handleUpdateAgent}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
-          style={{
-            backgroundColor: !hasChanges || loading ? "grey" : "",
-            cursor: !hasChanges || loading ? "not-allowed" : "pointer",
-          }}
-        >
-          <span
-            className="text-base font-bold sm:text-lg"
+        {canEdit && (
+          <button
+            disabled={!hasChanges || loading}
+            onClick={handleUpdateAgent}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
             style={{
-              fontFamily: "'Outfit', sans-serif",
+              backgroundColor: !hasChanges || loading ? "grey" : "",
+              cursor: !hasChanges || loading ? "not-allowed" : "pointer",
             }}
           >
-            <span>{loading ? "Publishing..." : "Publish"}</span>
-          </span>
-          <i className="fa-solid fa-caret-right text-lg text-white sm:text-xl"></i>
-        </button>
+            <span
+              className="text-base font-bold sm:text-lg"
+              style={{
+                fontFamily: "'Outfit', sans-serif",
+              }}
+            >
+              <span>{loading ? "Publishing..." : "Publish"}</span>
+            </span>
+            <i className="fa-solid fa-caret-right text-lg text-white sm:text-xl"></i>
+          </button>
+        )}
       </div>
     </div>
   );

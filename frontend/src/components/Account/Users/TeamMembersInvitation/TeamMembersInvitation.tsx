@@ -6,7 +6,7 @@ import { useApiClient } from "../../../../lib/axios";
 import { appName } from "../../../../theme/appName";
 import { colorTheme } from "../../../../theme/colorTheme";
 import { BusinessUserInvitationsType } from "../../../../types/BusinessUserInvitationsTypes";
-import { errorToast } from "../../../../utils/react-toast";
+import { errorToast, successToast } from "../../../../utils/react-toast";
 import { capitalizeString } from "../../../../utils/string-utils";
 import TeamMemberInvitationModal from "./TeamMemberInvitationModal";
 import TeamMemberInvitationRemoveModal from "./TeamMemberInvitationRemoveModal";
@@ -56,7 +56,7 @@ function TeamMembersInvitation({
 
   const handleRemoveMember = async (clerkInvitationId: string) => {
     try {
-      await apiClient.delete<{
+      const response = await apiClient.delete<{
         success: boolean;
         message: string;
         data: BusinessUserInvitationsType;
@@ -65,6 +65,7 @@ function TeamMembersInvitation({
       setMembers((prev) =>
         prev.filter((member) => member.clerkInvitationId !== clerkInvitationId),
       );
+      successToast(response.data.message);
     } catch (error: any) {
       errorToast(
         error?.response?.data?.error || "Failed to cancel invitation.",
@@ -81,6 +82,7 @@ function TeamMembersInvitation({
       }>(`/business-user-invitations/create/${userData?.businessId}`, member);
 
       setMembers((prev) => [...prev, response.data.data]);
+      successToast(response.data.message);
     } catch (error: any) {
       errorToast(error?.response?.data?.error || "Failed to send invitation.");
     }
@@ -122,15 +124,17 @@ function TeamMembersInvitation({
               <span className="text-lg font-bold text-gray-800">
                 Invitations
               </span>
-              <div className="flex w-full justify-end sm:w-auto">
-                <button
-                  onClick={handleModal}
-                  className="flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95"
-                >
-                  <i className="fa-solid fa-plus text-white"></i>
-                  <span>Add</span>
-                </button>
-              </div>
+              {userData?.role !== "viewer" && (
+                <div className="flex w-full justify-end sm:w-auto">
+                  <button
+                    onClick={handleModal}
+                    className="flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95"
+                  >
+                    <i className="fa-solid fa-plus text-white"></i>
+                    <span>Add</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Team Member Table */}
@@ -147,9 +151,11 @@ function TeamMembersInvitation({
                     <th className="px-4 py-3 text-left font-semibold text-gray-600">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-600">
-                      Actions
-                    </th>
+                    {userData?.role !== "viewer" && (
+                      <th className="px-4 py-3 text-left font-semibold text-gray-600">
+                        Actions
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -172,15 +178,17 @@ function TeamMembersInvitation({
                             {capitalizeString(member.status)}
                           </span>
                         </td>
-                        <td className="flex items-center gap-3 px-4 py-3">
-                          <button
-                            onClick={() => handleDelete(member)}
-                            className="inline-flex items-center justify-center rounded-md bg-red-50 p-2 text-red-600 transition-colors duration-200 hover:bg-red-100"
-                            title="Delete"
-                          >
-                            <i className="fa-solid fa-trash text-sm"></i>
-                          </button>
-                        </td>
+                        {userData?.role !== "viewer" && (
+                          <td className="flex items-center gap-3 px-4 py-3">
+                            <button
+                              onClick={() => handleDelete(member as any)}
+                              className="inline-flex items-center justify-center rounded-md bg-red-50 p-2 text-red-600 transition-colors duration-200 hover:bg-red-100"
+                              title="Delete"
+                            >
+                              <i className="fa-solid fa-trash text-sm"></i>
+                            </button>
+                          </td>
+                        )}
                       </tr>
                     ))
                   ) : (

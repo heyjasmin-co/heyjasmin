@@ -82,7 +82,7 @@ function TeamMemberInvitationRemoveModal({
         {/* Actions */}
         <div className="flex justify-end gap-3 px-4 py-3">
           <button
-            onClick={() => handleRemove(memberData?.clerKInvitationId!)}
+            onClick={() => handleRemove(memberData?.clerkInvitationId!)}
             disabled={loading}
             className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-md transition-all ${loading ? "cursor-not-allowed bg-gray-300" : "bg-red-600 hover:bg-red-700 active:scale-95"}`}
           >

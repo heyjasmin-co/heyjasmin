@@ -9,6 +9,7 @@ import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
 type BusinessServiceProps = {
   businessServices: string[];
+  canEdit: boolean;
   setBusinessDetails: React.Dispatch<
     React.SetStateAction<BusinessDetailsType | null>
   >;
@@ -16,6 +17,7 @@ type BusinessServiceProps = {
 function CoreService({
   businessServices,
   setBusinessDetails,
+  canEdit,
 }: BusinessServiceProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [services, setServices] = useState<string[]>(businessServices);
@@ -141,36 +143,38 @@ function CoreService({
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:gap-6">
-          <div className="flex w-full flex-col sm:flex-row sm:justify-end">
-            {isEditing ? (
-              <button
-                disabled={saving}
-                onClick={handleSave}
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-700 active:scale-95 sm:w-auto"
-                style={{
-                  cursor: saving ? "not-allowed" : "pointer",
-                  backgroundColor: saving ? "grey" : "",
-                }}
-              >
-                <img
-                  src={saveIcon}
-                  alt="Save Icon"
-                  className="h-5 w-5 opacity-90"
-                />
-                <span>{saving ? "Saving..." : "Save"}</span>
-              </button>
-            ) : (
-              <div
-                onClick={() => setIsEditing(true)}
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
-              >
-                <img src={editIcon} alt="Edit Icon" className="h-5 w-5" />
-                <span>Edit</span>
-              </div>
-            )}
+        {canEdit && (
+          <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:gap-6">
+            <div className="flex w-full flex-col sm:flex-row sm:justify-end">
+              {isEditing ? (
+                <button
+                  disabled={saving}
+                  onClick={handleSave}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-700 active:scale-95 sm:w-auto"
+                  style={{
+                    cursor: saving ? "not-allowed" : "pointer",
+                    backgroundColor: saving ? "grey" : "",
+                  }}
+                >
+                  <img
+                    src={saveIcon}
+                    alt="Save Icon"
+                    className="h-5 w-5 opacity-90"
+                  />
+                  <span>{saving ? "Saving..." : "Save"}</span>
+                </button>
+              ) : (
+                <div
+                  onClick={() => setIsEditing(true)}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
+                >
+                  <img src={editIcon} alt="Edit Icon" className="h-5 w-5" />
+                  <span>Edit</span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

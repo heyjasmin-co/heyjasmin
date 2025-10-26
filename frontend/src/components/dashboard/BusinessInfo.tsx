@@ -14,6 +14,7 @@ import { convertTo24Hour, formatTime } from "../../utils/time";
 
 type BusinessInfoProps = {
   businessDetails: BusinessDetailsType;
+  canEdit: boolean;
   setBusinessDetails: React.Dispatch<
     React.SetStateAction<BusinessDetailsType | null>
   >;
@@ -21,6 +22,7 @@ type BusinessInfoProps = {
 
 function BusinessInfo({
   businessDetails,
+  canEdit,
   setBusinessDetails,
 }: BusinessInfoProps) {
   //States
@@ -244,27 +246,33 @@ function BusinessInfo({
                 className="flex max-w-full min-w-0 items-center gap-4 rounded-md bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700"
               >
                 <span className="break-all">{tag}</span>
-                <button
-                  onClick={() => handleRemoveService(index)}
-                  className="text-gray-500 hover:text-red-600"
-                >
-                  ×
-                </button>
+                {canEdit && (
+                  <button
+                    onClick={() => handleRemoveService(index)}
+                    className="text-gray-500 hover:text-red-600"
+                  >
+                    ×
+                  </button>
+                )}
               </div>
             ))}
-            <input
-              type="text"
-              value={newService}
-              onChange={(e) => setNewService(e.target.value)}
-              placeholder="Add service"
-              className="w-40 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none"
-            />
-            <button
-              onClick={handleAddService}
-              className="rounded-md bg-purple-600 px-3 py-1 text-sm font-medium text-white hover:bg-purple-700"
-            >
-              Add
-            </button>
+            {canEdit && (
+              <>
+                <input
+                  type="text"
+                  value={newService}
+                  onChange={(e) => setNewService(e.target.value)}
+                  placeholder="Add service"
+                  className="w-40 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                />
+                <button
+                  onClick={handleAddService}
+                  className="rounded-md bg-purple-600 px-3 py-1 text-sm font-medium text-white hover:bg-purple-700"
+                >
+                  Add
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -346,43 +354,47 @@ function BusinessInfo({
         </div>
 
         {/* Save / Edit Buttons */}
-        <div className="flex flex-col gap-3 px-4 py-5 sm:flex-row sm:justify-end sm:gap-4">
-          {isEditing ? (
-            <div
-              onClick={() => setIsEditing(false)}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-700 active:scale-95 sm:w-auto"
-            >
-              <img
-                src={saveIcon}
-                alt="Save Icon"
-                className="h-5 w-5 opacity-90"
-              />
-              <span>Save</span>
-            </div>
-          ) : (
-            <div
-              onClick={() => setIsEditing(true)}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
-            >
-              <img src={editIcon} alt="Edit Icon" className="h-5 w-5" />
-              <span>Edit</span>
-            </div>
-          )}
-        </div>
+        {canEdit && (
+          <div className="flex flex-col gap-3 px-4 py-5 sm:flex-row sm:justify-end sm:gap-4">
+            {isEditing ? (
+              <div
+                onClick={() => setIsEditing(false)}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-green-700 active:scale-95 sm:w-auto"
+              >
+                <img
+                  src={saveIcon}
+                  alt="Save Icon"
+                  className="h-5 w-5 opacity-90"
+                />
+                <span>Save</span>
+              </div>
+            ) : (
+              <div
+                onClick={() => setIsEditing(true)}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
+              >
+                <img src={editIcon} alt="Edit Icon" className="h-5 w-5" />
+                <span>Edit</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Talk to Agent Button */}
-        <div className="flex flex-col gap-3 px-4 py-5 sm:flex-row sm:justify-end">
-          <button
-            disabled={loading}
-            onClick={handleTalkToAgent}
-            className={`flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto ${
-              loading && "cursor-not-allowed bg-gray-100 text-gray-400"
-            }`}
-          >
-            <span className="text-xl font-bold">{`Talk to ${appName}`}</span>
-            <img src={nextIcon} alt="Next Icon" className="h-6 w-6" />
-          </button>
-        </div>
+        {canEdit && (
+          <div className="flex flex-col gap-3 px-4 py-5 sm:flex-row sm:justify-end">
+            <button
+              disabled={loading}
+              onClick={handleTalkToAgent}
+              className={`flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto ${
+                loading && "cursor-not-allowed bg-gray-100 text-gray-400"
+              }`}
+            >
+              <span className="text-xl font-bold">{`Talk to ${appName}`}</span>
+              <img src={nextIcon} alt="Next Icon" className="h-6 w-6" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

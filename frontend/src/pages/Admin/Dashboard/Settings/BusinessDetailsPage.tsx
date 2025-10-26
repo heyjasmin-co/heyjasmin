@@ -75,22 +75,28 @@ export default function BusinessDetailsPage() {
                 businessDetails={businessDetails}
                 setCheckBusinessDetails={setCheckBusinessDetails}
                 title="Business Information"
+                canEdit={userData?.role !== "viewer"}
                 subtitle={`This business information gives ${appName} the context to handle your calls.`}
               />
-              <TrainingSources businessWebsite={businessDetails.website} />
+              <TrainingSources
+                businessWebsite={businessDetails.website}
+              />
               <BusinessDetails
                 setBusinessDetails={setBusinessDetails}
                 businessOverview={businessDetails.overview!}
                 businessName={businessDetails.name}
                 businessAddress={businessDetails.address!}
+                canEdit={userData?.role !== "viewer"}
               />
               <CoreService
                 businessServices={businessDetails.services}
                 setBusinessDetails={setBusinessDetails}
+                canEdit={userData?.role !== "viewer"}
               />
               <BusinessHours
                 hours={businessDetails.businessHours}
                 setBusinessDetails={setBusinessDetails}
+                canEdit={userData?.role !== "viewer"}
               />
             </>
           )}

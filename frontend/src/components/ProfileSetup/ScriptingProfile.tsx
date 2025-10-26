@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import completeIcon from "../../assets/image/completeIcon.png";
 import sparklesIcon from "../../assets/image/sparklesIcon.png";
 import { useUserData } from "../../context/UserDataContext";
@@ -17,7 +16,6 @@ export default function ScriptingProfile({
   totalSteps: number;
   setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
 }) {
-  const navigate = useNavigate();
   const user = useUserData();
   const trainingSteps = [
     { label: "Analyzing your website for data." },
