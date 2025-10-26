@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import completeIcon from "../../../assets/image/completeIcon.png";
 import LeftInfoPanel from "../../../components/ProfileSetup/LeftInfoPanel";
+import { useUserData } from "../../../context/UserDataContext";
 import { useApiClient } from "../../../lib/axios";
 import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast, successToast } from "../../../utils/react-toast";
@@ -31,8 +32,13 @@ export default function SelectBusinessPage() {
   });
   const navigate = useNavigate();
   const selectedBusiness = watch("businessId");
+  const { userData } = useUserData();
 
   useEffect(() => {
+    if (userData?.businessId) {
+      navigate("/admin/dashboard");
+      return;
+    }
     const fetchUserBusinesses = async () => {
       setLoading((pv) => ({ ...pv, apiLoading: true }));
       try {
