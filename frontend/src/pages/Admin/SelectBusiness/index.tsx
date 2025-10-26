@@ -5,7 +5,9 @@ import { useNavigate } from "react-router-dom";
 import completeIcon from "../../../assets/image/completeIcon.png";
 import LeftInfoPanel from "../../../components/ProfileSetup/LeftInfoPanel";
 import { useApiClient } from "../../../lib/axios";
+import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast, successToast } from "../../../utils/react-toast";
+import { capitalizeString } from "../../../utils/string-utils";
 
 type UserBusiness = {
   _id: string;
@@ -19,8 +21,9 @@ type FormValues = {
 };
 
 export default function SelectBusinessPage() {
-  const { register, handleSubmit, watch, setValue } = useForm<FormValues>();
+  const { handleSubmit, watch, setValue } = useForm<FormValues>();
   const apiClient = useApiClient();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userBusinesses, setUserBusinesses] = useState<UserBusiness[]>([]);
   const [loading, setLoading] = useState({
     apiLoading: false,
@@ -140,29 +143,57 @@ export default function SelectBusinessPage() {
                 Select Your Business
               </h2>
 
-              <div className="relative">
-                <select
-                  {...register("businessId", { required: true })}
-                  disabled={loading.apiLoading}
-                  className="w-full appearance-none rounded-full border border-gray-300 bg-white px-6 py-4 text-lg text-gray-800 shadow-md focus:border-purple-500 focus:ring-2 focus:ring-purple-300 disabled:cursor-not-allowed disabled:bg-gray-100"
-                >
-                  {loading.apiLoading ? (
-                    <option disabled>Loading businesses...</option>
-                  ) : (
-                    <>
-                      <option value="">Choose a business...</option>
+              {/* Custom dropdown */}
+              <div className="relative w-full">
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setDropdownOpen((prev) => !prev)}
+                    className="flex w-full items-center justify-between rounded-full border border-gray-300 bg-white px-6 py-4 text-lg text-gray-800 shadow-md focus:border-purple-500 focus:ring-2 focus:ring-purple-300 disabled:cursor-not-allowed disabled:bg-gray-100"
+                    disabled={loading.apiLoading}
+                  >
+                    <span>
+                      {selectedBusiness
+                        ? userBusinesses.find(
+                            (b) => b.businessId === selectedBusiness,
+                          )?.businessName
+                        : "Choose a business..."}
+                    </span>
+                    <i className="fa-solid fa-chevron-down text-gray-500"></i>
+                  </button>
+
+                  {/* Dropdown list */}
+                  {dropdownOpen && (
+                    <ul className="absolute right-0 left-0 z-50 mt-2 max-h-60 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-lg">
                       {userBusinesses.map((business) => (
-                        <option
+                        <li
                           key={business.businessId}
-                          value={business.businessId}
+                          onClick={() => {
+                            setValue("businessId", business.businessId);
+                            setDropdownOpen(false);
+                          }}
+                          className={`flex cursor-pointer items-center justify-between px-5 py-3 text-gray-800 transition hover:bg-purple-50 ${
+                            selectedBusiness === business.businessId
+                              ? "bg-purple-100"
+                              : ""
+                          }`}
                         >
-                          {business.businessName}
-                        </option>
+                          <span className="font-medium">
+                            {business.businessName}
+                          </span>
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-semibold text-white`}
+                            style={{
+                              backgroundColor: colorTheme.secondaryColor(0.9),
+                            }}
+                          >
+                            {capitalizeString(business.role)}
+                          </span>
+                        </li>
                       ))}
-                    </>
+                    </ul>
                   )}
-                </select>
-                <i className="fa-solid fa-chevron-down absolute top-5 right-5 text-gray-500"></i>
+                </div>
               </div>
 
               <button

@@ -4,7 +4,7 @@ import aggregatePaginate from 'mongoose-aggregate-paginate-v2'
 interface IBusinessUser extends Document {
 	businessId: mongoose.Types.ObjectId
 	userId: mongoose.Types.ObjectId
-	role: 'editor' | 'admin' | 'viewer'
+	role: 'editor' | 'admin' | 'viewer' | 'owner'
 	status: 'active' | 'pending' | 'removed'
 	createdAt: Date
 	updatedAt: Date
@@ -24,7 +24,7 @@ const businessUserSchema = new Schema<IBusinessUser>(
 		},
 		role: {
 			type: String,
-			enum: ['editor', 'admin', 'viewer'],
+			enum: ['editor', 'admin', 'viewer', 'owner'],
 			default: 'viewer',
 			required: true,
 		},

@@ -4,7 +4,7 @@ export type BusinessUserInvitationsType = {
   businessId: string;
   clerkInvitationId: string;
   email: string;
-  role: "editor" | "admin" | "viewer";
+  role: "editor" | "admin" | "viewer" | "owner";
   status: "active" | "pending" | "removed";
   createdAt: Date;
   updatedAt: Date;

@@ -184,31 +184,32 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
                       </td>
 
                       {/* Actions */}
-                      {userData?.role !== "viewer" && (
-                        <td className="flex items-center gap-3 px-4 py-3">
-                          {canEdit(member.role, userData) && (
-                            <>
-                              {/* Edit Button */}
-                              <button
-                                onClick={() => handleEdit(member)}
-                                className="inline-flex items-center justify-center rounded-md bg-blue-50 p-2 text-blue-600 transition-colors duration-200 hover:bg-blue-100"
-                                title="Edit"
-                              >
-                                <i className="fa-solid fa-pen text-sm"></i>
-                              </button>
+                      {userData?.role !== "viewer" &&
+                        member.role !== "owner" && (
+                          <td className="flex items-center gap-3 px-4 py-3">
+                            {canEdit(member.role, userData) && (
+                              <>
+                                {/* Edit Button */}
+                                <button
+                                  onClick={() => handleEdit(member)}
+                                  className="inline-flex items-center justify-center rounded-md bg-blue-50 p-2 text-blue-600 transition-colors duration-200 hover:bg-blue-100"
+                                  title="Edit"
+                                >
+                                  <i className="fa-solid fa-pen text-sm"></i>
+                                </button>
 
-                              {/* Delete Button */}
-                              <button
-                                onClick={() => handleDelete(member)}
-                                className="inline-flex items-center justify-center rounded-md bg-red-50 p-2 text-red-600 transition-colors duration-200 hover:bg-red-100"
-                                title="Delete"
-                              >
-                                <i className="fa-solid fa-trash text-sm"></i>
-                              </button>
-                            </>
-                          )}
-                        </td>
-                      )}
+                                {/* Delete Button */}
+                                <button
+                                  onClick={() => handleDelete(member)}
+                                  className="inline-flex items-center justify-center rounded-md bg-red-50 p-2 text-red-600 transition-colors duration-200 hover:bg-red-100"
+                                  title="Delete"
+                                >
+                                  <i className="fa-solid fa-trash text-sm"></i>
+                                </button>
+                              </>
+                            )}
+                          </td>
+                        )}
                     </tr>
                   ))}
                 </tbody>

@@ -41,7 +41,7 @@ export const websiteScrape = async (ctx: FastifyRequest, args: WebsiteScrapeInpu
 		const businessMember = new BusinessUser({
 			userId: ownerUserId,
 			businessId: newBusiness._id,
-			role: 'admin',
+			role: 'owner',
 		})
 
 		const [org] = await Promise.all([
@@ -54,7 +54,7 @@ export const websiteScrape = async (ctx: FastifyRequest, args: WebsiteScrapeInpu
 					dbUserId: ctx.context?.dbUserId!,
 					clerkId: ctx.context?.clerkId!,
 					businessId: (newBusiness._id as any).toString(),
-					role: 'admin',
+					role: 'owner',
 					selectedClientId: null,
 				},
 			}),
@@ -66,7 +66,7 @@ export const websiteScrape = async (ctx: FastifyRequest, args: WebsiteScrapeInpu
 		await clerkClient.users.updateUser(ctx.context?.clerkId!, {
 			publicMetadata: {
 				businessId: newBusiness._id,
-				role: 'admin',
+				role: 'owner',
 			},
 		})
 		return newBusiness
