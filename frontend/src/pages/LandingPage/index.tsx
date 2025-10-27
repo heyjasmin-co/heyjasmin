@@ -28,14 +28,14 @@ export default function LandingPage() {
       {/* Features */}
       <Features />
 
-      {/* Pricing / Subscriptions */}
-      <Pricing />
-
       {/* How It Works */}
       <HowWorks />
 
       {/* Industries */}
       <Industries />
+
+      {/* Pricing / Subscriptions */}
+      <Pricing />
 
       {/* FAQ */}
       <FAQ />
