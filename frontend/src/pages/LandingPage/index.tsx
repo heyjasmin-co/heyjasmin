@@ -1,3 +1,4 @@
+import About from "../../components/Landing/About";
 import CTA from "../../components/Landing/CTA";
 import FAQ from "../../components/Landing/FAQ";
 import Features from "../../components/Landing/Features";
@@ -7,6 +8,7 @@ import HowWorks from "../../components/Landing/HowWorks";
 import Industries from "../../components/Landing/Industries";
 import Navbar from "../../components/Landing/Navbar";
 import Pricing from "../../components/Landing/Pricing";
+import Statistics from "../../components/Landing/Statistics";
 
 export default function LandingPage() {
   return (
@@ -18,7 +20,11 @@ export default function LandingPage() {
       <Navbar />
       {/* Hero Section */}
       <HeroSection />
+      {/* About */}
+      <About />
 
+      {/* Statistics */}
+      <Statistics />
       {/* Features */}
       <Features />
 
