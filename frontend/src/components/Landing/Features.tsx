@@ -42,7 +42,7 @@ function Features() {
             </span>
           </h2> */}
           <p className="mx-auto max-w-4xl text-center text-2xl leading-relaxed font-bold text-black sm:text-4xl">
-            Smarter "AI" call handling that grows your business seamlessly,{" "}
+            Smarter AI call handling that grows your business seamlessly,{" "}
             <span
               className="bg-clip-text font-extrabold text-transparent"
               style={{
