@@ -39,6 +39,24 @@ export default function Dashboard() {
       setLoading(false);
     }
   };
+  const handleLaunchAgent = async () => {
+    setLoading(true);
+    try {
+      const response = await apiClient.patch<{
+        success: boolean;
+        message: string;
+        data: BusinessDetailsType;
+      }>("/businesses/launch/" + userData?.businessId);
+
+      setBusinessDetails(response.data.data);
+      successToast(response.data.message);
+    } catch (error: any) {
+      const message = error.response.data.error;
+      errorToast(message);
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleStep = () => {
     if (!(guideStep < 3)) {
       return;
@@ -52,8 +70,17 @@ export default function Dashboard() {
   }, []);
   useEffect(() => {
     if (businessDetails) {
-      if (businessDetails.aiAgentSettings.agentNumber) {
+      if (
+        businessDetails.aiAgentSettings.assistantSetup === "testing" &&
+        businessDetails.aiAgentSettings.twilioNumber
+      ) {
         setGuideStep(1);
+      }
+      if (
+        businessDetails.aiAgentSettings.assistantSetup === "completed" &&
+        businessDetails.aiAgentSettings.twilioNumber
+      ) {
+        setGuideStep(2);
       }
     }
   }, [businessDetails]);
@@ -90,7 +117,12 @@ export default function Dashboard() {
               )}
             </>
           )}
-          {guideStep === 1 && <TalkToAgent handleStep={handleStep} />}
+          {guideStep === 1 && businessDetails && (
+            <TalkToAgent
+              businessDetails={businessDetails}
+              handleLaunchAgent={handleLaunchAgent}
+            />
+          )}
           {guideStep === 2 && (
             <InfoCard
               icon={celebIcon}

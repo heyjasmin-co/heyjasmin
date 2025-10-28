@@ -5,7 +5,6 @@ dotenv.config()
 import Fastify from 'fastify'
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod'
 import config from './config/index'
-import { createContext } from './context'
 import mongoosePlugin from './plugins/mongoose'
 import swaggerPlugin from './plugins/swagger'
 import routes from './routes/index'
