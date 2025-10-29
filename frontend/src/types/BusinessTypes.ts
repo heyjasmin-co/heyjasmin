@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type BusinessDetailsType = {
-  _id: string;
+  _id?: string;
   name: string;
   overview?: string;
   address?: string;

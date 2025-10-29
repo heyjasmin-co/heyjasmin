@@ -8,14 +8,14 @@ import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { formatPhoneNumber } from "../../utils/string-utils";
 
 type TalkToAgentProps = {
-  handleLaunchAgent: () => Promise<void>;
+  handleLaunchAgent: (assistantSetup: string) => Promise<void>;
   businessDetails: BusinessDetailsType;
 };
 function TalkToAgent({ handleLaunchAgent, businessDetails }: TalkToAgentProps) {
   const [loading, setLoading] = useState(false);
   const handleStep = async () => {
     setLoading(true);
-    await handleLaunchAgent();
+    await handleLaunchAgent("completed");
     setLoading(false);
   };
   return (

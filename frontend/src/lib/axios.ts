@@ -1,42 +1,50 @@
 import { useAuth, useOrganizationList } from "@clerk/clerk-react";
 import axios, { AxiosInstance } from "axios";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 export const useApiClient = (timeout: number = 10000): AxiosInstance => {
-  const { getToken } = useAuth();
+  const { getToken, isLoaded } = useAuth();
   const { setActive } = useOrganizationList();
 
-  // Clear active organization on mount
   useEffect(() => {
     if (setActive) {
       setActive({ organization: null });
     }
   }, [setActive]);
 
-  const apiClient = axios.create({
-    baseURL:
-      import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:3000/api/v1",
-    timeout,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const apiClient = useMemo(() => {
+    const client = axios.create({
+      baseURL:
+        import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:3000/api/v1",
+      timeout,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-  apiClient.interceptors.request.use(
-    async (config) => {
-      const token = await getToken({
-        skipCache: config.url?.includes("/me"),
-      });
+    client.interceptors.request.use(
+      async (config) => {
+        if (!isLoaded) {
+          throw new Error("Auth not loaded");
+        }
 
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+        const token = await getToken({
+          skipCache: config.url?.includes("/me"),
+        });
 
-      return config;
-    },
-    (error) => Promise.reject(error),
-  );
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+
+        return config;
+      },
+      (error) => Promise.reject(error),
+    );
+
+    return client;
+  }, [getToken, isLoaded, timeout]);
 
   return apiClient;
 };
+
 export const useScrapeApiClient = () => useApiClient(90000);

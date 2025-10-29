@@ -177,13 +177,16 @@ export async function updateAIAssistant(businessData: BusinessData, assistantId:
 export async function linkTwilioNumberToAIAssistant(args: {
 	mobileNumber: string
 	assistantId: string
+	businessName: string
 }): Promise<PhoneNumbersCreateResponse> {
 	try {
-		const { mobileNumber, assistantId } = args
+		const { mobileNumber, assistantId, businessName } = args
 		const response = await vapiClient.phoneNumbers.create({
 			assistantId,
+			name: businessName,
 			provider: 'twilio',
 			number: mobileNumber,
+			smsEnabled: false,
 			twilioAccountSid: config.TWILIO_ACCOUNT_SID!,
 			twilioAuthToken: config.TWILIO_AUTH_TOKEN!,
 		})

@@ -1,6 +1,8 @@
 import { IBusiness } from '../../../models'
 import {
 	GetBusinessDetailsByIdParamsSchemaInput,
+	UpdateBusinessAssistantByIdSchemaInput,
+	UpdateBusinessAssistantSetupByIdBodySchemaInput,
 	UpdateBusinessDetailsByIdBodySchemaInput,
 	UpdateBusinessHoursByIdBodySchemaInput,
 	UpdateBusinessInformationByIdBodySchemaInput,
@@ -29,3 +31,11 @@ export type UpdateBusinessServicesByIdOutput = string[] | null
 //
 export type UpdateBusinessHoursByIdInput = UpdateBusinessHoursByIdBodySchemaInput
 export type UpdateBusinessHoursByIdOutput = IBusiness['businessHours'] | null
+
+//
+export type UpdateBusinessAssistantSetupByIdInput = UpdateBusinessAssistantSetupByIdBodySchemaInput
+export type UpdateBusinessAssistantSetupByIdOutput = IBusiness['aiAgentSettings'] | null
+
+//
+export type UpdateBusinessAssistantByIdInput = UpdateBusinessAssistantByIdSchemaInput
+export type UpdateBusinessAssistantByIdOutput = IBusiness | null

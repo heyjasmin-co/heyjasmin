@@ -39,16 +39,20 @@ export default function Dashboard() {
       setLoading(false);
     }
   };
-  const handleLaunchAgent = async () => {
+  const handleLaunchAgent = async (assistantSetup: string) => {
     setLoading(true);
     try {
       const response = await apiClient.patch<{
         success: boolean;
         message: string;
-        data: BusinessDetailsType;
-      }>("/businesses/launch/" + userData?.businessId);
-
-      setBusinessDetails(response.data.data);
+        data: BusinessDetailsType["aiAgentSettings"];
+      }>("/businesses/update-assistant-setup/" + userData?.businessId, {
+        assistantSetup,
+      });
+      const aiAgentSettings = response.data.data;
+      setBusinessDetails((prev) =>
+        prev ? { ...prev, aiAgentSettings } : prev,
+      );
       successToast(response.data.message);
     } catch (error: any) {
       const message = error.response.data.error;
@@ -56,12 +60,6 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
-  const handleStep = () => {
-    if (!(guideStep < 3)) {
-      return;
-    }
-    setGuideStep(guideStep + 1);
   };
 
   // UseEffect

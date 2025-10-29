@@ -14,7 +14,7 @@ export default async function vapiWebhook(fastify: FastifyInstance) {
 			},
 		},
 		async (request, reply) => {
-			console.log(request)
+			console.log(request.body)
 		}
 	)
 }

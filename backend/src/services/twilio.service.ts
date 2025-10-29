@@ -1,11 +1,11 @@
 import { LocalInstance } from 'twilio/lib/rest/api/v2010/account/availablePhoneNumberCountry/local'
-import { twilioClient } from '../lib/twillio'
 import { IncomingPhoneNumberInstance } from 'twilio/lib/rest/api/v2010/account/incomingPhoneNumber'
+import { twilioClient } from '../lib/twillio'
 
 /**
  * Fetches available Twilio numbers and purchases one at random.
  */
-export async function getTwilioAvailableNumbers():Promise<IncomingPhoneNumberInstance> {
+export async function getTwilioAvailableNumbers(): Promise<IncomingPhoneNumberInstance> {
 	try {
 		// Step 1: Fetch available numbers
 		const availableNumbers = await twilioClient.availablePhoneNumbers('US').local.list({

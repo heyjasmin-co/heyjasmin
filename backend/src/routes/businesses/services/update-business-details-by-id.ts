@@ -50,6 +50,7 @@ export const updateBusinessDetailsById = async (
 			// Step 4: Link Twilio number to AI Assistant
 			linkedPhoneNumber = await linkTwilioNumberToAIAssistant({
 				mobileNumber: twilioNumber.phoneNumber,
+				businessName: updatedBusinessInfo.name,
 				assistantId: aIAssistant.id,
 			})
 
