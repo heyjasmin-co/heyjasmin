@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import celebIcon from "../../../../assets/image/celebIcon.png";
 import websiteIcon from "../../../../assets/image/websiteIcon.png";
 import Breadcrumb from "../../../../components/dashboard/Breadcrumb";
@@ -63,7 +63,7 @@ export default function Dashboard() {
   };
 
   // UseEffect
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchBusinessDetails();
   }, []);
   useEffect(() => {

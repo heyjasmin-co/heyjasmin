@@ -11,30 +11,44 @@ export const me = async (request: MeUserInput): Promise<MeUserOutput> => {
 			clerkId: null,
 			businessId: null,
 			isSetupComplete: false,
-			hasSubscription: false, // TODO: For future
+			hasSubscription: false,
 			role: null,
+			assistantNumber: null,
+			businessName: null,
+			subscriptionNumbersLeft: null,
 		}
 	}
-	let isSetupComplete = null
+
+	let isSetupComplete: boolean | null = null
 	let role: string | null = null
+	let assistantNumber: string | null = null
+	let businessName: string | null = null
+	let subscriptionNumbersLeft: string | null = null
+
 	if (context.businessId) {
 		const businessUser = await BusinessUser.findOne({
 			businessId: context.businessId,
 			userId: context.dbUserId,
 		}).populate<{ businessId: IBusiness }>({
 			path: 'businessId',
-			select: 'name isSetupComplete subscriptionStatus',
 		})
-		isSetupComplete = businessUser?.businessId?.isSetupComplete
-		role = businessUser?.role!
+
+		businessName = businessUser?.businessId.name ?? null
+		subscriptionNumbersLeft = '20:00' // TODO: For future
+		assistantNumber = businessUser?.businessId.aiAgentSettings.twilioNumber ?? null
+		isSetupComplete = businessUser?.businessId?.isSetupComplete ?? null
+		role = businessUser?.role ?? null
 	}
 
 	return {
 		dbUserId: context.dbUserId,
 		clerkId: context.clerkId,
 		businessId: context.businessId,
-		isSetupComplete: isSetupComplete,
-		hasSubscription: false, // TODO: For future
-		role: role ?? context.role,
+		isSetupComplete: isSetupComplete ?? false,
+		hasSubscription: false,
+		role: role ?? context.role ?? null,
+		assistantNumber,
+		businessName,
+		subscriptionNumbersLeft,
 	}
 }

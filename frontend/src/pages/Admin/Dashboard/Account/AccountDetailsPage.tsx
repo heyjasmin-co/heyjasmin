@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import AccountDetails from "../../../../components/Account/AccountSettings/AccountDetails";
 import Loading from "../../../../components/Loading";
 import TitleCard from "../../../../components/TitleCard";
@@ -34,7 +34,7 @@ export default function AccountDetailsPage() {
     }
   };
   // UseEffect
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchAccountDetails();
   }, []);
   return (

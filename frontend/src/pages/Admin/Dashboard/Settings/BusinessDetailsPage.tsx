@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import TrainingSources from "../../../../components/dashboard/TrainingSources";
 import Loading from "../../../../components/Loading";
 import BusinessDetails from "../../../../components/settings/BusinessDetails";
@@ -76,7 +76,7 @@ export default function BusinessDetailsPage() {
   };
 
   // UseEffect
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchBusinessDetails();
   }, []);
   useEffect(() => {

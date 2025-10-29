@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/clerk-react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useLayoutEffect, useState } from "react";
 import { useApiClient } from "../lib/axios";
 
 export interface UserData {
@@ -8,6 +8,9 @@ export interface UserData {
   businessId?: string | null;
   isSetupComplete?: boolean | null;
   hasSubscription?: boolean | null;
+  assistantNumber?: string | null;
+  businessName?: string | null;
+  subscriptionNumbersLeft?: string | null;
   role?: string | null;
 }
 
@@ -71,7 +74,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     await fetchUserData();
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchUserData();
   }, [isSignedIn]);
 
