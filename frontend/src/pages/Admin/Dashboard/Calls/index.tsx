@@ -3,9 +3,24 @@ import CallsList from "../../../../components/calls/CallsList";
 
 export default function CallsPage() {
   return (
-    <div className="flex h-full flex-1 flex-col gap-4 overflow-y-auto sm:flex-row">
+    <div
+      className="flex h-full flex-1 flex-col gap-4 overflow-y-auto sm:flex-row"
+      style={{
+        scrollbarWidth: "none", // Firefox
+        msOverflowStyle: "none", // IE/Edge
+      }}
+    >
+      <style>
+        {`
+          /* Chrome, Safari, Edge */
+          div::-webkit-scrollbar {
+            display: none;
+          }
+        `}
+      </style>
+
       {/* Sidebar */}
-      <div className="w-full sm:w-72 lg:w-96">
+      <div className="h-90 w-full sm:h-full sm:w-72 lg:w-96">
         <CallsList />
       </div>
 

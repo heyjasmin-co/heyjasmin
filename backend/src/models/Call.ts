@@ -4,84 +4,61 @@ import aggregatePaginate from 'mongoose-aggregate-paginate-v2'
 interface ICall extends Document {
 	businessId: mongoose.Schema.Types.ObjectId
 	callId: string
-	callerPhone: string
-	callerName: string
-	duration: number
-	status: 'completed' | 'missed' | 'voicemail' | 'in_progress'
-	transcript: string
 	summary: string
-	sentiment: 'positive' | 'neutral' | 'negative'
+	status: 'completed' | 'missed' | 'voicemail' | 'in_progress'
 	recordingUrl: string
-	callStartTime: Date
-	callEndTime?: Date
+	durationMs?: number
+	durationSeconds?: number
+	durationMinutes?: number
+	customerPhoneNumber?: string
 	createdAt: Date
 	updatedAt: Date
 }
-
 const callSchema = new Schema<ICall>(
 	{
-		businessId: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Business',
-			required: true,
-		},
-
-		// Call Details
-		callId: {
-			type: String,
-			required: true,
-			unique: true,
-			trim: true,
-		},
-		callerPhone: {
-			type: String,
-			required: true,
-			trim: true,
-		},
-		callerName: {
-			type: String,
-			default: '',
-			trim: true,
-		},
-		duration: {
-			type: Number,
-			default: 0,
-		},
 		status: {
 			type: String,
 			enum: ['completed', 'missed', 'voicemail', 'in_progress'],
 			default: 'completed',
 		},
 
-		// Call Content
-		transcript: {
+		businessId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Business',
+			required: true,
+		},
+		callId: {
 			type: String,
-			default: '',
+			required: true,
+			unique: true,
+			trim: true,
 		},
 		summary: {
 			type: String,
 			default: '',
+			trim: true,
 		},
-		sentiment: {
-			type: String,
-			enum: ['positive', 'neutral', 'negative'],
-			default: 'neutral',
-		},
-
-		// Recording
 		recordingUrl: {
 			type: String,
 			default: '',
+			trim: true,
 		},
-
-		// Metadata
-		callStartTime: {
-			type: Date,
-			required: true,
+		durationMs: {
+			type: Number,
+			default: 0,
 		},
-		callEndTime: {
-			type: Date,
-			default: null,
+		durationSeconds: {
+			type: Number,
+			default: 0,
+		},
+		durationMinutes: {
+			type: Number,
+			default: 0,
+		},
+		customerPhoneNumber: {
+			type: String,
+			default: '',
+			trim: true,
 		},
 	},
 	{
@@ -89,8 +66,6 @@ const callSchema = new Schema<ICall>(
 	}
 )
 
-callSchema.index({ businessId: 1, callStartTime: -1 })
-callSchema.index({ businessId: 1, status: 1 })
 callSchema.plugin(aggregatePaginate)
 
 const Call: Model<ICall> = mongoose.model<ICall>('Call', callSchema)
