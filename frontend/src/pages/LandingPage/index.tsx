@@ -18,18 +18,22 @@ export default function LandingPage() {
     >
       {/* Navbar */}
       <Navbar />
+
       {/* Hero Section */}
       <HeroSection />
+
       {/* About */}
       <About />
 
       {/* Statistics */}
       <Statistics />
+
       {/* Features */}
       <Features />
 
       {/* Industries */}
       <Industries />
+
       {/* How It Works */}
       <HowWorks />
 

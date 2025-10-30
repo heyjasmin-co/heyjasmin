@@ -2,7 +2,6 @@
 import { isEqual } from "lodash";
 import { useState } from "react";
 import { BusinessDetailsType } from "../../types/BusinessTypes";
-import { errorToast, successToast } from "../../utils/react-toast";
 
 function BusinessTitleCard({
   title,
@@ -10,33 +9,22 @@ function BusinessTitleCard({
   checkBusinessDetails,
   businessDetails,
   canEdit,
-  setCheckBusinessDetails,
+  handleUpdateAgent,
 }: {
   title: string;
   subtitle: string;
   checkBusinessDetails: BusinessDetailsType;
   businessDetails: BusinessDetailsType;
   canEdit: boolean;
-  setCheckBusinessDetails: React.Dispatch<
-    React.SetStateAction<BusinessDetailsType | null>
-  >;
+  handleUpdateAgent: () => Promise<void>;
 }) {
   const [loading, setLoading] = useState(false);
   const hasChanges = !isEqual(businessDetails, checkBusinessDetails);
 
-  const handleUpdateAgent = async () => {
-    try {
-      setLoading(true);
-      localStorage.clear();
-      setCheckBusinessDetails(businessDetails);
-      successToast("Agent Update Successfully");
-    } catch (error: any) {
-      errorToast(
-        error?.response?.data?.error || "Failed to update business hours.",
-      );
-    } finally {
-      setLoading(false);
-    }
+  const handlePublishAgent = async () => {
+    setLoading(true);
+    await handleUpdateAgent();
+    setLoading(false);
   };
 
   return (
@@ -57,7 +45,7 @@ function BusinessTitleCard({
         {canEdit && (
           <button
             disabled={!hasChanges || loading}
-            onClick={handleUpdateAgent}
+            onClick={handlePublishAgent}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
             style={{
               backgroundColor: !hasChanges || loading ? "grey" : "",

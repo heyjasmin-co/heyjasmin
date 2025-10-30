@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import TrainingSources from "../../../../components/dashboard/TrainingSources";
 import Loading from "../../../../components/Loading";
 import BusinessDetails from "../../../../components/settings/BusinessDetails";
@@ -43,8 +43,8 @@ export default function BusinessDetailsPage() {
           "businessDetails",
           JSON.stringify(response.data.data),
         );
-        setCheckBusinessDetails(response.data.data);
       }
+      setCheckBusinessDetails(response.data.data);
       setBusinessDetails(response.data.data);
       successToast(response.data.message);
     } catch (error: any) {
@@ -54,8 +54,29 @@ export default function BusinessDetailsPage() {
       setLoading(false);
     }
   };
+
+  const handleUpdateAgent = async () => {
+    setLoading(true);
+    try {
+      const response = await apiClient.post<{
+        success: boolean;
+        message: string;
+        data: BusinessDetailsType;
+      }>("/businesses/update-assistant/" + userData?.businessId);
+      localStorage.clear();
+      setCheckBusinessDetails(response.data.data);
+      setBusinessDetails(response.data.data);
+      successToast(response.data.message);
+    } catch (error: any) {
+      const message = error.response.data.error;
+      errorToast(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // UseEffect
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchBusinessDetails();
   }, []);
   useEffect(() => {
@@ -73,14 +94,12 @@ export default function BusinessDetailsPage() {
               <BusinessTitleCard
                 checkBusinessDetails={checkBusinessDetails}
                 businessDetails={businessDetails}
-                setCheckBusinessDetails={setCheckBusinessDetails}
                 title="Business Information"
                 canEdit={userData?.role !== "viewer"}
+                handleUpdateAgent={handleUpdateAgent}
                 subtitle={`This business information gives ${appName} the context to handle your calls.`}
               />
-              <TrainingSources
-                businessWebsite={businessDetails.website}
-              />
+              <TrainingSources businessWebsite={businessDetails.website} />
               <BusinessDetails
                 setBusinessDetails={setBusinessDetails}
                 businessOverview={businessDetails.overview!}

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type BusinessDetailsType = {
+  _id?: string;
   name: string;
   overview?: string;
   address?: string;
@@ -21,11 +22,12 @@ export type BusinessDetailsType = {
   subscriptionEndDate?: Date | null;
   ownerUserId: string;
   aiAgentSettings: {
-    agentId?: string;
-    agentNumber?: string;
-    trainingData?: Record<string, any>;
-    voiceSettings?: Record<string, any>;
-    customInstructions?: string;
+    assistantId?: string;
+    assistantName?: string;
+    assistantPhoneNumberId?: string;
+    assistantSetup?: string;
+    twilioNumber?: string;
+    twilioId?: string;
   };
   isSetupComplete: boolean;
   createdAt: Date;
@@ -44,4 +46,3 @@ export interface IBusinessHour {
   end: string;
   isOpen: boolean;
 }
-

@@ -5,7 +5,6 @@ dotenv.config()
 import Fastify from 'fastify'
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod'
 import config from './config/index'
-import { createContext } from './context'
 import mongoosePlugin from './plugins/mongoose'
 import swaggerPlugin from './plugins/swagger'
 import routes from './routes/index'
@@ -33,14 +32,18 @@ export const createApp = async () => {
 	app.setValidatorCompiler(validatorCompiler)
 	app.setSerializerCompiler(serializerCompiler)
 
+	await app.register(require('@fastify/cors'), {
+		origin: true,
+		credentials: true,
+	})
+
+	await app.register(clerkPlugin, {
+		publishableKey: config.CLERK_PUBLISHABLE_KEY,
+		secretKey: config.CLERK_SECRET_KEY,
+	})
 	await app.register(require('@fastify/sensible'))
 	await app.register(mongoosePlugin)
 	await app.register(swaggerPlugin)
-
-	await app.register(clerkPlugin)
-	await app.register(require('@fastify/cors'), {
-		origin: '*',
-	})
 	await app.register(routes)
 
 	app.setErrorHandler((error, request, reply) => {

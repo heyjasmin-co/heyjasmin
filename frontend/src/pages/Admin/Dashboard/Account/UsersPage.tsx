@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import TeamMembers from "../../../../components/Account/Users/TeamMember/TeamMembers";
 import TeamMembersInvitation from "../../../../components/Account/Users/TeamMembersInvitation/TeamMembersInvitation";
 import Loading from "../../../../components/Loading";
@@ -36,7 +36,7 @@ export default function UsersPage() {
           data: BusinessUserInvitationsType[];
         }>("/business-user-invitations/" + userData?.businessId),
       ]);
-      
+
       setBusinessUsers(businessUsers.data.data);
       setBusinessUserInvitations(businessUserInvitations.data.data);
       successToast("Business User Information fetch Successfully");
@@ -51,7 +51,7 @@ export default function UsersPage() {
   };
 
   // UseEffect
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchUsersDetails();
   }, []);
   return (

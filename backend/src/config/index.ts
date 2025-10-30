@@ -1,7 +1,26 @@
 import dotenv from 'dotenv'
 dotenv.config()
+interface Config {
+	PORT: number
+	HOST: string
+	NODE_ENV: string
+	LOG_LEVEL: string
+	MONGODB_URI: string
+	STRIPE_SECRET_KEY?: string
+	STRIPE_WEBHOOK_SECRET?: string
+	STRIPE_PUBLISHABLE_KEY?: string
+	CLERK_PUBLISHABLE_KEY: string
+	CLERK_SECRET_KEY: string
+	CLERK_WEBHOOK_SECRET: string
+	OPEN_ROUTER_API_KEY: string
+	FRONTEND_URL: string
+	VAPI_API_KEY: string
+	TWILIO_ACCOUNT_SID: string
+	TWILIO_AUTH_TOKEN: string
+	BACKEND_URL: string
+}
 
-const config = {
+const config: Config = {
 	PORT: Number(process.env.PORT) || 3000,
 	HOST: process.env.HOST || '0.0.0.0',
 	NODE_ENV: process.env.NODE_ENV || 'development',
@@ -16,15 +35,24 @@ const config = {
 	STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY,
 
 	// Clerk
-	CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY,
-	CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
-	CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,
+	CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY!,
+	CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY!,
+	CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET!,
 
 	//OPEN_AI
-	apiKey: process.env.OPEN_ROUTER_API,
+	OPEN_ROUTER_API_KEY: process.env.OPEN_ROUTER_API!,
 
-	//Frontend
-	frontend_url: process.env.FRONTEND_URL,
+	//FRONTEND_URL
+	FRONTEND_URL: process.env.FRONTEND_URL!,
+	//BACKEND_URL
+	BACKEND_URL: process.env.BACKEND_URL!,
+
+	//VAPI
+	VAPI_API_KEY: process.env.VAPI_API_KEY!,
+
+	//VAPI
+	TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID!,
+	TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN!,
 }
 
 export default config

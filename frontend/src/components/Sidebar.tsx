@@ -2,9 +2,11 @@ import { useClerk } from "@clerk/clerk-react";
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import websiteLogo from "../assets/image/websiteLogo.png";
+import { useUserData } from "../context/UserDataContext";
 import { useApiClient } from "../lib/axios";
 import { colorTheme } from "../theme/colorTheme";
 import { errorToast, successToast } from "../utils/react-toast";
+import { formatPhoneNumber } from "../utils/string-utils";
 
 export default function Sidebar() {
   const { signOut } = useClerk();
@@ -15,7 +17,7 @@ export default function Sidebar() {
   const location = useLocation();
   const apiClient = useApiClient();
   const toggleSidebar = () => setIsOpen(!isOpen);
-
+  const { userData } = useUserData();
   const isPathActive = (path: string) => location.pathname.startsWith(path);
 
   const handleSignOut = async () => {
@@ -295,6 +297,39 @@ export default function Sidebar() {
 
             {/* Logout */}
             <li className="mt-auto pt-4">
+              {/* Info Section */}
+              {userData?.businessName && (
+                <li className="pb-8">
+                  <div
+                    className="flex flex-col items-center justify-center rounded-2xl text-center text-sm shadow-md sm:text-base"
+                    style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+                  >
+                    {/* Business Name */}
+                    <div className="w-full border-b border-white/30 py-2 font-semibold text-white">
+                      <span>{userData?.businessName}</span>
+                    </div>
+
+                    {/* Phone Number */}
+                    <div className="flex w-full items-center justify-center gap-2 border-b border-white/30 py-2 text-white">
+                      <i className="fa-solid fa-phone-volume text-base sm:text-lg"></i>
+                      <span className="truncate">
+                        {userData?.assistantNumber
+                          ? formatPhoneNumber(userData?.assistantNumber)
+                          : "No Number Available"}
+                      </span>
+                    </div>
+
+                    {/* Minutes Left */}
+                    <div className="flex w-full items-center justify-center gap-2 py-2 font-medium text-white">
+                      <i className="fa-solid fa-circle-info text-base sm:text-lg"></i>
+                      <span className="truncate">
+                        {userData?.subscriptionNumbersLeft} MIN LEFT
+                      </span>
+                    </div>
+                  </div>
+                </li>
+              )}
+
               <button
                 onClick={handleSignOut}
                 disabled={loading}

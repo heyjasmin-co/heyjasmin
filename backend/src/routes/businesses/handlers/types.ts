@@ -88,3 +88,19 @@ export const updateBusinessHoursByIdParamsSchema = z.object({
 })
 export type UpdateBusinessHoursByIdBodySchemaInput = z.infer<typeof updateBusinessHoursByIdBodySchema> &
 	z.infer<typeof updateBusinessHoursByIdParamsSchema>
+
+// Update Business Setup
+export const updateBusinessAssistantSetupByIdBodySchema = z.object({
+	assistantSetup: z.enum(['testing', 'completed']),
+})
+export const updateBusinessAssistantSetupByIdParamsSchema = z.object({
+	businessId: z.string(),
+})
+export type UpdateBusinessAssistantSetupByIdBodySchemaInput = z.infer<typeof updateBusinessAssistantSetupByIdBodySchema> &
+	z.infer<typeof updateBusinessAssistantSetupByIdParamsSchema>
+
+// Update Business Assistant
+export const updateBusinessAssistantByIdParamsSchema = z.object({
+	businessId: z.string(),
+})
+export type UpdateBusinessAssistantByIdSchemaInput = z.infer<typeof updateBusinessAssistantByIdParamsSchema>

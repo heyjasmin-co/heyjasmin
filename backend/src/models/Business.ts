@@ -23,12 +23,14 @@ interface IBusiness extends Document {
 	subscriptionEndDate?: Date | null
 	ownerUserId: mongoose.Types.ObjectId
 	aiAgentSettings: {
-		agentId?: string
-		agentNumber?: string
-		trainingData?: Record<string, any>
-		voiceSettings?: Record<string, any>
-		customInstructions?: string
+		assistantId?: string
+		assistantName?: string
+		assistantPhoneNumberId?: string
+		assistantSetup?: string
+		twilioNumber?: string
+		twilioId?: string
 	}
+
 	clerkOrganizationId: string
 	isSetupComplete: boolean
 	createdAt: Date
@@ -125,25 +127,29 @@ const businessSchema = new Schema<IBusiness>(
 
 		// AI Agent Settings
 		aiAgentSettings: {
-			agentId: {
+			assistantId: {
 				type: String,
 				default: null,
 			},
-			agentNumber: {
+			assistantPhoneNumberId: {
 				type: String,
 				default: null,
 			},
-			trainingData: {
-				type: Schema.Types.Mixed,
-				default: {},
-			},
-			voiceSettings: {
-				type: Schema.Types.Mixed,
-				default: {},
-			},
-			customInstructions: {
+			assistantSetup: {
 				type: String,
-				default: '',
+				default: null,
+			},
+			assistantName: {
+				type: String,
+				default: null,
+			},
+			twilioNumber: {
+				type: String,
+				default: null,
+			},
+			twilioId: {
+				type: String,
+				default: null,
 			},
 		},
 

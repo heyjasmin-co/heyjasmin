@@ -45,9 +45,9 @@ export const createBusinessUserInvitationById = async (
 	}
 
 	//
-	let redirectUrl = `${config.frontend_url}/admin/sign-up`
+	let redirectUrl = `${config.FRONTEND_URL}/admin/sign-up`
 	if (clerkAccount.data.length > 0) {
-		redirectUrl = `${config.frontend_url}/admin/join-organization?userId=${dbUser._id}&clerkUserId=${clerkUserId}&businessId=${business._id}&businessName=${business.name}&email=${email}&clerkOrganizationId=${business.clerkOrganizationId}&role=${role}`
+		redirectUrl = `${config.FRONTEND_URL}/admin/join-organization?userId=${dbUser._id}&clerkUserId=${clerkUserId}&businessId=${business._id}&businessName=${business.name}&email=${email}&clerkOrganizationId=${business.clerkOrganizationId}&role=${role}`
 	}
 
 	let response: OrganizationInvitation | null = null

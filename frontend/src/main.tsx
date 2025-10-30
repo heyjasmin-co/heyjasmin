@@ -20,5 +20,6 @@ createRoot(document.getElementById("root")!).render(
     <App />
     <ToastContainer />
   </ClerkProvider>,
-  // </StrictMode>
+
+  // <StrictMode>
 );

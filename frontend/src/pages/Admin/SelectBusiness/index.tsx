@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import completeIcon from "../../../assets/image/completeIcon.png";
@@ -34,7 +34,7 @@ export default function SelectBusinessPage() {
   const selectedBusiness = watch("businessId");
   const { userData } = useUserData();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (userData?.businessId) {
       navigate("/admin/dashboard");
       return;

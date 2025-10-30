@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import celebIcon from "../../../../assets/image/celebIcon.png";
 import websiteIcon from "../../../../assets/image/websiteIcon.png";
 import Breadcrumb from "../../../../components/dashboard/Breadcrumb";
@@ -39,21 +39,46 @@ export default function Dashboard() {
       setLoading(false);
     }
   };
-  const handleStep = () => {
-    if (!(guideStep < 3)) {
-      return;
+  const handleLaunchAgent = async (assistantSetup: string) => {
+    setLoading(true);
+    try {
+      const response = await apiClient.patch<{
+        success: boolean;
+        message: string;
+        data: BusinessDetailsType["aiAgentSettings"];
+      }>("/businesses/update-assistant-setup/" + userData?.businessId, {
+        assistantSetup,
+      });
+      const aiAgentSettings = response.data.data;
+      setBusinessDetails((prev) =>
+        prev ? { ...prev, aiAgentSettings } : prev,
+      );
+      successToast(response.data.message);
+    } catch (error: any) {
+      const message = error.response.data.error;
+      errorToast(message);
+    } finally {
+      setLoading(false);
     }
-    setGuideStep(guideStep + 1);
   };
 
   // UseEffect
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchBusinessDetails();
   }, []);
   useEffect(() => {
     if (businessDetails) {
-      if (businessDetails.aiAgentSettings.agentNumber) {
+      if (
+        businessDetails.aiAgentSettings.assistantSetup === "testing" &&
+        businessDetails.aiAgentSettings.twilioNumber
+      ) {
         setGuideStep(1);
+      }
+      if (
+        businessDetails.aiAgentSettings.assistantSetup === "completed" &&
+        businessDetails.aiAgentSettings.twilioNumber
+      ) {
+        setGuideStep(2);
       }
     }
   }, [businessDetails]);
@@ -90,7 +115,12 @@ export default function Dashboard() {
               )}
             </>
           )}
-          {guideStep === 1 && <TalkToAgent handleStep={handleStep} />}
+          {guideStep === 1 && businessDetails && (
+            <TalkToAgent
+              businessDetails={businessDetails}
+              handleLaunchAgent={handleLaunchAgent}
+            />
+          )}
           {guideStep === 2 && (
             <InfoCard
               icon={celebIcon}

@@ -1,8 +1,12 @@
 import { FastifyInstance } from 'fastify'
+import { createContext } from '../../context'
 import { authenticate } from '../../middleware/clerkAuth'
 import { getBusinessDetailsByIdHandler } from './handlers/get-business-details-by-id'
 import {
 	getBusinessDetailsByIdParamsSchema,
+	updateBusinessAssistantByIdParamsSchema,
+	updateBusinessAssistantSetupByIdBodySchema,
+	updateBusinessAssistantSetupByIdParamsSchema,
 	updateBusinessDetailsByIdBodySchema,
 	updateBusinessDetailsByIdParamsSchema,
 	updateBusinessHoursByIdBodySchema,
@@ -12,11 +16,12 @@ import {
 	updateBusinessServicesByIdBodySchema,
 	updateBusinessServicesByIdParamsSchema,
 } from './handlers/types'
+import { updateBusinessAssistantByIdHandler } from './handlers/update-business-assistance-by-id'
+import { updateBusinessAssistantSetupByIdHandler } from './handlers/update-business-assistant-setup-by-id'
 import { updateBusinessDetailsByIdHandler } from './handlers/update-business-details-by-id'
 import { updateBusinessHoursByIdHandler } from './handlers/update-business-hours-by-id'
 import { updateBusinessInformationByIdHandler } from './handlers/update-business-information-by-id'
 import { updateBusinessServicesByIdHandler } from './handlers/update-business-services-by-id'
-import { createContext } from '../../context'
 
 export default async function businessRoute(fastify: FastifyInstance) {
 	// Get Business Details by Id
@@ -28,6 +33,29 @@ export default async function businessRoute(fastify: FastifyInstance) {
 			params: getBusinessDetailsByIdParamsSchema,
 		},
 		handler: getBusinessDetailsByIdHandler,
+	})
+
+	// Update Business Assistant Setup by Id
+	fastify.patch('/update-assistant-setup/:businessId', {
+		preHandler: [createContext, authenticate],
+		schema: {
+			tags: ['businesses'],
+			description: 'Update Business Assistant Setup',
+			params: updateBusinessAssistantSetupByIdParamsSchema,
+			body: updateBusinessAssistantSetupByIdBodySchema,
+		},
+		handler: updateBusinessAssistantSetupByIdHandler,
+	})
+
+	// Update Business Assistant by Id
+	fastify.post('/update-assistant/:businessId', {
+		preHandler: [createContext, authenticate],
+		schema: {
+			tags: ['businesses'],
+			description: 'Update Business Assistant',
+			params: updateBusinessAssistantByIdParamsSchema,
+		},
+		handler: updateBusinessAssistantByIdHandler,
 	})
 
 	// Update Business Details by Id

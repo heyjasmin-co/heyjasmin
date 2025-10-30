@@ -1,13 +1,23 @@
+import { useState } from "react";
 import infoIcon from "../../assets/image/infoIcon.png";
+import nextIcon from "../../assets/image/nextIcon.png";
 import phoneIcon from "../../assets/image/phoneIcon.png";
 import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
-import nextIcon from "../../assets/image/nextIcon.png";
+import { BusinessDetailsType } from "../../types/BusinessTypes";
+import { formatPhoneNumber } from "../../utils/string-utils";
 
 type TalkToAgentProps = {
-  handleStep: () => void;
+  handleLaunchAgent: (assistantSetup: string) => Promise<void>;
+  businessDetails: BusinessDetailsType;
 };
-function TalkToAgent({ handleStep }: TalkToAgentProps) {
+function TalkToAgent({ handleLaunchAgent, businessDetails }: TalkToAgentProps) {
+  const [loading, setLoading] = useState(false);
+  const handleStep = async () => {
+    setLoading(true);
+    await handleLaunchAgent("completed");
+    setLoading(false);
+  };
   return (
     <div
       className="w-full rounded-xl border border-gray-200 bg-white shadow-lg"
@@ -56,7 +66,9 @@ function TalkToAgent({ handleStep }: TalkToAgentProps) {
               }}
             >
               <span className="text-md text-center font-bold text-white">
-                (252) 489-4419
+                {formatPhoneNumber(
+                  businessDetails.aiAgentSettings.twilioNumber!,
+                )}
               </span>
             </div>
           </div>
@@ -64,10 +76,15 @@ function TalkToAgent({ handleStep }: TalkToAgentProps) {
         <div className="flex flex-col gap-3 px-4 py-5 sm:flex-row sm:justify-end">
           <button
             onClick={handleStep}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
+            disabled={loading}
+            className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-md transition-all sm:w-auto ${loading ? "cursor-not-allowed bg-purple-400" : "bg-purple-600 hover:bg-purple-700 active:scale-95"} `}
           >
-            <span className="text-xl font-bold">Continue</span>
-            <img src={nextIcon} alt="Next Icon" className="h-6 w-6" />
+            <span className="text-xl font-bold">
+              {loading ? "Launching..." : "Continue"}
+            </span>
+            {!loading && (
+              <img src={nextIcon} alt="Next Icon" className="h-6 w-6" />
+            )}
           </button>
         </div>
       </div>
