@@ -298,7 +298,7 @@ export default function Sidebar() {
             {/* Logout */}
             <li className="mt-auto pt-4">
               {/* Info Section */}
-              {userData?.assistantNumber && (
+              {userData?.businessName && (
                 <li className="pb-8">
                   <div
                     className="flex flex-col items-center justify-center rounded-2xl text-center text-sm shadow-md sm:text-base"
@@ -313,7 +313,9 @@ export default function Sidebar() {
                     <div className="flex w-full items-center justify-center gap-2 border-b border-white/30 py-2 text-white">
                       <i className="fa-solid fa-phone-volume text-base sm:text-lg"></i>
                       <span className="truncate">
-                        {formatPhoneNumber(userData?.assistantNumber)}
+                        {userData?.assistantNumber
+                          ? formatPhoneNumber(userData?.assistantNumber)
+                          : "No Number Available"}
                       </span>
                     </div>
 

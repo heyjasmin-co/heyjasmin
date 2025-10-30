@@ -1,6 +1,8 @@
 import { Assistant, PhoneNumbersCreateResponse } from '@vapi-ai/server-sdk/dist/cjs/api'
+import { FastifyRequest } from 'fastify'
 import config from '../config'
 import { vapiClient } from '../lib/vapiAgent'
+import { Business, Call } from '../models'
 
 interface BusinessData {
 	businessName: string
@@ -230,5 +232,38 @@ export async function unlinkTwilioNumberFromAIAssistant(args: { mobileNumber: st
 	} catch (error: any) {
 		console.error('✗ Error unlinking Twilio number:', error?.response?.data || error?.message || error)
 		throw error
+	}
+}
+
+/**
+ * Create Call from an VAPI Assistant Webhook
+ */
+export async function handleCreateAssistantCall(request: FastifyRequest, vapiMessage: any) {
+	try {
+		const findAssistantBusiness = await Business.findOne({
+			'aiAgentSettings.assistantId': vapiMessage?.assistant?.id,
+		})
+		if (!findAssistantBusiness) {
+			request.log.error(`No business found for assistant ID: ${vapiMessage?.assistant?.id}`)
+			return null
+		}
+		const data = {
+			businessId: findAssistantBusiness?._id,
+			callId: vapiMessage?.call?.id,
+			summary: vapiMessage?.analysis?.summary,
+			recordingUrl: vapiMessage.recordingUrl,
+			status: vapiMessage.analysis.successEvaluation ? 'completed' : 'missed',
+			durationMs: vapiMessage.durationMs,
+			durationSeconds: vapiMessage.durationSeconds,
+			durationMinutes: vapiMessage.durationMinutes,
+			customerPhoneNumber: vapiMessage?.call?.customer?.number ?? null,
+		}
+		const createdCall = await Call.create(data)
+
+		request.log.info(`✅ Call created successfully`)
+		return createdCall
+	} catch (error: any) {
+		console.error('❌ Failed to create call:', error?.response?.data || error?.message || error)
+		throw new Error('Failed to create call record')
 	}
 }
