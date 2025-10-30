@@ -91,21 +91,6 @@ export const handleBusinessUserInvitationCreated = async (args: ClerkOrganizatio
 		throw new Error(`User not found with clerkId: ${user_id}`)
 	}
 
-	// // Check if business user already exists to prevent duplicates
-	// const existingBusinessUser = await BusinessUser.findOne({
-	// 	businessId,
-	// 	userId: findUserByClerkId._id,
-	// }).session(session)
-
-	// if (existingBusinessUser) {
-	// 	console.log(`Business user already exists for user ${user_id} in business ${businessId}`)
-	// 	return {
-	// 		success: true,
-	// 		data: findUserByClerkId,
-	// 		businessUser: existingBusinessUser,
-	// 	}
-	// }
-
 	// Create business user
 	const businessUser = new BusinessUser({
 		businessId,
