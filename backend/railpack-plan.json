@@ -1,7 +1,8 @@
 {
+    "version": "1.0",
     "build": {
-        "image": "node:18",
         "builder": "nodejs",
+        "image": "node:18",
         "buildCommand": "cd backend && npm install && npm run build"
     },
     "deploy": {
