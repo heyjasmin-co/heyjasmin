@@ -1,5 +1,10 @@
 import dotenv from 'dotenv'
-dotenv.config()
+import path from 'path'
+
+const env = process.env.NODE_ENV || 'development'
+dotenv.config({
+	path: path.resolve('env', `${env}.env`),
+})
 interface Config {
 	PORT: number
 	HOST: string
@@ -54,5 +59,5 @@ const config: Config = {
 	TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID!,
 	TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN!,
 }
-
+console.log(config)
 export default config

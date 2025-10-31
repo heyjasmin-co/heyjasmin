@@ -6,7 +6,7 @@ const start = async () => {
 
 	try {
 		await app.listen({
-			port: config.PORT ?? 1234,
+			port: Number(process.env.PORT || config.PORT) ?? 1234,
 			host: config.HOST,
 		})
 
