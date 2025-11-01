@@ -80,8 +80,8 @@ function inferBusinessName(parsed: any, url: string): string | null {
 }
 
 export async function extractBusinessData(url: string, websiteContent: string): Promise<BusinessData | ExtractError> {
-	if (!config.OPEN_ROUTER_API_KEY) {
-		return { error: 'API key not configured', details: 'OPENROUTER_API_KEY environment variable is missing' }
+	if (!config.OPEN_API_KEY) {
+		return { error: 'API key not configured', details: 'OPEN_API_KEY environment variable is missing' }
 	}
 
 	if (!websiteContent || websiteContent.trim().length === 0) {
