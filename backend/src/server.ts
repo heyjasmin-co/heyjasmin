@@ -13,7 +13,7 @@ const start = async () => {
 		})
 
 		app.log.info(`Server listening on ${host}:${port}`)
-		app.log.info(`Swagger docs: http://${host}:${port}/documentation`)
+		app.log.info(`Swagger docs: http://${host}:${port}/docs`)
 	} catch (err) {
 		app.log.error(err)
 		process.exit(1)
