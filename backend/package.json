@@ -22,7 +22,7 @@
         "fastify-type-provider-zod": "^4.0.2",
         "mongoose": "^8.0.0",
         "mongoose-aggregate-paginate-v2": "^1.1.4",
-        "openai": "^6.2.0",
+        "openai": "^6.7.0",
         "puppeteer": "^24.24.1",
         "stripe": "^14.0.0",
         "svix": "^1.15.0",
