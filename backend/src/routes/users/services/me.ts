@@ -4,7 +4,7 @@ import { MeUserInput, MeUserOutput } from './types'
 
 export const me = async (request: MeUserInput): Promise<MeUserOutput> => {
 	const context = request.context
-	console.log(context)
+
 	if (!context || !context.dbUserId || !context.clerkId) {
 		return {
 			dbUserId: null,
@@ -32,7 +32,7 @@ export const me = async (request: MeUserInput): Promise<MeUserOutput> => {
 		}).populate<{ businessId: IBusiness }>({
 			path: 'businessId',
 		})
-		console.log('businessUser', businessUser)
+
 		businessName = businessUser?.businessId.name ?? null
 		subscriptionNumbersLeft = '20:00' // TODO: For future
 		assistantNumber = businessUser?.businessId.aiAgentSettings.twilioNumber ?? null

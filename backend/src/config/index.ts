@@ -19,6 +19,7 @@ interface Config {
 	CLERK_WEBHOOK_SECRET: string
 	OPEN_ROUTER_API_KEY: string
 	FRONTEND_URL: string
+	OPEN_AI_MODEL: string
 	VAPI_API_KEY: string
 	TWILIO_ACCOUNT_SID: string
 	TWILIO_AUTH_TOKEN: string
@@ -46,6 +47,7 @@ const config: Config = {
 
 	//OPEN_AI
 	OPEN_ROUTER_API_KEY: process.env.OPEN_ROUTER_API!,
+	OPEN_AI_MODEL: process.env.OPEN_AI_MODEL!,
 
 	//FRONTEND_URL
 	FRONTEND_URL: process.env.FRONTEND_URL!,

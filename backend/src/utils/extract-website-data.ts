@@ -115,7 +115,7 @@ ${truncatedContent}
 
 	try {
 		const response = await openai.chat.completions.create({
-			model: 'nvidia/nemotron-nano-9b-v2:free',
+			model: config.OPEN_AI_MODEL,
 			messages: [{ role: 'user', content: prompt }],
 			temperature: 0.3,
 		})
