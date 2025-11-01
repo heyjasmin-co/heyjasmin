@@ -23,13 +23,28 @@ const start = async () => {
 
 		console.log(`✅ Server successfully listening on ${host}:${port}`)
 		app.log.info(`Server listening on ${host}:${port}`)
-	} catch (err) {
+		app.log.info(`Swagger docs: http://${host}:${port}/documentation`)
+	} catch (err: any) {
 		console.error('❌ Fatal error during startup:', err)
+		console.error('Error stack:', err.stack)
 		process.exit(1)
 	}
 }
 
+// Handle graceful shutdown
 process.on('SIGTERM', () => {
 	console.log('⚠️  SIGTERM received, shutting down gracefully...')
 	process.exit(0)
 })
+
+process.on('SIGINT', () => {
+	console.log('⚠️  SIGINT received, shutting down gracefully...')
+	process.exit(0)
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+	console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason)
+})
+
+console.log('📦 Starting application...')
+start()
