@@ -4,7 +4,7 @@ import { MeUserInput, MeUserOutput } from './types'
 
 export const me = async (request: MeUserInput): Promise<MeUserOutput> => {
 	const context = request.context
-
+	console.log(context)
 	if (!context || !context.dbUserId || !context.clerkId) {
 		return {
 			dbUserId: null,

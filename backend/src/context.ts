@@ -26,7 +26,7 @@ export const createContext = async (request: FastifyRequest, reply: FastifyReply
 			context.dbUserId = user._id.toString()
 			request.log.info({ context }, 'User context created')
 		}
-		console.log('context', context)
+
 		request.context = context
 
 		return context
