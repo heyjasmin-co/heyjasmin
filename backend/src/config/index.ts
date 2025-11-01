@@ -32,7 +32,7 @@ const config: Config = {
 	LOG_LEVEL: process.env.LOG_LEVEL || 'info',
 
 	// MongoDB
-	MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/ai-agent-app',
+	MONGODB_URI: process.env.MONGODB_URI!,
 
 	// Stripe
 	STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
