@@ -17,7 +17,7 @@ interface Config {
 	CLERK_PUBLISHABLE_KEY: string
 	CLERK_SECRET_KEY: string
 	CLERK_WEBHOOK_SECRET: string
-	OPEN_API_KEY: string
+	OPENAI_API_KEY: string
 	FRONTEND_URL: string
 	OPEN_AI_MODEL: string
 	VAPI_API_KEY: string
@@ -46,7 +46,7 @@ const config: Config = {
 	CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET!,
 
 	//OPEN_AI
-	OPEN_API_KEY: process.env.OPEN_API_KEY!,
+	OPENAI_API_KEY: process.env.OPENAI_API_KEY!,
 	OPEN_AI_MODEL: process.env.OPEN_AI_MODEL!,
 
 	//FRONTEND_URL
