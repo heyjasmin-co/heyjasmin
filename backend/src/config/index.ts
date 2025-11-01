@@ -19,7 +19,7 @@ interface Config {
 	CLERK_WEBHOOK_SECRET: string
 	OPENAI_API_KEY: string
 	FRONTEND_URL: string
-	OPEN_AI_MODEL: string
+	OPENAI_AI_MODEL: string
 	VAPI_API_KEY: string
 	TWILIO_ACCOUNT_SID: string
 	TWILIO_AUTH_TOKEN: string
@@ -47,7 +47,7 @@ const config: Config = {
 
 	//OPEN_AI
 	OPENAI_API_KEY: process.env.OPENAI_API_KEY!,
-	OPEN_AI_MODEL: process.env.OPEN_AI_MODEL!,
+	OPENAI_AI_MODEL: process.env.OPENAI_AI_MODEL!,
 
 	//FRONTEND_URL
 	FRONTEND_URL: process.env.FRONTEND_URL!,
