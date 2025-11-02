@@ -1,5 +1,4 @@
 import config from '../config'
-import { openai } from '../lib/openAIModel'
 
 export interface BusinessHours {
 	day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
@@ -114,13 +113,32 @@ ${truncatedContent}
 `
 
 	try {
-		const response = await openai.chat.completions.create({
-			model: config.OPENAI_AI_MODEL,
-			messages: [{ role: 'user', content: prompt }],
-			temperature: 0.3,
+		// HTTP request instead of OpenAI SDK
+		const response = await fetch('https://api.openai.com/v1/chat/completions', {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${config.OPENAI_API_KEY}`,
+				'Content-Type': 'application/json',
+				'OpenAI-Project': config.OPENAI_AI_PROJECT_ID,
+			},
+			body: JSON.stringify({
+				model: config.OPENAI_AI_MODEL,
+				messages: [{ role: 'user', content: prompt }],
+				temperature: 0.3,
+			}),
 		})
 
-		const raw = response.choices?.[0]?.message?.content?.trim()
+		if (!response.ok) {
+			const errorData = await response.text()
+			console.error('❌ OpenAI API Error:', response.status, errorData)
+			return {
+				error: 'OpenAI API request failed',
+				details: `${response.status}: ${errorData}`,
+			}
+		}
+
+		const data = await response.json()
+		const raw = data.choices?.[0]?.message?.content?.trim()
 		if (!raw) return { error: 'Empty response from AI', details: 'The AI returned no content' }
 
 		let jsonStr = raw
