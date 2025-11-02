@@ -118,13 +118,17 @@ ${truncatedContent}
 			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${config.OPENAI_API_KEY}`,
+				'OpenAI-Project': 'proj_Hwsh8jAwc2Qt92XDWNLw9Q7i',
 				'Content-Type': 'application/json',
-				'OpenAI-Project': config.OPENAI_AI_PROJECT_ID,
 			},
 			body: JSON.stringify({
-				model: config.OPENAI_AI_MODEL,
-				messages: [{ role: 'user', content: prompt }],
-				temperature: 0.3,
+				model: 'gpt-4o-mini',
+				messages: [
+					{
+						role: 'user',
+						content: prompt,
+					},
+				],
 			}),
 		})
 
