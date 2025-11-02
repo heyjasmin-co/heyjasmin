@@ -1,6 +1,6 @@
-import { clerkClient } from '@clerk/fastify'
 import { FastifyRequest } from 'fastify'
 import mongoose from 'mongoose'
+import clerkClient from '../../../config/clerk'
 import { Business } from '../../../models'
 import { BusinessUser } from '../../../models/BusinessUser'
 import { BusinessData, ExtractError, extractBusinessData } from '../../../utils/extract-website-data'
