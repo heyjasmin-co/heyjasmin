@@ -27,8 +27,8 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 		const userData = {
 			clerkId: clerkUser.id,
 			email: clerkUser.email_addresses[0]?.email_address,
-			firstName: clerkUser.first_name,
-			lastName: clerkUser.last_name,
+			firstName: clerkUser.first_name ?? '',
+			lastName: clerkUser.last_name ?? '',
 			profileImage: clerkUser.has_image ? clerkUser.image_url : '',
 		}
 
