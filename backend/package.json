@@ -4,7 +4,8 @@
     "description": "AI Agent Calling SaaS",
     "main": "dist/server.js",
     "scripts": {
-        "build": "tsc -p tsconfig.json",
+        "clean": "rimraf dist",
+        "build": "npm run clean && tsc -p tsconfig.json",
         "start": "node dist/server.js",
         "dev": "nodemon --watch src --exec ts-node src/server.ts",
         "dev:env": "ts-node -r dotenv/config src/server.ts dotenv_config_path=.env.development"
@@ -38,6 +39,7 @@
         "@types/uuid": "^11.0.0",
         "nodemon": "^3.1.10",
         "pino-pretty": "^13.1.1",
+        "rimraf": "^6.1.0",
         "ts-node": "^10.9.2",
         "typescript": "^5.4.0"
     },
