@@ -1,7 +1,8 @@
-import { clerkClient } from '@clerk/fastify'
+
 import { FastifyRequest } from 'fastify'
 import { BusinessUserInvitation } from '../../../models/BusinessUserInvitation'
 import { RevokeBusinessUserInvitationInput, RevokeBusinessUserInvitationOutput } from './types'
+import clerkClient from '../../../config/clerk'
 
 export const revokeBusinessUserInvitationById = async (
 	request: FastifyRequest,

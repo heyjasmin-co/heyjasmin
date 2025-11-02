@@ -1,6 +1,6 @@
-import { clerkClient } from '@clerk/fastify'
 import { FastifyRequest } from 'fastify'
 import mongoose from 'mongoose'
+import clerkClient from '../../../config/clerk'
 import { BusinessUser } from '../../../models'
 import { runTransaction } from '../../../utils/transaction'
 import { DeleteBusinessUserInput, DeleteBusinessUserOutput } from './types'
