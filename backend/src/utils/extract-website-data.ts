@@ -1,4 +1,5 @@
 import config from '../config'
+import { openai } from '../lib/openAIModel'
 
 export interface BusinessHours {
 	day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
@@ -113,36 +114,13 @@ ${truncatedContent}
 `
 
 	try {
-		// HTTP request instead of OpenAI SDK
-		const response = await fetch('https://api.openai.com/v1/chat/completions', {
-			method: 'POST',
-			headers: {
-				Authorization: `Bearer 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`,
-				'OpenAI-Project': 'proj_Hwsh8jAwc2Qt92XDWNLw9Q7i',
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				model: 'gpt-4o-mini',
-				messages: [
-					{
-						role: 'user',
-						content: prompt,
-					},
-				],
-			}),
+		const response = await openai.chat.completions.create({
+			model: config.OPENAI_AI_MODEL,
+			messages: [{ role: 'user', content: prompt }],
+			temperature: 0.3,
 		})
 
-		if (!response.ok) {
-			const errorData = await response.text()
-			console.error('❌ OpenAI API Error:', response.status, errorData)
-			return {
-				error: 'OpenAI API request failed',
-				details: `${response.status}: ${errorData}`,
-			}
-		}
-
-		const data = await response.json()
-		const raw = data.choices?.[0]?.message?.content?.trim()
+		const raw = response.choices?.[0]?.message?.content?.trim()
 		if (!raw) return { error: 'Empty response from AI', details: 'The AI returned no content' }
 
 		let jsonStr = raw
