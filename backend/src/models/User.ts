@@ -33,8 +33,7 @@ const userSchema = new Schema<IUser>(
 
 		lastName: {
 			type: String,
-			required: true,
-			trim: true,
+			default: '',
 		},
 
 		profileImage: {
