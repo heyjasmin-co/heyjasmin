@@ -1,5 +1,5 @@
-import { clerkClient } from '@clerk/fastify'
 import { FastifyRequest } from 'fastify'
+import clerkClient from '../../../config/clerk'
 
 export const logout = async (request: FastifyRequest): Promise<void> => {
 	const context = request.context

@@ -1,6 +1,7 @@
-import { clerkClient, OrganizationInvitation } from '@clerk/fastify'
+import { OrganizationInvitation } from '@clerk/fastify'
 import { FastifyRequest } from 'fastify'
 import config from '../../../config'
+import clerkClient from '../../../config/clerk'
 import { Business, User } from '../../../models'
 import { BusinessUserInvitation } from '../../../models/BusinessUserInvitation'
 import { CreateBusinessUserInvitationInput, CreateBusinessUserInvitationOutput } from './types'
