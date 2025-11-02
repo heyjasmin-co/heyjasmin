@@ -117,7 +117,7 @@ ${truncatedContent}
 		const response = await fetch('https://api.openai.com/v1/chat/completions', {
 			method: 'POST',
 			headers: {
-				Authorization: `Bearer ${config.OPENAI_API_KEY}`,
+				Authorization: `Bearer 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`,
 				'OpenAI-Project': 'proj_Hwsh8jAwc2Qt92XDWNLw9Q7i',
 				'Content-Type': 'application/json',
 			},
