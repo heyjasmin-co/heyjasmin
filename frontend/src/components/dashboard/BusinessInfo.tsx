@@ -390,7 +390,9 @@ function BusinessInfo({
                 loading && "cursor-not-allowed bg-gray-100 text-gray-400"
               }`}
             >
-              <span className="text-xl font-bold">{`Talk to ${appName}`}</span>
+              <span className="text-xl font-bold">
+                {loading ? "Creating Agent..." : `Talk to ${appName}`}
+              </span>
               <img src={nextIcon} alt="Next Icon" className="h-6 w-6" />
             </button>
           </div>

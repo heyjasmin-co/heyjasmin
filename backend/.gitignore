@@ -11,6 +11,13 @@ lerna-debug.log*
 # Dependencies
 node_modules
 
+# Environment files
+.env
+.env.*
+*.env
+env/
+!vite-env.d.ts
+
 # Build outputs
 dist
 dist-ssr

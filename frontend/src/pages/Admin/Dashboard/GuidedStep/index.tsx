@@ -129,22 +129,7 @@ export default function Dashboard() {
             />
           )}
 
-          {/* Talk to Jasmin */}
-
-          {/* {guideStep !== 2 && (
-          <div className="flex flex-col gap-3 px-4 sm:flex-row sm:justify-end">
-            <button
-              onClick={handleStep}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto"
-            >
-              <span className="text-xl font-bold">
-                {guideStep == 0 && `Talk to ${appName}`}
-                {guideStep == 1 && `Continue`}
-              </span>
-              <img src={nextIcon} alt="Next Icon" className="h-6 w-6" />
-            </button>
-          </div>
-        )} */}
+      
         </div>
       )}
     </div>
