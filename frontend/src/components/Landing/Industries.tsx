@@ -38,9 +38,9 @@ function Industries() {
       icon: "fa-solid fa-wrench",
     },
     {
-      name: "Property Management",
+      name: "Small Business",
       image: realestateImage,
-      icon: "fa-solid fa-building",
+      icon: "fa-solid fa-shop",
     },
   ];
 
