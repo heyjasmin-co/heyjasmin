@@ -1,10 +1,6 @@
 import dotenv from 'dotenv'
-import path from 'path'
 
-const env = process.env.NODE_ENV || 'development'
-dotenv.config({
-	path: path.resolve('env', `${env}.env`),
-})
+dotenv.config()
 interface Config {
 	PORT: number
 	HOST: string
@@ -18,8 +14,6 @@ interface Config {
 	CLERK_SECRET_KEY: string
 	CLERK_WEBHOOK_SECRET: string
 	OPENAI_API_KEY: string
-	OPENAI_AI_PROJECT_ID: string
-	OPENAI_AI_MODEL: string
 	FRONTEND_URL: string
 	VAPI_API_KEY: string
 	TWILIO_ACCOUNT_SID: string
@@ -48,8 +42,6 @@ const config: Config = {
 
 	//OPEN_AI
 	OPENAI_API_KEY: process.env.OPENAI_API_KEY!,
-	OPENAI_AI_MODEL: process.env.OPENAI_AI_MODEL!,
-	OPENAI_AI_PROJECT_ID: process.env.OPENAI_AI_PROJECT_ID!,
 
 	//FRONTEND_URL
 	FRONTEND_URL: process.env.FRONTEND_URL!,
@@ -63,5 +55,5 @@ const config: Config = {
 	TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID!,
 	TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN!,
 }
-
+console.log(config)
 export default config
