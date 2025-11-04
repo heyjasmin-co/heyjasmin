@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { colorTheme } from "../../theme/colorTheme";
+import { colorTheme } from "../../../theme/colorTheme";
 
 function HowWorks() {
   const steps = [

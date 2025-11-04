@@ -2,9 +2,9 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import waveImage from "../../assets/image/waveImage.png";
-import websiteIcon from "../../assets/image/websiteIcon.png";
-import { colorTheme } from "../../theme/colorTheme";
+import waveImage from "../../../assets/image/waveImage.png";
+import websiteIcon from "../../../assets/image/websiteIcon.png";
+import { colorTheme } from "../../../theme/colorTheme";
 
 export default function HeroSection() {
   const [businessName, setBusinessName] = useState("");

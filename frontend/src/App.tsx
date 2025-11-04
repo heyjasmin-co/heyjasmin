@@ -3,6 +3,7 @@ import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import CallDetails from "./components/calls/CallDetails";
 
 import { RouteGuard } from "./components/Auth/RouteGuard";
+import ScrollToTop from "./components/common/ScrollToTop";
 import { UserDataProvider } from "./context/UserDataContext";
 import Main from "./pages/Admin";
 import JoinOrganization from "./pages/Admin/Auth/JoinOrganization";
@@ -22,15 +23,38 @@ import BusinessDetailsPage from "./pages/Admin/Dashboard/Settings/BusinessDetail
 import SelectBusiness from "./pages/Admin/SelectBusiness";
 import SubscriptionPage from "./pages/Admin/Subscription";
 import LandingPage from "./pages/LandingPage";
+import HomePage from "./pages/LandingPage/HomePage";
+import IndustriesPage from "./pages/LandingPage/IndustriesPages";
+import AutomotiveRepairPage from "./pages/LandingPage/IndustriesPages/AutomotiveRepairPage";
+import HomeServicePage from "./pages/LandingPage/IndustriesPages/HomeServicePage";
+import LegalPracticesPage from "./pages/LandingPage/IndustriesPages/LegalPracticesPage";
+import RealEstatePage from "./pages/LandingPage/IndustriesPages/RealEstatePage";
+import SalonPage from "./pages/LandingPage/IndustriesPages/SalonPage";
+import SmallBusinessPage from "./pages/LandingPage/IndustriesPages/SmallBusinessPage";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
     <BrowserRouter>
       <UserDataProvider>
+        <ScrollToTop />
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<LandingPage />} />
+
+          <Route path="/" element={<LandingPage />}>
+            <Route index element={<HomePage />} />
+            <Route path="industries" element={<IndustriesPage />}>
+              <Route path="salon" element={<SalonPage />} />
+              <Route path="home-service" element={<HomeServicePage />} />
+              <Route path="legal-practices" element={<LegalPracticesPage />} />
+              <Route
+                path="automotive-repair"
+                element={<AutomotiveRepairPage />}
+              />
+              <Route path="small-business" element={<SmallBusinessPage />} />
+              <Route path="real-estate" element={<RealEstatePage />} />
+            </Route>
+          </Route>
           <Route path="/admin" element={<Login />} />
           <Route path="/admin/sign-in" element={<Login />} />
           <Route path="/admin/sign-up" element={<Register />} />

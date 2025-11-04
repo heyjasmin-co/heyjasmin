@@ -1,46 +1,55 @@
 import { motion } from "framer-motion";
-import websiteIcon from "../../assets/image/websiteIcon.png";
-import { colorTheme } from "../../theme/colorTheme";
+import { useNavigate } from "react-router-dom";
+import websiteIcon from "../../../assets/image/websiteIcon.png";
+import { colorTheme } from "../../../theme/colorTheme";
 
-import clinicImage from "../../assets/image/industries/clinicImage.jpeg";
-import constructionImage from "../../assets/image/industries/constructionImage.jpeg";
-import legalPracticesImage from "../../assets/image/industries/legalPracticesImage.jpeg";
-import realestateImage from "../../assets/image/industries/realestateImage.jpeg";
-import repairImage from "../../assets/image/industries/repairImage.jpeg";
-import spaImage from "../../assets/image/industries/spaImage.jpeg";
+import clinicImage from "../../../assets/image/industries/clinicImage.jpeg";
+import HomeServiceHero from "../../../assets/image/industries/HomeServiceHero.png";
+import legalPracticesImage from "../../../assets/image/industries/legalPracticesImage.jpeg";
+import realestateImage from "../../../assets/image/industries/realestateImage.jpeg";
+import repairImage from "../../../assets/image/industries/repairImage.jpeg";
+import spaImage from "../../../assets/image/industries/spaImage.jpeg";
+import waveImage from "../../../assets/image/waveImage.png";
 
-import waveImage from "../../assets/image/waveImage.png";
 function Industries() {
+  const navigate = useNavigate();
+
   const industries = [
     {
       name: "Real Estate",
-      image: clinicImage,
+      image: realestateImage,
       icon: "fa-solid fa-building",
+      path: "/industries/real-estate",
     },
     {
       name: "Legal Practices",
       image: legalPracticesImage,
       icon: "fa-solid fa-scale-balanced",
+      path: "/industries/legal-practices",
     },
     {
       name: "Home Service",
-      image: constructionImage,
+      image: HomeServiceHero,
       icon: "fa-solid fa-hard-hat",
+      path: "/industries/home-service",
     },
     {
       name: "Salons & Spas",
       image: spaImage,
       icon: "fa-solid fa-scissors",
+      path: "/industries/salon",
     },
     {
       name: "Automotive Repair",
       image: repairImage,
       icon: "fa-solid fa-wrench",
+      path: "/industries/automotive-repair",
     },
     {
       name: "Small Business",
-      image: realestateImage,
+      image: clinicImage,
       icon: "fa-solid fa-shop",
+      path: "/industries/small-business",
     },
   ];
 
@@ -56,7 +65,9 @@ function Industries() {
           <span
             className="bg-clip-text text-transparent"
             style={{
-              backgroundImage: `linear-gradient(to right, ${colorTheme.secondaryColor(1)}, #8b5cf6)`,
+              backgroundImage: `linear-gradient(to right, ${colorTheme.secondaryColor(
+                1
+              )}, #8b5cf6)`,
             }}
           >
             industry’s unique demands
@@ -86,7 +97,7 @@ function Industries() {
           className="absolute flex h-20 w-20 items-center justify-center rounded-full sm:h-30 sm:w-30 md:h-40 md:w-40"
           style={{
             background: `radial-gradient(circle, ${colorTheme.secondaryColor(
-              1,
+              1
             )} 0%, ${colorTheme.secondaryColor(0.9)} 60%)`,
             boxShadow: `0 0 40px 10px ${colorTheme.secondaryColor(0.4)}`,
           }}
@@ -119,7 +130,8 @@ function Industries() {
           return (
             <div
               key={idx}
-              className="absolute flex flex-col items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-gray-200 transition-all hover:-translate-y-1 hover:shadow-2xl"
+              onClick={() => navigate(industry.path)}
+              className="absolute flex cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-gray-200 transition-all hover:-translate-y-1 hover:shadow-2xl"
               style={{
                 top: `calc(50% + 40% * cos(${angle}deg))`,
                 left: `calc(50% + 40% * sin(${angle}deg))`,
@@ -149,7 +161,8 @@ function Industries() {
         {industries.map((industry, idx) => (
           <div
             key={idx}
-            className="flex flex-col overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-gray-200 transition-all hover:-translate-y-1 hover:shadow-lg"
+            onClick={() => navigate(industry.path)}
+            className="flex cursor-pointer flex-col overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-gray-200 transition-all hover:-translate-y-1 hover:shadow-lg"
           >
             <img
               src={industry.image}
