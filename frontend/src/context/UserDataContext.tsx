@@ -44,11 +44,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
         data: UserData;
       }>("/users/me");
 
-      if (response.data?.success && response.data?.data) {
-        setUserData(response.data.data);
-      } else {
-        throw new Error(response.data?.message || "Failed to fetch user data");
-      }
+      setUserData(response.data.data);
     } catch (error: any) {
       const message =
         error?.response?.data?.error ||
