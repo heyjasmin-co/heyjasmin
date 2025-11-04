@@ -61,7 +61,7 @@ function BusinessInfo({
   const [loading, setLoading] = useState(false);
   // Hooks
   const apiClient = useApiClient();
-  const { userData, fetchUserData } = useUserData();
+  const { userData, refreshUserData } = useUserData();
 
   // Handles
   const handleAddService = () => {
@@ -127,7 +127,7 @@ function BusinessInfo({
         message: string;
         data: BusinessDetailsType;
       }>("/businesses/" + userData?.businessId, updateData);
-      await fetchUserData();
+      await refreshUserData();
       setBusinessDetails(response.data.data);
       successToast(response.data.message);
     } catch (error: any) {

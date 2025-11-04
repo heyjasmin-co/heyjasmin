@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useUser } from "@clerk/clerk-react";
 import { createContext, useContext, useLayoutEffect, useState } from "react";
 import { useApiClient } from "../lib/axios";
-import { errorToast } from "../utils/react-toast";
 
 export interface UserData {
   dbUserId?: string | null;
@@ -21,7 +19,6 @@ interface UserDataContextType {
   loading: boolean;
   updateUserData: (data: Partial<UserData>) => void;
   refreshUserData: () => Promise<void>;
-  fetchUserData: () => Promise<void>;
   setUserData: React.Dispatch<React.SetStateAction<UserData | null>>;
 }
 
@@ -37,41 +34,25 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const fetchUserData = async () => {
-    try {
-      const response = await apiClient.get<{
-        message: string;
-        success: boolean;
-        data: UserData;
-      }>("/users/me");
-
-      setUserData(response.data.data);
-    } catch (error: any) {
-      const message =
-        error?.response?.data?.error ||
-        error?.message ||
-        "An unexpected error occurred while fetching user data.";
-      errorToast(message);
-      throw error;
-    }
-  };
-
-  const updateUserData = (data: Partial<UserData>) => {
-    setUserData((prev) => (prev ? { ...prev, ...data } : null));
-  };
-
-  const refreshUserData = async () => {
     if (!user || !isSignedIn) {
       setUserData(null);
       setLoading(false);
       return;
     }
 
-    setLoading(true);
     try {
-      await fetchUserData();
+      setLoading(true);
+
+      const response = await apiClient.get<{
+        message: string;
+        success: boolean;
+        data: UserData;
+      }>(`/users/me`);
+      setUserData(response.data.data);
     } catch (error) {
       console.error("Failed to fetch user data:", error);
 
+      // Fallback data for development
       setUserData({
         dbUserId: null,
         clerkId: null,
@@ -83,6 +64,14 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateUserData = (data: Partial<UserData>) => {
+    setUserData((prev) => (prev ? { ...prev, ...data } : null));
+  };
+
+  const refreshUserData = async () => {
+    await fetchUserData();
   };
 
   useLayoutEffect(() => {
@@ -97,7 +86,6 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
         updateUserData,
         refreshUserData,
         setUserData,
-        fetchUserData,
       }}
     >
       {children}
