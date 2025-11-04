@@ -24,10 +24,6 @@ export const useApiClient = (timeout: number = 10000): AxiosInstance => {
 
     client.interceptors.request.use(
       async (config) => {
-        if (!isLoaded) {
-          throw new Error("Auth not loaded");
-        }
-
         const token = await getToken({
           skipCache: config.url?.includes("/me"),
         });
