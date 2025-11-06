@@ -36,12 +36,12 @@ function Navbar() {
 
         {/* Desktop Menu */}
         <nav className="hidden items-center space-x-6 lg:flex">
-          <a href="#features" className="hover:text-blue-600">
+          <HashLink to="/#features" className="hover:text-blue-600">
             Features
-          </a>
-          <a href="#how-it-works" className="hover:text-blue-600">
+          </HashLink>
+          <HashLink to="/#how-it-works" className="hover:text-blue-600">
             How It Works
-          </a>
+          </HashLink>
 
           {/* Industries Dropdown */}
           <div
@@ -51,7 +51,7 @@ function Navbar() {
           >
             <HashLink
               to="/#industries"
-              className="flex items-center gap-1 rounded-md px-3 py-2 hover:bg-gray-100 hover:text-blue-600 transition-colors duration-200"
+              className="flex items-center gap-1 rounded-md px-3 py-2 transition-colors duration-200 hover:bg-gray-100 hover:text-blue-600"
             >
               Industries
               <svg
@@ -71,15 +71,13 @@ function Navbar() {
 
             {/* Dropdown Menu */}
             <div
-              className={`absolute left-0 mt-2 w-56 rounded-lg border border-gray-200 bg-white shadow-xl transition-all duration-200 z-50
-                ${industriesOpen ? "visible opacity-100 translate-y-0" : "invisible opacity-0 -translate-y-2"}
-              `}
+              className={`absolute left-0 z-50 mt-2 w-56 rounded-lg border border-gray-200 bg-white shadow-xl transition-all duration-200 ${industriesOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-2 opacity-0"} `}
             >
               {industriesList.map((item) => (
                 <NavLink
                   key={item.href}
                   to={item.href}
-                  className="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors"
+                  className="block rounded-lg px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-purple-50 hover:text-purple-700"
                   onClick={() => setIndustriesOpen(false)}
                 >
                   {item.label}
@@ -88,9 +86,9 @@ function Navbar() {
             </div>
           </div>
 
-          <a href="#faq" className="hover:text-blue-600">
+          <HashLink to="/#faq" className="hover:text-blue-600">
             FAQ
-          </a>
+          </HashLink>
 
           <a
             href="/admin"
@@ -136,15 +134,19 @@ function Navbar() {
       {menuOpen && (
         <div className="bg-white shadow-lg lg:hidden">
           <nav className="flex flex-col space-y-4 px-4 py-4">
-            <a href="#features">Features</a>
-            <a href="#how-it-works">How It Works</a>
+            <HashLink to="/#features" className="hover:text-blue-600">
+              Features
+            </HashLink>
+            <HashLink to="/#how-it-works" className="hover:text-blue-600">
+              How It Works
+            </HashLink>
 
             {/* Mobile Industries dropdown */}
-            <details className="text-black group">
-              <summary className="cursor-pointer py-2 font-medium flex justify-between items-center rounded-md px-3 hover:bg-gray-100 transition-colors">
+            <details className="group text-black">
+              <summary className="flex cursor-pointer items-center justify-between rounded-md py-2 font-medium transition-colors hover:bg-gray-100">
                 Industries
                 <svg
-                  className="h-4 w-4 transform group-open:rotate-180 transition-transform duration-200"
+                  className="h-4 w-4 transform transition-transform duration-200 group-open:rotate-180"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -162,7 +164,7 @@ function Navbar() {
                   <NavLink
                     key={item.href}
                     to={item.href}
-                    className="text-sm text-gray-700 hover:text-purple-700 hover:bg-purple-50 rounded-md px-2 py-1 transition-colors"
+                    className="rounded-md px-2 py-1 text-sm text-gray-700 transition-colors hover:bg-purple-50 hover:text-purple-700"
                     onClick={() => setMenuOpen(false)}
                   >
                     {item.label}
@@ -171,7 +173,7 @@ function Navbar() {
               </div>
             </details>
 
-            <a href="#faq">FAQ</a>
+            <HashLink to="/#faq">FAQ</HashLink>
 
             <a
               href="/admin"

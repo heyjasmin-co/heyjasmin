@@ -1,6 +1,7 @@
 import { useLayoutEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import BusinessProfileSetup from "../../../components/ProfileSetup/BusinessProfileSetup";
 import ScriptingProfile from "../../../components/ProfileSetup/ScriptingProfile";
 import WebsiteProfileSetup from "../../../components/ProfileSetup/WebsiteProfileSetup";
 import { useUserData } from "../../../context/UserDataContext";
@@ -56,7 +57,7 @@ export default function Index() {
       {/* Centered container */}
       {currentStep === 1 && (
         <div className="h-auto min-h-[400px] w-full max-w-[1100px] sm:min-h-[500px] lg:h-[600px]">
-          <WebsiteProfileSetup
+          <BusinessProfileSetup
             totalSteps={totalSteps}
             currentStep={currentStep}
             handleScrapeData={handleScrapeData}
@@ -64,6 +65,15 @@ export default function Index() {
         </div>
       )}
       {currentStep === 2 && (
+        <div className="h-auto min-h-[400px] w-full max-w-[1100px] sm:min-h-[500px] lg:h-[600px]">
+          <WebsiteProfileSetup
+            totalSteps={totalSteps}
+            currentStep={currentStep}
+            handleScrapeData={handleScrapeData}
+          />
+        </div>
+      )}
+      {currentStep === 3 && (
         <div className="h-auto min-h-[400px] w-full max-w-[1100px] sm:min-h-[500px] lg:h-[600px]">
           <ScriptingProfile
             loading={loading}

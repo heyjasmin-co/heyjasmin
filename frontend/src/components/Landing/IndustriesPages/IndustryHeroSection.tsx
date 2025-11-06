@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
 import { colorTheme } from "../../../theme/colorTheme";
 
 interface ChatBubble {
@@ -158,14 +159,14 @@ const IndustryHeroSection: React.FC<IndustryHeroSectionProps> = ({
               style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
             >
               {" "}
-              <a
-                href="/admin"
+              <NavLink
+                to="/admin"
                 className="w-full text-center"
                 style={{ color: "white" }}
               >
                 {" "}
                 {ctaText}{" "}
-              </a>{" "}
+              </NavLink>{" "}
             </div>{" "}
           </div>{" "}
           <p className="text-bold mt-3 text-lg">{trialNote}</p>

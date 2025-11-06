@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { HashLink } from "react-router-hash-link";
 import { colorTheme } from "../../theme/colorTheme";
 
 function Footer() {
@@ -54,28 +55,28 @@ function Footer() {
             <h3 className="text-lg font-bold text-white">Resources</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <NavLink
+                <HashLink
                   to="/#features"
                   className="transition-colors hover:text-white"
                 >
                   Features
-                </NavLink>
+                </HashLink>
               </li>
               <li>
-                <NavLink
+                <HashLink
                   to="/#how-it-works"
                   className="transition-colors hover:text-white"
                 >
                   How It Works
-                </NavLink>
+                </HashLink>
               </li>
               <li>
-                <NavLink
+                <HashLink
                   to="/#faq"
                   className="transition-colors hover:text-white"
                 >
                   FAQ
-                </NavLink>
+                </HashLink>
               </li>
             </ul>
           </div>
