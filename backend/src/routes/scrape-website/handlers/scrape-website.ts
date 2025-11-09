@@ -6,9 +6,11 @@ export const websiteScrapeHandler = asyncHandler(async (request, reply) => {
 	const body = websiteScrapeBodySchema.parse(request.body)
 
 	const websiteScrapeService = new ScrapeWebsiteService()
-	await websiteScrapeService.websiteScrape(request, body)
+	const businessData = await websiteScrapeService.websiteScrape(request, body)
 
 	return reply.status(200).send({
-		message: 'Agent has successfully retrieved your business data',
+		success: true,
+		message: 'Business created successfully',
+		data: businessData,
 	})
 })

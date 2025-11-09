@@ -1,5 +1,6 @@
 import { IBusiness } from '../../../models'
 import {
+	CreateBusinessGoogleProfileSchemaInput,
 	GetBusinessDetailsByIdParamsSchemaInput,
 	UpdateBusinessAssistantByIdSchemaInput,
 	UpdateBusinessAssistantSetupByIdBodySchemaInput,
@@ -39,3 +40,7 @@ export type UpdateBusinessAssistantSetupByIdOutput = IBusiness['aiAgentSettings'
 //
 export type UpdateBusinessAssistantByIdInput = UpdateBusinessAssistantByIdSchemaInput
 export type UpdateBusinessAssistantByIdOutput = IBusiness | null
+
+//
+export type CreateBusinessGoogleProfileInput = CreateBusinessGoogleProfileSchemaInput
+export type CreateBusinessGoogleProfileOutput = IBusiness | null

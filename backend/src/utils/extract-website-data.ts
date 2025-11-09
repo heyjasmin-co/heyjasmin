@@ -23,6 +23,15 @@ export interface ExtractError {
 	details?: string
 }
 
+export interface GooglePlaceData {
+	name?: string
+	formatted_address?: string
+	website?: string
+	business_hours?: string[] // Array like ["Monday: 11:00 AM – 10:00 PM", ...]
+	types?: string[]
+	editorial_summary?: string
+}
+
 // Default business hours (Mon–Fri open, Sat–Sun closed)
 function getDefaultBusinessHours(): BusinessHours[] {
 	return [
@@ -36,9 +45,53 @@ function getDefaultBusinessHours(): BusinessHours[] {
 	]
 }
 
+// Parse Google Business hours format: "Monday: 11:00 AM – 10:00 PM" or "Monday: Closed"
+function parseGoogleBusinessHours(hours: string[]): BusinessHours[] {
+	const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+	const parsedHours: BusinessHours[] = []
+
+	for (const day of daysOfWeek) {
+		const hourString = hours.find((h) => h.startsWith(day))
+
+		if (!hourString) {
+			// Day not found, use default
+			parsedHours.push({ day: day as any, start: '09:00 AM', end: '05:00 PM', isOpen: false })
+			continue
+		}
+
+		// Check if closed
+		if (hourString.toLowerCase().includes('closed')) {
+			parsedHours.push({ day: day as any, start: '09:00 AM', end: '05:00 PM', isOpen: false })
+			continue
+		}
+
+		// Parse format: "Monday: 11:00 AM – 10:00 PM"
+		const timeMatch = hourString.match(/:\s*(.+?)\s*[–-]\s*(.+)/)
+		if (timeMatch) {
+			const [, start, end] = timeMatch
+			parsedHours.push({
+				day: day as any,
+				start: start.trim(),
+				end: end.trim(),
+				isOpen: true,
+			})
+		} else {
+			// Fallback
+			parsedHours.push({ day: day as any, start: '09:00 AM', end: '05:00 PM', isOpen: true })
+		}
+	}
+
+	return parsedHours
+}
+
 // Generate fallback description
-function generateDescription(parsed: any, content: string): string {
-	const name = parsed.name || 'This business'
+function generateDescription(parsed: any, content: string, googleData?: GooglePlaceData): string {
+	// First try Google's editorial summary
+	if (googleData?.editorial_summary) {
+		return googleData.editorial_summary
+	}
+
+	const name = parsed.name || googleData?.name || 'This business'
 	const services =
 		Array.isArray(parsed.services) && parsed.services.length > 0
 			? parsed.services.slice(0, 3).join(', ')
@@ -59,13 +112,22 @@ function generateDescription(parsed: any, content: string): string {
 }
 
 // Get name from URL or description if missing
-function inferBusinessName(parsed: any, url: string): string | null {
+function inferBusinessName(parsed: any, url: string, googleData?: GooglePlaceData): string | null {
+	// First priority: Google Business name
+	if (googleData?.name && googleData.name.trim()) {
+		return googleData.name.trim()
+	}
+
+	// Second priority: AI extracted name
 	if (parsed.name && parsed.name.trim()) return parsed.name.trim()
 
+	// Third priority: domain name
 	try {
 		const domain = new URL(url).hostname.replace('www.', '')
 		const nameFromDomain = domain.split('.')[0]
-		if (nameFromDomain && nameFromDomain.length > 2) return nameFromDomain.charAt(0).toUpperCase() + nameFromDomain.slice(1)
+		if (nameFromDomain && nameFromDomain.length > 2) {
+			return nameFromDomain.charAt(0).toUpperCase() + nameFromDomain.slice(1)
+		}
 	} catch {
 		// ignore URL parsing errors
 	}
@@ -79,20 +141,45 @@ function inferBusinessName(parsed: any, url: string): string | null {
 	return null
 }
 
-export async function extractBusinessData(url: string, websiteContent: string): Promise<BusinessData | ExtractError> {
+export async function extractBusinessData(
+	url: string,
+	websiteContent: string,
+	googleData?: GooglePlaceData
+): Promise<BusinessData | ExtractError> {
 	if (!config.OPENAI_API_KEY) {
 		return { error: 'API key not configured', details: 'OPENAI_API_KEY environment variable is missing' }
 	}
 
-	if (!websiteContent || websiteContent.trim().length === 0) {
-		return { error: 'No website content provided', details: 'The scraped content is empty' }
+	// Allow empty website content if we have Google data
+	const hasContent = websiteContent && websiteContent.trim().length > 0
+	const hasGoogleData = googleData && Object.keys(googleData).length > 0
+
+	if (!hasContent && !hasGoogleData) {
+		return { error: 'No data provided', details: 'Need either website content or Google Business data' }
 	}
 
-	const truncatedContent = websiteContent.slice(0, 10000)
+	const truncatedContent = hasContent ? websiteContent.slice(0, 10000) : ''
+
+	// Build context from Google data if available
+	let googleContext = ''
+	if (hasGoogleData) {
+		googleContext = `
+===== GOOGLE BUSINESS PROFILE DATA (PRIORITIZE THIS) =====
+- Business Name: ${googleData.name || 'N/A'}
+- Address: ${googleData.formatted_address || 'N/A'}
+- Website: ${googleData.website || 'N/A'}
+- Business Hours: ${googleData.business_hours ? googleData.business_hours.join(', ') : 'N/A'}
+- Business Types: ${googleData.types ? googleData.types.join(', ') : 'N/A'}
+${googleData.editorial_summary ? `- Summary: ${googleData.editorial_summary}` : ''}
+============================================================
+`
+	}
 
 	const prompt = `
 You are a structured data extraction assistant.
 Extract the following fields from the provided business website content.
+
+${googleContext}
 
 Fields:
 - name: Business name (string or null)
@@ -105,9 +192,11 @@ Fields:
 - website: The website URL (use: ${url})
 
 Instructions:
-1. If business hours are clearly mentioned, extract them as they are.
-2. Do not invent hours. If not found, leave business_hours as null.
-3. Return ONLY a valid JSON object, no markdown or text.
+1. If Google Business Profile data is provided above, prioritize that information
+2. If business hours are clearly mentioned, extract them as they are
+3. Do not invent hours. If not found, leave business_hours as null
+4. Extract services from both the website content and Google types if available
+5. Return ONLY a valid JSON object, no markdown or text
 
 Website Content:
 ${truncatedContent}
@@ -134,27 +223,49 @@ ${truncatedContent}
 			return { error: 'Invalid JSON returned from model', details: 'Failed to parse JSON' }
 		}
 
-		// Fallback name logic
-		parsed.name = inferBusinessName(parsed, url)
+		// Prioritize Google data for name
+		parsed.name = inferBusinessName(parsed, url, googleData)
+
+		// Prioritize Google data for address
+		const address = googleData?.formatted_address || parsed.address || null
+
+		// Prioritize Google data for website
+		const website = googleData?.website || url
 
 		// Fallback description
 		const description =
 			parsed.description && parsed.description.trim().length > 0
 				? parsed.description.trim()
-				: generateDescription(parsed, truncatedContent)
+				: generateDescription(parsed, truncatedContent, googleData)
 
-		// Business hours: either extracted or default
-		const businessHours =
-			Array.isArray(parsed.business_hours) && parsed.business_hours.length > 0 ? parsed.business_hours : getDefaultBusinessHours()
+		// Business hours: prioritize Google data, then AI extracted, then default
+		let businessHours: BusinessHours[]
+		if (googleData?.business_hours && Array.isArray(googleData.business_hours) && googleData.business_hours.length > 0) {
+			businessHours = parseGoogleBusinessHours(googleData.business_hours)
+		} else if (Array.isArray(parsed.business_hours) && parsed.business_hours.length > 0) {
+			businessHours = parsed.business_hours
+		} else {
+			businessHours = getDefaultBusinessHours()
+		}
+
+		// Merge services from both sources
+		let services: string[] | null = null
+		const aiServices = Array.isArray(parsed.services) ? parsed.services : []
+		const googleServices = googleData?.types?.filter((t) => t !== 'establishment' && t !== 'point_of_interest') || []
+
+		const allServices = [...new Set([...aiServices, ...googleServices])]
+		if (allServices.length > 0) {
+			services = allServices
+		}
 
 		return {
 			name: parsed.name,
 			description,
-			address: parsed.address ?? null,
+			address,
 			email: parsed.email ?? null,
-			services: Array.isArray(parsed.services) ? parsed.services : null,
+			services,
 			business_hours: businessHours,
-			website: url,
+			website,
 		} as BusinessData
 	} catch (err: any) {
 		console.error('❌ AI Extraction Error:', err.message)

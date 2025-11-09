@@ -1,18 +1,24 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useLayoutEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import BusinessProfileSetup from "../../../components/ProfileSetup/BusinessProfileSetup";
+import GoogleBusinessProfileSetup from "../../../components/ProfileSetup/GoogleBusinessProfile";
+import PreviewAgentVoice from "../../../components/ProfileSetup/PreviewAgentVoice";
 import ScriptingProfile from "../../../components/ProfileSetup/ScriptingProfile";
 import WebsiteProfileSetup from "../../../components/ProfileSetup/WebsiteProfileSetup";
 import { useUserData } from "../../../context/UserDataContext";
 import { useScrapeApiClient } from "../../../lib/axios";
+import { BusinessDetailsType } from "../../../types/BusinessTypes";
+import { errorToast, successToast } from "../../../utils/react-toast";
 
 export default function Index() {
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 2;
+  const totalSteps = 4;
   const scrapeApiClient = useScrapeApiClient();
   const [loading, setLoading] = useState(false);
+  const [scrapeType, setScrapeType] = useState("business");
   const { userData } = useUserData();
+  const [businessDetails, setBusinessDetails] =
+    useState<BusinessDetailsType | null>(null);
   const navigate = useNavigate();
   useLayoutEffect(() => {
     if (userData?.businessId) {
@@ -22,54 +28,48 @@ export default function Index() {
   const handleScrapeData = async (websiteUrl: string) => {
     setLoading(true);
     try {
-      setCurrentStep(2);
-      const response = await scrapeApiClient.post(`/scrape`, {
+      setCurrentStep(3);
+      const response = await scrapeApiClient.post<{
+        message: string;
+        data: BusinessDetailsType;
+        success: boolean;
+      }>(`/scrape`, {
         websiteUrl,
       });
-      toast.success(response.data.message, {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      successToast(response.data.message);
+      setCurrentStep(4);
+      setBusinessDetails(response.data.data);
     } catch (_error) {
-      toast.error("Failed to train the agent. Please try again.", {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "light",
-      });
+      errorToast("Failed to train the agent. Please try again.");
       setCurrentStep(1);
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div className="flex min-h-screen items-center justify-center overflow-y-auto p-4 sm:p-6 lg:p-8">
       {/* Centered container */}
-      {currentStep === 1 && (
+      {currentStep === 1 && scrapeType === "business" && (
         <div className="h-auto min-h-[400px] w-full max-w-[1100px] sm:min-h-[500px] lg:h-[600px]">
-          <BusinessProfileSetup
+          <GoogleBusinessProfileSetup
             totalSteps={totalSteps}
             currentStep={currentStep}
-            handleScrapeData={handleScrapeData}
+            setBusinessDetails={setBusinessDetails}
+            setLoading={setLoading}
+            setCurrentStep={setCurrentStep}
+            setScrapeType={setScrapeType}
           />
         </div>
       )}
-      {currentStep === 2 && (
+
+      {currentStep === 1 && scrapeType === "website" && (
         <div className="h-auto min-h-[400px] w-full max-w-[1100px] sm:min-h-[500px] lg:h-[600px]">
           <WebsiteProfileSetup
             totalSteps={totalSteps}
             currentStep={currentStep}
             handleScrapeData={handleScrapeData}
+            setScrapeType={setScrapeType}
           />
         </div>
       )}
@@ -80,6 +80,15 @@ export default function Index() {
             totalSteps={totalSteps}
             currentStep={currentStep}
             setCurrentStep={setCurrentStep}
+          />
+        </div>
+      )}
+      {currentStep === 4 && businessDetails && (
+        <div className="h-auto min-h-[400px] w-full max-w-[1100px] sm:min-h-[500px] lg:h-[600px]">
+          <PreviewAgentVoice
+            businessDetails={businessDetails}
+            totalSteps={totalSteps}
+            currentStep={currentStep}
           />
         </div>
       )}

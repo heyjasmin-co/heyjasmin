@@ -104,3 +104,14 @@ export const updateBusinessAssistantByIdParamsSchema = z.object({
 	businessId: z.string(),
 })
 export type UpdateBusinessAssistantByIdSchemaInput = z.infer<typeof updateBusinessAssistantByIdParamsSchema>
+
+// Create Business Google Profile
+export const createBusinessGoogleProfileBodySchema = z.object({
+	name: z.string().min(1, 'Business name is required'),
+	overview: z.string().optional(),
+	address: z.string().min(1, 'Address is required'),
+	website: z.string().url('Invalid website URL'),
+	service: z.array(z.string().min(1)),
+	business_hours: z.array(z.string()),
+})
+export type CreateBusinessGoogleProfileSchemaInput = z.infer<typeof createBusinessGoogleProfileBodySchema>

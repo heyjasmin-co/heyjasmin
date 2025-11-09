@@ -1,145 +1,139 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import completeIcon from "../../assets/image/completeIcon.png";
-import sparklesIcon from "../../assets/image/sparklesIcon.png";
-import { appName } from "../../theme/appName";
-import LeftInfoPanel from "./LeftInfoPanel";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Dispatch, SetStateAction, useState } from "react";
+import { usePlacesWidget } from "react-google-autocomplete";
+import { GooglePlaceDetails } from "../../types/GooglePlaceDetails";
+import { errorToast } from "../../utils/react-toast";
 
+// Import your Publishable Key
+const VITE_GOOGLE_MAP_API = import.meta.env.VITE_GOOGLE_MAP_API;
+
+if (!VITE_GOOGLE_MAP_API) {
+  throw new Error("Add your Clerk Publishable Key to the .env file");
+}
 export default function BusinessProfileSetup({
-  currentStep,
-  totalSteps,
-  handleScrapeData,
+  setGoogleBusinessData,
+  setScrapeType,
 }: {
-  currentStep: number;
-  totalSteps: number;
-  handleScrapeData: (businessName: string) => Promise<void>;
+  setGoogleBusinessData: Dispatch<SetStateAction<GooglePlaceDetails | null>>;
+  setScrapeType: Dispatch<SetStateAction<string>>;
 }) {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm({
-    defaultValues: { businessName: "" },
+  const [businessId, setBusinessId] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const { ref } = usePlacesWidget({
+    apiKey: VITE_GOOGLE_MAP_API,
+    onPlaceSelected: async (place) => {
+      const businessId = place.place_id;
+      if (!businessId) {
+        errorToast("Please select a valid business from the suggestions.");
+        return;
+      }
+      setBusinessId(businessId);
+    },
+
+    options: {
+      types: ["establishment"],
+      componentRestrictions: { country: "ca" },
+    },
   });
+  const getPlaceDetails = async (
+    placeId: string,
+  ): Promise<GooglePlaceDetails> => {
+    return new Promise((resolve, reject) => {
+      const service = new google.maps.places.PlacesService(
+        document.createElement("div"),
+      );
 
-  const businessName = watch("businessName");
-  const [suggestions, setSuggestions] = useState<string[]>([
-    "Pest Busters USA – Passaic Avenue, Passaic, NJ, USA",
-    "Pest Busters Pest Control – Ogden Avenue, Downers Grove, IL, USA",
-    "Pest Busters Pest Control – Shermer Road, Northbrook, IL, USA",
-    "Pest Busters – White Street, Lowell, MA, USA",
-    "PESTBUSTERS LLC – North Embree Street, Princeton, IL, USA",
-  ]);
+      service.getDetails(
+        {
+          placeId: placeId,
+          fields: [
+            "editorial_summary",
+            "formatted_address",
+            "name",
+            "website",
+            "current_opening_hours",
+            "icon",
+            "types",
+          ],
+        },
+        (place, status) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+            resolve(place as GooglePlaceDetails);
+          } else {
+            reject(new Error(`Failed to get place details: ${status}`));
+          }
+        },
+      );
+    });
+  };
+  const handleSubmitClick = async () => {
+    setLoading(true);
+    try {
+      if (ref.current === null || (ref.current as any).value.trim() === "") {
+        setError("Please select a valid business from the suggestions.");
+        return;
+      }
 
-  const onSubmit = async (data: { businessName: string }) => {
-    await handleScrapeData(data.businessName);
+      if (!businessId && businessId?.trim() !== "") {
+        setError("Business Id is required");
+        return;
+      }
+
+      setError("");
+      const businessData = await getPlaceDetails(businessId);
+      console.log("businessData", businessData);
+      setGoogleBusinessData(businessData);
+    } catch (error) {
+      errorToast("Failed to fetch business details. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="flex h-full w-full flex-col rounded-2xl bg-white shadow-2xl lg:h-full lg:flex-row">
-      {/* Left info section */}
-      <LeftInfoPanel
-        currentStep={currentStep}
-        totalSteps={totalSteps}
-        heading={
-          <>
-            Train {appName} with your{" "}
-            <span className="font-semibold text-purple-600">
-              Google Business Profile
-            </span>
-          </>
-        }
-        listItems={[
-          {
-            icon: "fa-solid fa-magnifying-glass",
-            text: "Find your profile by entering your business name.",
-          },
-          {
-            icon: "fa-solid fa-robot",
-            text: "Your AI agent will be trained on your Google profile.",
-          },
-          {
-            icon: "fa-solid fa-clock",
-            text: "Takes less than a minute!",
-          },
-        ]}
-        trialText={
-          <div className="flex gap-2">
-            <img
-              src={completeIcon}
-              alt="Website Icon"
-              className="h-5 w-5 shrink-0"
-            />{" "}
-            <span>
-              Start risk-free:{" "}
-              <span className="font-semibold">5-day trial</span> with all
-              features
-            </span>
-          </div>
-        }
-      />
+    <div className="flex w-full flex-col items-center justify-center gap-6 px-4 py-8 sm:px-8 lg:w-1/2">
+      <h2 className="text-center text-2xl font-bold text-gray-800 sm:text-3xl">
+        Find your Google Business Profile
+      </h2>
 
-      {/* Right content section */}
-      <div className="flex w-full items-center justify-center px-4 py-8 sm:px-8 lg:w-1/2">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex w-full max-w-lg flex-col gap-6 rounded-xl bg-gradient-to-b from-white to-gray-50 p-8 shadow-lg sm:p-10"
+      <div className="flex w-full max-w-md flex-col gap-6">
+        {/* Google Places Autocomplete Input */}
+        <div className="relative w-full">
+          <input
+            ref={ref}
+            placeholder="Search your business (e.g. pest control)"
+            className="w-full rounded-full border border-gray-300 px-6 py-4 pr-12 text-lg text-gray-800 shadow-md focus:border-purple-500 focus:ring-2 focus:ring-purple-300 focus:outline-none"
+          />
+          <i className="fa-solid fa-magnifying-glass absolute top-1/2 right-5 -translate-y-1/2 text-gray-400"></i>
+        </div>
+
+        {error && <p className="text-sm text-red-500">{error}</p>}
+
+        <button
+          onClick={handleSubmitClick}
+          disabled={loading}
+          className={`flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-200 active:scale-95 ${
+            businessId && !loading
+              ? "bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-300"
+              : "cursor-not-allowed bg-gray-300 text-gray-100"
+          }`}
         >
-          <h2 className="text-center text-2xl font-bold text-gray-800 sm:text-3xl">
-            Find your Google Business Profile
-          </h2>
+          {loading ? "Continuing... " : "Continue"}
+          <i className="fa-solid fa-arrow-right text-sm"></i>
+        </button>
 
-          {/* Search input */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search your business (e.g. pest busters)"
-              {...register("businessName", {
-                required: "Business name is required",
-              })}
-              className="w-full rounded-full border border-gray-300 px-6 py-4 text-lg text-gray-800 shadow-md focus:border-purple-500 focus:ring-2 focus:ring-purple-300"
-            />
-            <i className="fa-solid fa-magnifying-glass absolute top-1/2 right-5 -translate-y-1/2 text-gray-400"></i>
-          </div>
-
-          {errors.businessName && (
-            <p className="text-sm text-red-500">
-              {errors.businessName.message}
-            </p>
-          )}
-
-          {/* Mock dropdown suggestions */}
-          {businessName && (
-            <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 shadow-md">
-              {suggestions.map((s, i) => (
-                <li
-                  key={i}
-                  className="flex cursor-pointer items-center gap-2 px-4 py-3 hover:bg-gray-100"
-                >
-                  <i className="fa-solid fa-location-dot text-purple-500"></i>
-                  {s}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <button
-            type="submit"
-            className={`flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-lg font-semibold text-white shadow-lg transition active:scale-95 ${
-              businessName
-                ? "bg-purple-600 hover:bg-purple-700"
-                : "cursor-not-allowed bg-gray-300"
-            }`}
-          >
-            Train {appName}
-            <img src={sparklesIcon} alt="Sparkles" className="h-6 w-6" />
-          </button>
-
-          <p className="text-right text-xs text-gray-400">
-            powered by <span className="font-medium text-gray-600">Google</span>
-          </p>
-        </form>
+        {/* Secondary Button */}
+        <button
+          type="button"
+          onClick={() => setScrapeType("website")}
+          className="flex items-center justify-center gap-2 text-lg font-medium text-purple-600 transition-colors duration-200 hover:text-purple-700 active:scale-95"
+        >
+          Use my website instead
+          <i className="fa-solid fa-arrow-right text-sm"></i>
+        </button>
       </div>
     </div>
   );
