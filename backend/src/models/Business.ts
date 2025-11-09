@@ -12,7 +12,7 @@ interface IBusiness extends Document {
 	name: string
 	overview?: string
 	address?: string
-	website: string
+	website?: string
 	services: string[]
 	businessHours: IBusinessHour[]
 	stripeCustomerId?: string | null
@@ -55,7 +55,7 @@ const businessSchema = new Schema<IBusiness>(
 		},
 		website: {
 			type: String,
-			required: true,
+			default: '',
 		},
 
 		// Services

@@ -58,8 +58,9 @@ export default function GoogleBusinessProfileSetup({
       setBusinessDetails(response.data.data);
       setCurrentStep(4);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (_error) {
-      errorToast("Failed to train the agent. Please try again.");
+    } catch (_error: any) {
+      const message = _error.response.data.message;
+      errorToast(message);
       setCurrentStep(1);
     } finally {
       setLoading(false);

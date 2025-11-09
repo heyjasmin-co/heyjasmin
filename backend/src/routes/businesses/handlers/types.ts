@@ -107,11 +107,21 @@ export type UpdateBusinessAssistantByIdSchemaInput = z.infer<typeof updateBusine
 
 // Create Business Google Profile
 export const createBusinessGoogleProfileBodySchema = z.object({
-	name: z.string().min(1, 'Business name is required'),
+	name: z.string({ required_error: 'Business name is required' }).min(1, 'Please provide your business name'),
+
 	overview: z.string().optional(),
-	address: z.string().min(1, 'Address is required'),
-	website: z.string().url('Invalid website URL'),
-	service: z.array(z.string().min(1)),
-	business_hours: z.array(z.string()),
+
+	address: z.string({ required_error: 'Business address is required' }).min(1, 'Please provide a valid business address'),
+
+	website: z
+		.string({ required_error: 'Website URL is required' })
+		.url('Please enter a valid website URL (e.g., https://example.com)')
+		.optional(),
+
+	service: z.array(z.string().min(1, 'Each service must have a name')).min(1, 'Please specify at least one service you offer'),
+
+	business_hours: z
+		.array(z.string().min(1, 'Business hours entry cannot be empty'))
+		.min(1, 'Please include at least one business hours entry'),
 })
 export type CreateBusinessGoogleProfileSchemaInput = z.infer<typeof createBusinessGoogleProfileBodySchema>

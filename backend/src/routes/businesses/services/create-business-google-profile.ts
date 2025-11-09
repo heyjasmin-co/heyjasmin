@@ -12,7 +12,7 @@ export const CreateBusinessGoogleProfile = async (
 ): Promise<CreateBusinessGoogleProfileOutput> => {
 	const { website, ...scrapedContent } = args
 	return await runTransaction(async (session) => {
-		const data = await extractBusinessData(website, '', scrapedContent)
+		const data = await extractBusinessData(website ?? '', '', scrapedContent)
 		if ((data as ExtractError).error) {
 			throw new Error(`AI extraction failed: ${(data as ExtractError).details || (data as ExtractError).error}`)
 		}
