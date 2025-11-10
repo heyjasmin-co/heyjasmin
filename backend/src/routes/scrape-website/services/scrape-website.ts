@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import clerkClient from '../../../config/clerk'
 import { Business } from '../../../models'
 import { BusinessUser } from '../../../models/BusinessUser'
+import { createElevenlabsAudioClip } from '../../../services/elevenlabs.service'
 import { BusinessData, ExtractError, extractBusinessData } from '../../../utils/extract-website-data'
 import scrapeWebsiteContent from '../../../utils/scraping-website'
 import { runTransaction } from '../../../utils/transaction'
@@ -69,6 +70,17 @@ export const websiteScrape = async (ctx: FastifyRequest, args: WebsiteScrapeInpu
 				role: 'owner',
 			},
 		})
-		return newBusiness
+		const [greeting, message] = await Promise.all([
+			createElevenlabsAudioClip(`Hello, thank you for calling ${newBusiness.name}. My name is Jasmin, how can I help you today?`),
+			createElevenlabsAudioClip(`I'd be happy to take a message for the ${newBusiness.name} team. Can I start by getting your name?`),
+		])
+
+		const finalData = {
+			name: newBusiness.name,
+			messageAudio: message,
+			greetingAudio: greeting,
+		}
+
+		return finalData
 	})
 }

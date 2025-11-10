@@ -12,6 +12,7 @@
     },
     "dependencies": {
         "@clerk/fastify": "^2.4.42",
+        "@elevenlabs/elevenlabs-js": "^2.22.0",
         "@fastify/cors": "^10.0.0",
         "@fastify/sensible": "^6.0.0",
         "@fastify/swagger": "^9.0.0",
