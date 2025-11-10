@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useLayoutEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -7,7 +8,7 @@ import ScriptingProfile from "../../../components/ProfileSetup/ScriptingProfile"
 import WebsiteProfileSetup from "../../../components/ProfileSetup/WebsiteProfileSetup";
 import { useUserData } from "../../../context/UserDataContext";
 import { useScrapeApiClient } from "../../../lib/axios";
-import { BusinessDetailsType } from "../../../types/BusinessTypes";
+import { BusinessCreationType } from "../../../types/BusinessTypes";
 import { errorToast, successToast } from "../../../utils/react-toast";
 
 export default function Index() {
@@ -18,7 +19,7 @@ export default function Index() {
   const [scrapeType, setScrapeType] = useState("business");
   const { userData } = useUserData();
   const [businessDetails, setBusinessDetails] =
-    useState<BusinessDetailsType | null>(null);
+    useState<BusinessCreationType | null>(null);
   const navigate = useNavigate();
   useLayoutEffect(() => {
     if (userData?.businessId) {
@@ -31,7 +32,11 @@ export default function Index() {
       setCurrentStep(3);
       const response = await scrapeApiClient.post<{
         message: string;
-        data: BusinessDetailsType;
+        data: {
+          name: string;
+          messageAudio: any;
+          greetingAudio: any;
+        };
         success: boolean;
       }>(`/scrape`, {
         websiteUrl,

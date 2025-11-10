@@ -46,3 +46,9 @@ export interface IBusinessHour {
   end: string;
   isOpen: boolean;
 }
+
+export interface BusinessCreationType {
+  name: string;
+  messageAudio: any;
+  greetingAudio: any;
+}

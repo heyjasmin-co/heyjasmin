@@ -19,6 +19,7 @@ interface Config {
 	TWILIO_ACCOUNT_SID: string
 	TWILIO_AUTH_TOKEN: string
 	BACKEND_URL: string
+	ELEVENLABS_API_KEY: string
 }
 
 const config: Config = {
@@ -54,6 +55,9 @@ const config: Config = {
 	//VAPI
 	TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID!,
 	TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN!,
+
+	//ELEVENLABS
+	ELEVENLABS_API_KEY: process.env.ELEVENLABS_API_KEY!,
 }
 
 export default config
