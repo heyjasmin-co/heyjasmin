@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import completeIcon from "../../assets/image/completeIcon.png";
 import { useScrapeApiClient } from "../../lib/axios";
 import { appName } from "../../theme/appName";
-import { BusinessDetailsType } from "../../types/BusinessTypes";
+import { BusinessCreationType } from "../../types/BusinessTypes";
 import { GooglePlaceDetails } from "../../types/GooglePlaceDetails";
 import { errorToast, successToast } from "../../utils/react-toast";
 import BusinessProfileSetup from "./BusinessProfileSetup";
@@ -30,7 +30,7 @@ export default function GoogleBusinessProfileSetup({
   setCurrentStep: Dispatch<SetStateAction<number>>;
   setScrapeType: Dispatch<SetStateAction<string>>;
   setLoading: Dispatch<SetStateAction<boolean>>;
-  setBusinessDetails: Dispatch<SetStateAction<BusinessDetailsType | null>>;
+  setBusinessDetails: Dispatch<SetStateAction<BusinessCreationType | null>>;
 }) {
   const [googleBusinessData, setGoogleBusinessData] =
     useState<GooglePlaceDetails | null>(null);
@@ -53,7 +53,15 @@ export default function GoogleBusinessProfileSetup({
         business_hours: googleBusinessData.current_opening_hours?.weekday_text,
       };
 
-      const response = await scrapeApiClient.post(`/businesses`, formatData);
+      const response = await scrapeApiClient.post<{
+        message: string;
+        success: boolean;
+        data: {
+          name: string;
+          messageAudio: any;
+          greetingAudio: any;
+        };
+      }>(`/businesses`, formatData);
       successToast(response.data.message);
       setBusinessDetails(response.data.data);
       setCurrentStep(4);

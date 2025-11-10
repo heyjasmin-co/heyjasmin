@@ -2,7 +2,7 @@ import completeIcon from "../../assets/image/completeIcon.png";
 import sparklesIcon from "../../assets/image/sparklesIcon.png";
 import { useUserData } from "../../context/UserDataContext";
 import { appName } from "../../theme/appName";
-import { BusinessDetailsType } from "../../types/BusinessTypes";
+import { BusinessCreationType } from "../../types/BusinessTypes";
 import LeftInfoPanel from "./LeftInfoPanel";
 
 export default function PreviewAgentVoice({
@@ -10,7 +10,7 @@ export default function PreviewAgentVoice({
   totalSteps,
   businessDetails,
 }: {
-  businessDetails: BusinessDetailsType;
+  businessDetails: BusinessCreationType;
   currentStep: number;
   totalSteps: number;
 }) {
@@ -84,7 +84,7 @@ export default function PreviewAgentVoice({
               Greeting
             </label>
             <audio controls className="w-full rounded-lg">
-              <source src="/audio/greeting-sample.mp3" type="audio/mpeg" />
+              <source src={businessDetails.greetingAudio} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>
           </div>
@@ -94,7 +94,7 @@ export default function PreviewAgentVoice({
               Message
             </label>
             <audio controls className="w-full rounded-lg">
-              <source src="/audio/message-sample.mp3" type="audio/mpeg" />
+              <source src={businessDetails.messageAudio} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>
           </div>
