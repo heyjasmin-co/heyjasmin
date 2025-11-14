@@ -238,6 +238,7 @@ export async function unlinkTwilioNumberFromAIAssistant(args: { mobileNumber: st
 /**
  * Create Call from an VAPI Assistant Webhook
  */
+
 export async function handleCreateAssistantCall(request: FastifyRequest, vapiMessage: any) {
 	try {
 		const findAssistantBusiness = await Business.findOne({
@@ -267,3 +268,4 @@ export async function handleCreateAssistantCall(request: FastifyRequest, vapiMes
 		throw new Error('Failed to create call record')
 	}
 }
+

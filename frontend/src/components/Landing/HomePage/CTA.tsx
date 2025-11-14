@@ -1,4 +1,4 @@
-import { colorTheme } from "../../theme/colorTheme";
+import { colorTheme } from "../../../theme/colorTheme";
 
 function CTA() {
   return (

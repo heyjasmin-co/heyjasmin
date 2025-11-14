@@ -5,6 +5,7 @@ import { updateBusinessInformationById } from './update-business-information-by-
 import { updateBusinessServicesById } from './update-business-services-by-id'
 import { updateBusinessAssistantSetupById } from './update-business-assistant-setup-by-id'
 import { updateBusinessAssistantById } from './update-business-assistance-by-id'
+import { CreateBusinessGoogleProfile } from './create-business-google-profile'
 
 export class BusinessService {
 	getBusinessDetailsById = getBusinessDetailsById
@@ -14,4 +15,5 @@ export class BusinessService {
 	updateBusinessHoursById = updateBusinessHoursById
 	updateBusinessAssistantSetupById = updateBusinessAssistantSetupById
 	updateBusinessAssistantById = updateBusinessAssistantById
+	createBusinessGoogleProfile = CreateBusinessGoogleProfile
 }

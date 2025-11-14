@@ -1,7 +1,5 @@
 import React from "react";
 import completeIcon from "../../assets/image/completeIcon.png";
-import sparklesIcon from "../../assets/image/sparklesIcon.png";
-import { useUserData } from "../../context/UserDataContext";
 import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
 import LeftInfoPanel from "./LeftInfoPanel";
@@ -16,22 +14,13 @@ export default function ScriptingProfile({
   totalSteps: number;
   setCurrentStep: React.Dispatch<React.SetStateAction<number>>;
 }) {
-  const user = useUserData();
   const trainingSteps = [
     { label: "Analyzing your website for data." },
     { label: "Processing your business information." },
     { label: "Optimizing your data for AI." },
     { label: "Generating your custom Jasmin agent." },
   ];
-  const handleClaimAgent = () => {
-    user.setUserData((prev) => {
-      if (prev) {
-        return { ...prev, hasCompletedSetup: true };
-      }
-      return prev;
-    });
-    window.location.href = "/admin/dashboard";
-  };
+
   return (
     <div className="flex h-full w-full flex-col rounded-2xl bg-white shadow-2xl lg:h-full lg:flex-row">
       <LeftInfoPanel
@@ -117,20 +106,6 @@ export default function ScriptingProfile({
               </div>
             ))}
           </div>
-
-          {/* Train button */}
-          {!loading && (
-            <button
-              onClick={handleClaimAgent}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-8 py-4 text-lg font-semibold text-white shadow-lg transition hover:bg-purple-700 active:scale-95"
-              style={{
-                color: "white",
-              }}
-            >
-              Claim your Agent
-              <img src={sparklesIcon} alt="Sparkles" className="h-6 w-6" />
-            </button>
-          )}
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import completeIcon from "../../assets/image/completeIcon.png";
 import sparklesIcon from "../../assets/image/sparklesIcon.png";
@@ -8,10 +9,12 @@ export default function WebsiteProfileSetup({
   currentStep,
   totalSteps,
   handleScrapeData,
+  setScrapeType,
 }: {
   currentStep: number;
   totalSteps: number;
   handleScrapeData: (websiteUrl: string) => Promise<void>;
+  setScrapeType: Dispatch<SetStateAction<string>>;
 }) {
   const {
     register,
@@ -111,6 +114,14 @@ export default function WebsiteProfileSetup({
           >
             Train {appName}
             <img src={sparklesIcon} alt="Sparkles" className="h-6 w-6" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setScrapeType("business")}
+            className="flex items-center justify-center gap-2 text-lg font-medium text-purple-600 transition-colors duration-200 hover:text-purple-700 active:scale-95"
+          >
+            Train with Google Business Profile
+            <i className="fa-solid fa-arrow-right text-sm"></i>
           </button>
         </form>
       </div>

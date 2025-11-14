@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { colorTheme } from "../../theme/colorTheme";
+import { colorTheme } from "../../../theme/colorTheme";
 
 function About() {
   const cards = [
@@ -107,10 +107,10 @@ function About() {
                 e.currentTarget.style.color = "white";
 
                 const iconWrapper = e.currentTarget.querySelector(
-                  ".icon-wrapper"
+                  ".icon-wrapper",
                 ) as HTMLElement;
                 const icon = e.currentTarget.querySelector(
-                  ".icon"
+                  ".icon",
                 ) as HTMLElement;
                 if (iconWrapper && icon) {
                   iconWrapper.style.backgroundColor = "white";
@@ -123,10 +123,10 @@ function About() {
                 e.currentTarget.style.color = "black";
 
                 const iconWrapper = e.currentTarget.querySelector(
-                  ".icon-wrapper"
+                  ".icon-wrapper",
                 ) as HTMLElement;
                 const icon = e.currentTarget.querySelector(
-                  ".icon"
+                  ".icon",
                 ) as HTMLElement;
                 if (iconWrapper && icon) {
                   iconWrapper.style.backgroundColor =

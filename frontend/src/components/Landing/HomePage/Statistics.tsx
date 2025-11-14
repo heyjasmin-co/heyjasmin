@@ -1,16 +1,13 @@
 import { motion } from "framer-motion";
-import user1 from "../../assets/image/statistics/user_1.png";
-import user5 from "../../assets/image/statistics/user_5.png";
-import user3 from "../../assets/image/statistics/user_3.png";
-import websiteIcon from "../../assets/image/websiteIcon.png";
-import { colorTheme } from "../../theme/colorTheme";
+import user1 from "../../../assets/image/statistics/user_1.png";
+import user3 from "../../../assets/image/statistics/user_3.png";
+import user5 from "../../../assets/image/statistics/user_5.png";
+import websiteIcon from "../../../assets/image/websiteIcon.png";
+import { colorTheme } from "../../../theme/colorTheme";
 
 export default function Statistics() {
   return (
-    <section
-      className="relative w-full overflow-hidden px-4 py-16 sm:px-6 sm:py-20 md:px-8 md:py-28"
-  
-    >
+    <section className="relative w-full overflow-hidden px-4 py-16 sm:px-6 sm:py-20 md:px-8 md:py-28">
       {/* Floating Shapes Background */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="animate-float absolute top-20 left-10 h-32 w-32 rounded-full bg-purple-200/30 blur-2xl"></div>

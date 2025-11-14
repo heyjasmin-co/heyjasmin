@@ -1,8 +1,10 @@
 import { FastifyInstance } from 'fastify'
 import { createContext } from '../../context'
 import { authenticate } from '../../middleware/clerkAuth'
+import { createBusinessGoogleProfileHandler } from './handlers/create-business-google-profile'
 import { getBusinessDetailsByIdHandler } from './handlers/get-business-details-by-id'
 import {
+	createBusinessGoogleProfileBodySchema,
 	getBusinessDetailsByIdParamsSchema,
 	updateBusinessAssistantByIdParamsSchema,
 	updateBusinessAssistantSetupByIdBodySchema,
@@ -104,5 +106,15 @@ export default async function businessRoute(fastify: FastifyInstance) {
 			body: updateBusinessHoursByIdBodySchema,
 		},
 		handler: updateBusinessHoursByIdHandler,
+	})
+	// Create Business from google profile
+	fastify.post('/', {
+		preHandler: [createContext, authenticate],
+		schema: {
+			tags: ['businesses'],
+			description: 'Create Business From google profile',
+			body: createBusinessGoogleProfileBodySchema,
+		},
+		handler: createBusinessGoogleProfileHandler,
 	})
 }

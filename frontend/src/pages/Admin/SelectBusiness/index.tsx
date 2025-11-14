@@ -214,6 +214,14 @@ export default function SelectBusinessPage() {
                 {loading.selectBusinessLoading ? "Processing..." : "Continue"}
                 <i className="fa-solid fa-arrow-right text-lg text-white"></i>
               </button>
+              <button
+                type="button"
+                onClick={() => navigate("/admin/setup")}
+                className="flex items-center justify-center gap-2 text-lg font-medium text-purple-600 transition-all duration-200 hover:text-purple-700 active:scale-95"
+              >
+                Create new business
+                <i className="fa-solid fa-arrow-right text-lg"></i>
+              </button>
             </form>
           </div>
         </div>
