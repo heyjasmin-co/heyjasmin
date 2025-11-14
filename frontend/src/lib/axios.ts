@@ -38,7 +38,7 @@ export const useApiClient = (timeout: number = 10000): AxiosInstance => {
     );
 
     return client;
-  }, [getToken]);
+  }, [getToken, isLoaded, timeout]);
 
   return apiClient;
 };

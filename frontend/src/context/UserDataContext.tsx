@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/clerk-react";
-import { createContext, useContext, useLayoutEffect, useState } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useState } from "react";
 import { useApiClient } from "../lib/axios";
 
 export interface UserData {
@@ -74,7 +74,7 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     await fetchUserData();
   };
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     fetchUserData();
   }, [isSignedIn]);
 
