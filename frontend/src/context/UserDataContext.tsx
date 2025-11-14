@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/clerk-react";
-import { createContext, useContext, useEffect, useLayoutEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useApiClient } from "../lib/axios";
 
 export interface UserData {
