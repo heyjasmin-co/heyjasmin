@@ -110,8 +110,11 @@ export async function createAIAssistant(businessData: BusinessData): Promise<Ass
 				temperature: 0.2,
 			},
 			voice: {
-				provider: '11labs',
+				model: 'eleven_turbo_v2_5',
 				voiceId: 'jBzLvP03992lMFEkj2kJ',
+				provider: '11labs',
+				stability: 0.5,
+				similarityBoost: 0.75,
 			},
 			firstMessageMode: 'assistant-speaks-first-with-model-generated-message',
 			voicemailMessage: "Please call back when you're available.",
@@ -268,4 +271,3 @@ export async function handleCreateAssistantCall(request: FastifyRequest, vapiMes
 		throw new Error('Failed to create call record')
 	}
 }
-
