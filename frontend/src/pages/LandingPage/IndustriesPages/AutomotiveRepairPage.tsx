@@ -60,7 +60,7 @@ function AutomotiveRepairPage() {
         averageRevenue="$150–$500+"
         data={automotiveData}
         ctaLabel="Start your free trial"
-        ctaLink="/admin"
+        ctaLink="/admin/setup"
         icon="fa-solid fa-wrench"
       />
     </div>

@@ -26,7 +26,7 @@ export const websiteScrape = async (ctx: FastifyRequest, args: WebsiteScrapeInpu
 			throw new Error('Failed to extract valid business data (missing name or description)')
 		}
 
-		const ownerUserId = new mongoose.Types.ObjectId(ctx.context?.dbUserId!)
+		const ownerUserId = ctx.context?.dbUserId ? new mongoose.Types.ObjectId(ctx.context.dbUserId) : undefined
 
 		const newBusiness = new Business({
 			name: businessData.name,
@@ -39,43 +39,52 @@ export const websiteScrape = async (ctx: FastifyRequest, args: WebsiteScrapeInpu
 			isSetupComplete: true,
 		})
 
-		const businessMember = new BusinessUser({
-			userId: ownerUserId,
-			businessId: newBusiness._id,
-			role: 'owner',
-		})
-
-		const [org] = await Promise.all([
-			clerkClient.organizations.createOrganization({
-				name: businessData.name,
-				createdBy: ctx.context?.clerkId!,
-			}),
-			clerkClient.users.updateUserMetadata(ctx.context?.clerkId!, {
-				publicMetadata: {
-					dbUserId: ctx.context?.dbUserId!,
-					clerkId: ctx.context?.clerkId!,
-					businessId: (newBusiness._id as any).toString(),
-					role: 'owner',
-					selectedClientId: null,
-				},
-			}),
-		])
-		newBusiness.clerkOrganizationId = org.id
-		await newBusiness.save({ session })
-		await businessMember.save({ session })
-
-		await clerkClient.users.updateUser(ctx.context?.clerkId!, {
-			publicMetadata: {
+		let businessMember: any = null
+		if (ownerUserId) {
+			businessMember = new BusinessUser({
+				userId: ownerUserId,
 				businessId: newBusiness._id,
 				role: 'owner',
-			},
-		})
+			})
+		}
+		if (ownerUserId) {
+			const [org] = await Promise.all([
+				clerkClient.organizations.createOrganization({
+					name: businessData.name,
+					createdBy: ctx.context?.clerkId!,
+				}),
+				clerkClient.users.updateUserMetadata(ctx.context?.clerkId!, {
+					publicMetadata: {
+						dbUserId: ctx.context?.dbUserId!,
+						clerkId: ctx.context?.clerkId!,
+						businessId: (newBusiness._id as any).toString(),
+						role: 'owner',
+						selectedClientId: null,
+					},
+				}),
+			])
+			newBusiness.clerkOrganizationId = org.id
+		}
+
+		await newBusiness.save({ session })
+		if (businessMember) {
+			await businessMember.save({ session })
+
+			await clerkClient.users.updateUser(ctx.context?.clerkId!, {
+				publicMetadata: {
+					businessId: newBusiness._id,
+					role: 'owner',
+				},
+			})
+		}
+
 		const [greeting, message] = await Promise.all([
 			createElevenlabsAudioClip(`Hello, thank you for calling ${newBusiness.name}. My name is Jasmin, how can I help you today?`),
 			createElevenlabsAudioClip(`I'd be happy to take a message for the ${newBusiness.name} team. Can I start by getting your name?`),
 		])
 
 		const finalData = {
+			id: newBusiness._id as string,
 			name: newBusiness.name,
 			messageAudio: message,
 			greetingAudio: greeting,

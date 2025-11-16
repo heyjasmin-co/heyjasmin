@@ -2,18 +2,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useLayoutEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import websiteIcon from "../../../assets/image/websiteIcon.png";
 import GoogleBusinessProfileSetup from "../../../components/ProfileSetup/GoogleBusinessProfile";
 import PreviewAgentVoice from "../../../components/ProfileSetup/PreviewAgentVoice";
 import ScriptingProfile from "../../../components/ProfileSetup/ScriptingProfile";
+import SignUpToClaimAgent from "../../../components/ProfileSetup/SignUpToClaimAgent";
 import WebsiteProfileSetup from "../../../components/ProfileSetup/WebsiteProfileSetup";
 import { useUserData } from "../../../context/UserDataContext";
 import { useScrapeApiClient } from "../../../lib/axios";
+import { appName } from "../../../theme/appName";
 import { BusinessCreationType } from "../../../types/BusinessTypes";
 import { errorToast, successToast } from "../../../utils/react-toast";
-
 export default function Index() {
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 4;
+  const totalSteps = 5;
   const scrapeApiClient = useScrapeApiClient();
   const [loading, setLoading] = useState(false);
   const [scrapeType, setScrapeType] = useState("business");
@@ -32,11 +34,7 @@ export default function Index() {
       setCurrentStep(3);
       const response = await scrapeApiClient.post<{
         message: string;
-        data: {
-          name: string;
-          messageAudio: any;
-          greetingAudio: any;
-        };
+        data: BusinessCreationType;
         success: boolean;
       }>(`/scrape`, {
         websiteUrl,
@@ -53,7 +51,17 @@ export default function Index() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center overflow-y-auto p-4 sm:p-6 lg:p-8">
+    <div className="flex min-h-screen flex-col items-center justify-center overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <div className="flex items-center rounded-lg p-4">
+        <img
+          className="h-13 w-13 rounded-full object-contain sm:h-20 sm:w-20"
+          src={websiteIcon}
+          alt={`${appName} logo`}
+        />
+        <h1 className="text-2xl font-bold text-gray-800 sm:text-3xl">
+          hey<span className="text-purple-500">{appName}</span>
+        </h1>
+      </div>
       {/* Centered container */}
       {currentStep === 1 && scrapeType === "business" && (
         <div className="h-auto min-h-[400px] w-full max-w-[1100px] sm:min-h-[500px] lg:h-[600px]">
@@ -92,6 +100,16 @@ export default function Index() {
         <div className="h-auto min-h-[400px] w-full max-w-[1100px] sm:min-h-[500px] lg:h-[600px]">
           <PreviewAgentVoice
             businessDetails={businessDetails}
+            setCurrentStep={setCurrentStep}
+            totalSteps={totalSteps}
+            currentStep={currentStep}
+          />
+        </div>
+      )}
+      {currentStep === 5 && businessDetails && (
+        <div className="h-auto min-h-[400px] w-full max-w-[1100px] sm:min-h-[500px] lg:h-[600px]">
+          <SignUpToClaimAgent
+            businessId={businessDetails?.id}
             totalSteps={totalSteps}
             currentStep={currentStep}
           />

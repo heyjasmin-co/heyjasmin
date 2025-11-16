@@ -144,7 +144,7 @@ function Pricing() {
 
                 {/* Redirect Button */}
                 <a
-                  href="/admin"
+                  href="/admin/setup"
                   style={{
                     color: "white",
                   }}

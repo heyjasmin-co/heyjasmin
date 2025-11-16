@@ -60,7 +60,7 @@ function LegalPracticesPage() {
         averageRevenue="$300–$1,000+"
         data={legalPracticeData}
         ctaLabel="Start your free trial"
-        ctaLink="/admin"
+        ctaLink="/admin/setup"
         icon="fa-solid fa-gavel"
       />
     </div>

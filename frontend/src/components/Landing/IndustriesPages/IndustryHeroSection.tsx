@@ -160,7 +160,7 @@ const IndustryHeroSection: React.FC<IndustryHeroSectionProps> = ({
             >
               {" "}
               <NavLink
-                to="/admin"
+                to="/admin/setup"
                 className="w-full text-center"
                 style={{ color: "white" }}
               >

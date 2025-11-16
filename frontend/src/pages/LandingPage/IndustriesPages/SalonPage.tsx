@@ -59,7 +59,7 @@ function SalonPage() {
         averageRevenue="$50-100+"
         data={salonData}
         ctaLabel="Start your free trial"
-        ctaLink="/admin"
+        ctaLink="/admin/setup"
         icon="fa-scissors"
       />
     </div>
