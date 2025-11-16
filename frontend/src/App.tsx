@@ -62,11 +62,7 @@ export default function App() {
           {/* Handle organization invitations for existing users */}
           <Route
             path="/admin/join-organization"
-            element={
-              // <ProtectedRoute>
-              <JoinOrganization />
-              // </ProtectedRoute>
-            }
+            element={<JoinOrganization />}
           />
 
           <Route
@@ -81,21 +77,14 @@ export default function App() {
           <Route
             path="/admin/subscription"
             element={
-              // <ProtectedRoute requireSetup>
-              <SubscriptionPage />
-              // </ProtectedRoute>
+              <ProtectedRoute requireSetup>
+                <SubscriptionPage />
+              </ProtectedRoute>
             }
           />
 
           {/* Setup page - requires auth only */}
-          <Route
-            path="/admin/setup"
-            element={
-              // <ProtectedRoute>
-              <BusinessProfileSetup />
-              // </ProtectedRoute>
-            }
-          />
+          <Route path="/admin/setup" element={<BusinessProfileSetup />} />
 
           {/* Dashboard routes - requires auth + subscription + setup */}
           <Route

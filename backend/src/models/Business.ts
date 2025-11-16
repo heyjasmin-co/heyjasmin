@@ -21,7 +21,7 @@ interface IBusiness extends Document {
 	subscriptionPlan?: 'core' | 'pro' | 'smart' | 'infinity'
 	subscriptionStartDate?: Date | null
 	subscriptionEndDate?: Date | null
-	ownerUserId: mongoose.Types.ObjectId
+	ownerUserId?: mongoose.Types.ObjectId
 	aiAgentSettings: {
 		assistantId?: string
 		assistantName?: string
@@ -31,7 +31,7 @@ interface IBusiness extends Document {
 		twilioId?: string
 	}
 
-	clerkOrganizationId: string
+	clerkOrganizationId?: string
 	isSetupComplete: boolean
 	createdAt: Date
 	updatedAt: Date
@@ -122,7 +122,6 @@ const businessSchema = new Schema<IBusiness>(
 		ownerUserId: {
 			type: Schema.Types.ObjectId,
 			ref: 'User',
-			required: true,
 		},
 
 		// AI Agent Settings
@@ -162,7 +161,6 @@ const businessSchema = new Schema<IBusiness>(
 		//Clerk Organization Id
 		clerkOrganizationId: {
 			type: String,
-			required: true,
 		},
 	},
 	{

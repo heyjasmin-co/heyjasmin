@@ -51,7 +51,7 @@ export default function HeroSection() {
               }}
             >
               <a
-                href="/admin"
+                href="/admin/setup"
                 className="w-full text-center"
                 style={{ color: "white" }}
               >

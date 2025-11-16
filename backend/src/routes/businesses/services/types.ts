@@ -44,6 +44,7 @@ export type UpdateBusinessAssistantByIdOutput = IBusiness | null
 //
 export type CreateBusinessGoogleProfileInput = CreateBusinessGoogleProfileSchemaInput
 export type CreateBusinessGoogleProfileOutput = {
+	id: string
 	name: string
 	messageAudio: any
 	greetingAudio: any

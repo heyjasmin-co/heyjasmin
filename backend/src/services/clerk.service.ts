@@ -1,5 +1,6 @@
 import { ClientSession } from 'mongoose'
-import { BusinessUser, User } from '../models'
+import clerkClient from '../config/clerk'
+import { Business, BusinessUser, User } from '../models'
 import { BusinessUserInvitation } from '../models/BusinessUserInvitation'
 type ClerkOrganizationInvitationAccepted = {
 	created_at: number
@@ -22,6 +23,7 @@ type ClerkOrganizationInvitationAccepted = {
 	url: string
 	user_id: string
 }
+
 export const handleUserCreated = async (clerkUser: any, session: ClientSession) => {
 	try {
 		const userData = {
@@ -31,9 +33,57 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 			lastName: clerkUser.last_name,
 			profileImage: clerkUser.has_image ? clerkUser.image_url : '',
 		}
-
+		// Create local user
 		const user = new User(userData)
 		const savedUser = await user.save({ session })
+
+		//Store User in Business
+		const businessId = clerkUser.unsafe_metadata.businessId
+		if (businessId) {
+			const business = await Business.findById(businessId).session(session)
+			if (!business) {
+				throw new Error(`Business not found with id: ${businessId}`)
+			}
+			// Create BusinessUser (owner)
+			const businessMember = new BusinessUser({
+				userId: savedUser._id,
+				businessId: businessId,
+				role: 'owner',
+				status: 'active',
+			})
+
+			// Create Clerk organization + update metadata
+			const [org] = await Promise.all([
+				clerkClient.organizations.createOrganization({
+					name: business.name,
+					createdBy: savedUser.clerkId,
+				}),
+				clerkClient.users.updateUserMetadata(savedUser.clerkId, {
+					publicMetadata: {
+						dbUserId: savedUser._id,
+						clerkId: savedUser.clerkId,
+						businessId: businessId,
+						role: 'owner',
+						selectedClientId: null,
+					},
+				}),
+			])
+
+			// Update Business with Clerk Organization ID
+			business.clerkOrganizationId = org.id
+			await business.save({ session })
+
+			// Save business membership
+			await businessMember.save({ session })
+
+			// Final metadata update (optional but clean)
+			await clerkClient.users.updateUser(savedUser.clerkId, {
+				publicMetadata: {
+					businessId: businessId,
+					role: 'owner',
+				},
+			})
+		}
 
 		return {
 			success: true,
@@ -44,6 +94,7 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 		throw new Error('Failed to create user from webhook')
 	}
 }
+
 export const handleBusinessUserCreated = async (args: any, session: ClientSession) => {
 	try {
 		const { user, data } = args

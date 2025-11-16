@@ -3,7 +3,7 @@ import aggregatePaginate from 'mongoose-aggregate-paginate-v2'
 
 interface IBusinessUser extends Document {
 	businessId: mongoose.Types.ObjectId
-	userId: mongoose.Types.ObjectId
+	userId?: mongoose.Types.ObjectId
 	role: 'editor' | 'admin' | 'viewer' | 'owner'
 	status: 'active' | 'pending' | 'removed'
 	createdAt: Date
@@ -20,7 +20,6 @@ const businessUserSchema = new Schema<IBusinessUser>(
 		userId: {
 			type: Schema.Types.ObjectId,
 			ref: 'User',
-			required: true,
 		},
 		role: {
 			type: String,

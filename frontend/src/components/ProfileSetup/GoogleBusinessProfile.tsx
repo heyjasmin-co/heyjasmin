@@ -56,11 +56,7 @@ export default function GoogleBusinessProfileSetup({
       const response = await scrapeApiClient.post<{
         message: string;
         success: boolean;
-        data: {
-          name: string;
-          messageAudio: any;
-          greetingAudio: any;
-        };
+        data: BusinessCreationType;
       }>(`/businesses`, formatData);
       successToast(response.data.message);
       setBusinessDetails(response.data.data);
