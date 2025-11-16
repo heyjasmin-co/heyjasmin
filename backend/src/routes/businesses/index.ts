@@ -109,7 +109,7 @@ export default async function businessRoute(fastify: FastifyInstance) {
 	})
 	// Create Business from google profile
 	fastify.post('/', {
-		preHandler: [createContext, authenticate],
+		preHandler: [createContext],
 		schema: {
 			tags: ['businesses'],
 			description: 'Create Business From google profile',

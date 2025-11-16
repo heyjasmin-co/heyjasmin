@@ -98,7 +98,7 @@ function Navbar() {
             Login
           </a>
           <a
-            href="/admin"
+            href="/admin/setup"
             className="rounded-full px-5 py-2 font-semibold text-white shadow-md transition hover:scale-105"
             style={{
               backgroundColor: colorTheme.secondaryColor(0.9),
@@ -176,14 +176,14 @@ function Navbar() {
             <HashLink to="/#faq">FAQ</HashLink>
 
             <a
-              href="/admin"
+              href="/admin/sign-in"
               className="rounded-full px-5 py-2 font-semibold text-white shadow-md"
               style={{ backgroundColor: colorTheme.primary(1), color: "white" }}
             >
               Login
             </a>
             <a
-              href="/admin"
+              href="/admin/setup"
               className="rounded-full px-5 py-2 font-semibold text-white shadow-md"
               style={{
                 backgroundColor: colorTheme.secondaryColor(0.9),

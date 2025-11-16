@@ -1,6 +1,6 @@
+import { Dispatch, SetStateAction } from "react";
 import completeIcon from "../../assets/image/completeIcon.png";
 import sparklesIcon from "../../assets/image/sparklesIcon.png";
-import { useUserData } from "../../context/UserDataContext";
 import { appName } from "../../theme/appName";
 import { BusinessCreationType } from "../../types/BusinessTypes";
 import LeftInfoPanel from "./LeftInfoPanel";
@@ -9,22 +9,13 @@ export default function PreviewAgentVoice({
   currentStep,
   totalSteps,
   businessDetails,
+  setCurrentStep,
 }: {
   businessDetails: BusinessCreationType;
+  setCurrentStep: Dispatch<SetStateAction<number>>;
   currentStep: number;
   totalSteps: number;
 }) {
-  const user = useUserData();
-
-  const handleClaimAgent = () => {
-    user.setUserData((prev) => {
-      if (prev) {
-        return { ...prev, hasCompletedSetup: true };
-      }
-      return prev;
-    });
-    window.location.href = "/admin/dashboard";
-  };
   return (
     <div className="flex h-full w-full flex-col rounded-2xl bg-white shadow-2xl lg:h-full lg:flex-row">
       {/* Left Info Panel */}
@@ -105,7 +96,7 @@ export default function PreviewAgentVoice({
         </p>
 
         <button
-          onClick={handleClaimAgent}
+          onClick={() => setCurrentStep(5)}
           className="mt-6 flex w-full max-w-md items-center justify-center rounded-full bg-purple-600 px-8 py-4 text-lg font-semibold text-white shadow-md transition hover:bg-purple-700 active:scale-95"
           style={{
             color: "white",

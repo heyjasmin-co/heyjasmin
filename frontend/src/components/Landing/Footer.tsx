@@ -88,7 +88,7 @@ function Footer() {
               Sign up to automate your business today.
             </p>
             <NavLink
-              to="/admin"
+              to="/admin/setup"
               className="inline-block transform rounded-full px-6 py-2 font-semibold text-white shadow-lg transition-transform hover:scale-105"
               style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
             >

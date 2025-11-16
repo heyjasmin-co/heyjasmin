@@ -60,7 +60,7 @@ function HomeServicePage() {
         averageRevenue="$200–$400+"
         data={homeServiceData}
         ctaLabel="Start your free trial"
-        ctaLink="/admin"
+        ctaLink="/admin/setup"
         icon="fa-solid fa-toolbox"
       />
     </div>

@@ -23,7 +23,7 @@ export const CreateBusinessGoogleProfile = async (
 			throw new Error('Failed to extract valid business data (missing name or description)')
 		}
 
-		const ownerUserId = new mongoose.Types.ObjectId(request.context?.dbUserId!)
+		const ownerUserId = request.context?.dbUserId ? new mongoose.Types.ObjectId(request.context.dbUserId) : undefined
 
 		const newBusiness = new Business({
 			name: businessData.name,
@@ -36,37 +36,44 @@ export const CreateBusinessGoogleProfile = async (
 			isSetupComplete: true,
 		})
 
-		const businessMember = new BusinessUser({
-			userId: ownerUserId,
-			businessId: newBusiness._id,
-			role: 'owner',
-		})
-
-		const [org] = await Promise.all([
-			clerkClient.organizations.createOrganization({
-				name: businessData.name,
-				createdBy: request.context?.clerkId!,
-			}),
-			clerkClient.users.updateUserMetadata(request.context?.clerkId!, {
-				publicMetadata: {
-					dbUserId: request.context?.dbUserId!,
-					clerkId: request.context?.clerkId!,
-					businessId: (newBusiness._id as any).toString(),
-					role: 'owner',
-					selectedClientId: null,
-				},
-			}),
-		])
-		newBusiness.clerkOrganizationId = org.id
-		await newBusiness.save({ session })
-		await businessMember.save({ session })
-
-		await clerkClient.users.updateUser(request.context?.clerkId!, {
-			publicMetadata: {
+		let businessMember: any = null
+		if (ownerUserId) {
+			businessMember = new BusinessUser({
+				userId: ownerUserId,
 				businessId: newBusiness._id,
 				role: 'owner',
-			},
-		})
+			})
+		}
+		if (ownerUserId) {
+			const [org] = await Promise.all([
+				clerkClient.organizations.createOrganization({
+					name: businessData.name,
+					createdBy: request.context?.clerkId!,
+				}),
+				clerkClient.users.updateUserMetadata(request.context?.clerkId!, {
+					publicMetadata: {
+						dbUserId: request.context?.dbUserId!,
+						clerkId: request.context?.clerkId!,
+						businessId: (newBusiness._id as any).toString(),
+						role: 'owner',
+						selectedClientId: null,
+					},
+				}),
+			])
+			newBusiness.clerkOrganizationId = org.id
+		}
+
+		await newBusiness.save({ session })
+		if (businessMember) {
+			await businessMember.save({ session })
+
+			await clerkClient.users.updateUser(request.context?.clerkId!, {
+				publicMetadata: {
+					businessId: newBusiness._id,
+					role: 'owner',
+				},
+			})
+		}
 
 		const [greeting, message] = await Promise.all([
 			createElevenlabsAudioClip(`Hello, thank you for calling ${newBusiness.name}. My name is Jasmin, how can I help you today?`),
@@ -74,6 +81,7 @@ export const CreateBusinessGoogleProfile = async (
 		])
 
 		const finalData = {
+			id: newBusiness._id as string,
 			name: newBusiness.name,
 			messageAudio: message,
 			greetingAudio: greeting,

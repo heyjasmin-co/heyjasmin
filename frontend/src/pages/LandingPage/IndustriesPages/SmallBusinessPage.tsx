@@ -60,7 +60,7 @@ function SmallBusinessPage() {
         averageRevenue="$100–$300+"
         data={smallBusinessData}
         ctaLabel="Start your free trial"
-        ctaLink="/admin"
+        ctaLink="/admin/setup"
         icon="fa-solid fa-briefcase"
       />
     </div>
