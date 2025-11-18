@@ -52,7 +52,7 @@ function CTA() {
 
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <a
-            href="/admin"
+            href="/admin/setup"
             className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-purple-600 to-purple-700 px-10 py-4 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95"
           >
             <span className="relative z-10 text-white">Start Free Trial</span>

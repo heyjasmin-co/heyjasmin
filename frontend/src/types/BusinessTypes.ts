@@ -48,6 +48,7 @@ export interface IBusinessHour {
 }
 
 export interface BusinessCreationType {
+  id: string;
   name: string;
   messageAudio: any;
   greetingAudio: any;

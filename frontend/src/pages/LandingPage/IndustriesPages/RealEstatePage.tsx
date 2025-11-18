@@ -62,7 +62,7 @@ function RealEstatePage() {
         averageRevenue="$3,000–$10,000+"
         data={realEstateData}
         ctaLabel="Start your free trial"
-        ctaLink="/admin"
+        ctaLink="/admin/setup"
         icon="fa-solid fa-house"
       />
     </div>
