@@ -96,7 +96,7 @@ export default function SubscriptionPage() {
           </div>
           <p className="max-w-xl text-sm text-gray-600 sm:text-base">
             All plans come with{" "}
-            <span className="font-semibold">5-day free trial</span> and{" "}
+            <span className="font-semibold">7-day free trial</span> and{" "}
             <span className="font-semibold">20 minutes</span> free agent usage
             per day.
           </p>

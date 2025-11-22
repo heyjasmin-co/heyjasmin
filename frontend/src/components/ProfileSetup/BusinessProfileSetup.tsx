@@ -1,43 +1,80 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { usePlacesWidget } from "react-google-autocomplete";
+import { useNavigate } from "react-router-dom";
 import { GooglePlaceDetails } from "../../types/GooglePlaceDetails";
 import { errorToast } from "../../utils/react-toast";
 
-// Import your Publishable Key
 const VITE_GOOGLE_MAP_API = import.meta.env.VITE_GOOGLE_MAP_API;
 
 if (!VITE_GOOGLE_MAP_API) {
   throw new Error("Add your Clerk Publishable Key to the .env file");
 }
+
 export default function BusinessProfileSetup({
   setGoogleBusinessData,
   setScrapeType,
+  placeId,
 }: {
   setGoogleBusinessData: Dispatch<SetStateAction<GooglePlaceDetails | null>>;
   setScrapeType: Dispatch<SetStateAction<string>>;
+  placeId?: string;
 }) {
-  const [businessId, setBusinessId] = useState<string | null>(null);
+  const [businessId, setBusinessId] = useState<any>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const { ref } = usePlacesWidget({
+  const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  // Google Places Autocomplete
+  const { ref: placesRef } = usePlacesWidget({
     apiKey: VITE_GOOGLE_MAP_API,
-    onPlaceSelected: async (place) => {
-      const businessId = place.place_id;
-      if (!businessId) {
+    onPlaceSelected: (place) => {
+      if (!place || !place.place_id) {
         errorToast("Please select a valid business from the suggestions.");
         return;
       }
-      setBusinessId(businessId);
+      setBusinessId(place.place_id);
     },
-
     options: {
       types: ["establishment"],
       componentRestrictions: { country: "ca" },
     },
-  });
+  }) as any;
+
+  // Prefill the input if placeId exists
+  useEffect(() => {
+    if (!placeId) return;
+
+    const service = new google.maps.places.PlacesService(
+      document.createElement("div"),
+    );
+    service.getDetails(
+      {
+        placeId,
+        fields: [
+          "editorial_summary",
+          "formatted_address",
+          "name",
+          "website",
+          "current_opening_hours",
+          "icon",
+          "types",
+        ],
+      },
+      (place, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+          // Autofill input
+          if (inputRef.current) inputRef.current.value = place.name || "";
+          setBusinessId(place.place_id);
+          setGoogleBusinessData(place as GooglePlaceDetails);
+          navigate(location.pathname, { replace: true, state: {} });
+        }
+      },
+    );
+  }, [placeId]);
+
+  // Fetch full place details
   const getPlaceDetails = async (
     placeId: string,
   ): Promise<GooglePlaceDetails> => {
@@ -45,10 +82,9 @@ export default function BusinessProfileSetup({
       const service = new google.maps.places.PlacesService(
         document.createElement("div"),
       );
-
       service.getDetails(
         {
-          placeId: placeId,
+          placeId,
           fields: [
             "editorial_summary",
             "formatted_address",
@@ -69,22 +105,20 @@ export default function BusinessProfileSetup({
       );
     });
   };
+
   const handleSubmitClick = async () => {
     setLoading(true);
     try {
-      if (ref.current === null || (ref.current as any).value.trim() === "") {
+      if (
+        !businessId ||
+        (inputRef.current && inputRef.current.value.trim() === "")
+      ) {
         setError("Please select a valid business from the suggestions.");
-        return;
-      }
-
-      if (!businessId && businessId?.trim() !== "") {
-        setError("Business Id is required");
         return;
       }
 
       setError("");
       const businessData = await getPlaceDetails(businessId);
-      console.log("businessData", businessData);
       setGoogleBusinessData(businessData);
     } catch (error) {
       errorToast("Failed to fetch business details. Please try again.");
@@ -103,8 +137,8 @@ export default function BusinessProfileSetup({
         {/* Google Places Autocomplete Input */}
         <div className="relative w-full">
           <input
-            ref={ref}
-            placeholder="Search your business (e.g. pest control)"
+            ref={placesRef}
+            placeholder="Search your business..."
             className="w-full rounded-full border border-gray-300 px-6 py-4 pr-12 text-lg text-gray-800 shadow-md focus:border-purple-500 focus:ring-2 focus:ring-purple-300 focus:outline-none"
           />
           <i className="fa-solid fa-magnifying-glass absolute top-1/2 right-5 -translate-y-1/2 text-gray-400"></i>
@@ -112,6 +146,7 @@ export default function BusinessProfileSetup({
 
         {error && <p className="text-sm text-red-500">{error}</p>}
 
+        {/* Continue Button */}
         <button
           onClick={handleSubmitClick}
           disabled={loading}
@@ -125,7 +160,7 @@ export default function BusinessProfileSetup({
           <i className="fa-solid fa-arrow-right text-sm"></i>
         </button>
 
-        {/* Secondary Button */}
+        {/* Use Website Button */}
         <button
           type="button"
           onClick={() => setScrapeType("website")}
