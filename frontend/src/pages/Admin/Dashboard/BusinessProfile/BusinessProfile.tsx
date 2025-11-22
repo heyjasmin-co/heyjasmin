@@ -47,7 +47,7 @@ export default function BusinessProfile() {
         </ul>
 
         <div className="mt-10 rounded-xl bg-white/20 p-4 text-sm font-medium backdrop-blur">
-          ✅ Start risk-free: <span className="font-semibold">5-day trial</span>{" "}
+          ✅ Start risk-free: <span className="font-semibold">7-day trial</span>{" "}
           with all features
         </div>
       </div>

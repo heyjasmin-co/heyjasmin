@@ -46,8 +46,7 @@ function CTA() {
         <p className="mx-auto mb-10 max-w-2xl text-xl leading-relaxed text-gray-700">
           Every missed call is a lost opportunity. Jasmin helps your business
           stay connected —{" "}
-          <span className="font-semibold text-purple-700">24/7</span>, smartly
-          and professionally.
+          <span className="font-semibold text-purple-700">24/7</span>.
         </p>
 
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">

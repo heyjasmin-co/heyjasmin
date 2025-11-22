@@ -2,6 +2,7 @@ import React from "react";
 import { colorTheme } from "../../theme/colorTheme";
 
 interface ListItem {
+  iconImage?: string;
   icon: string;
   text: React.ReactNode;
 }
@@ -67,12 +68,24 @@ export default function LeftInfoPanel({
         <ul className="mt-6 space-y-4 text-base sm:mt-10 sm:space-y-5 sm:text-lg">
           {listItems.map((item, index) => (
             <li key={index} className="flex items-center gap-3">
-              <div
-                className="flex h-8 w-8 items-center justify-center rounded-full"
-                style={{ backgroundColor: colorTheme.primary(0.8) }}
-              >
-                <i className={`${item.icon} text-lg text-white`}></i>
-              </div>
+              {item.iconImage ? (
+                <div className="flex h-14 w-8 items-center justify-center overflow-hidden rounded-full">
+                  <img
+                    className="h-full w-full object-cover"
+                    src={item.iconImage}
+                    alt={`icon-${index}`}
+                  />
+                </div>
+              ) : item.icon ? (
+                <div
+                  className="flex h-8 w-8 items-center justify-center rounded-full"
+                  style={{ backgroundColor: colorTheme.primary(0.8) }}
+                >
+                  <i className={`${item.icon} text-lg text-white`}></i>
+                </div>
+              ) : (
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400"></div>
+              )}
               <span className="flex-1 text-white">{item.text}</span>
             </li>
           ))}

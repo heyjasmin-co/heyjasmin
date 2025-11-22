@@ -8,3 +8,10 @@ export type UserDetailsType = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type UserBusinessesType = {
+  _id: string;
+  role: string;
+  businessId: string;
+  businessName: string;
+}[];

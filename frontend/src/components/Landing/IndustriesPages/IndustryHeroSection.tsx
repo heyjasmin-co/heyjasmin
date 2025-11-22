@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { usePlacesWidget } from "react-google-autocomplete";
+import { useNavigate } from "react-router-dom";
 import { colorTheme } from "../../../theme/colorTheme";
 
 interface ChatBubble {
@@ -30,6 +32,7 @@ interface IndustryHeroSectionProps {
   chatBubbles?: ChatBubble[];
   statCard?: StatCard;
 }
+const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAP_API;
 
 const IndustryHeroSection: React.FC<IndustryHeroSectionProps> = ({
   titleLines,
@@ -52,8 +55,29 @@ const IndustryHeroSection: React.FC<IndustryHeroSectionProps> = ({
     trendColor: "text-green-500",
   },
 }) => {
+  const navigate = useNavigate();
   const [input, setInput] = useState("");
 
+  if (!GOOGLE_KEY) throw new Error("Google Map API key missing in .env");
+
+  const { ref } = usePlacesWidget({
+    apiKey: GOOGLE_KEY,
+    onPlaceSelected: (place: any) => {
+      const name = place?.place_id;
+      if (name) setInput(name);
+    },
+    options: {
+      types: ["establishment"],
+      componentRestrictions: { country: "ca" },
+    },
+  });
+  const handleContinue = () => {
+    if (!input) return;
+
+    navigate("/admin/setup", {
+      state: { business: input },
+    });
+  };
   return (
     <section
       className="relative overflow-hidden px-4 pt-26 pb-12 sm:px-6 md:pt-28 md:pb-20 lg:px-10"
@@ -150,24 +174,28 @@ const IndustryHeroSection: React.FC<IndustryHeroSectionProps> = ({
             <input
               type="text"
               placeholder={placeholder}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
+              ref={ref}
               className="w-full rounded-full border border-gray-300 bg-white px-4 py-3 text-center text-sm text-gray-800 shadow-sm transition-all duration-300 focus:ring-2 focus:ring-purple-400 focus:outline-none sm:text-left"
             />{" "}
             <div
-              className="flex w-50 items-center justify-center rounded-full px-5 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95"
-              style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
+              className={`flex w-50 items-center justify-center rounded-full px-5 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95 ${
+                input
+                  ? "bg-purple-600 text-white hover:bg-purple-700"
+                  : "cursor-not-allowed bg-gray-200 text-gray-600"
+              }`}
+              style={{
+                backgroundColor: input ? colorTheme.secondaryColor(0.9) : "",
+              }}
             >
-              {" "}
-              <NavLink
-                to="/admin/setup"
+              <button
+                onClick={handleContinue}
+                disabled={!input}
                 className="w-full text-center"
                 style={{ color: "white" }}
               >
-                {" "}
-                {ctaText}{" "}
-              </NavLink>{" "}
-            </div>{" "}
+                {ctaText}
+              </button>
+            </div>
           </div>{" "}
           <p className="text-bold mt-3 text-lg">{trialNote}</p>
         </div>
