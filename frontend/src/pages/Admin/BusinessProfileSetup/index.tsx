@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useLayoutEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import websiteIcon from "../../../assets/image/websiteIcon.png";
 import GoogleBusinessProfileSetup from "../../../components/ProfileSetup/GoogleBusinessProfile";
 import PreviewAgentVoice from "../../../components/ProfileSetup/PreviewAgentVoice";
@@ -11,6 +11,7 @@ import WebsiteProfileSetup from "../../../components/ProfileSetup/WebsiteProfile
 import { useUserData } from "../../../context/UserDataContext";
 import { useScrapeApiClient } from "../../../lib/axios";
 import { appName } from "../../../theme/appName";
+import { colorTheme } from "../../../theme/colorTheme";
 import { BusinessCreationType } from "../../../types/BusinessTypes";
 import { errorToast, successToast } from "../../../utils/react-toast";
 export default function Index() {
@@ -23,11 +24,17 @@ export default function Index() {
   const [businessDetails, setBusinessDetails] =
     useState<BusinessCreationType | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const state = location.state || {};
+  const placeId = state?.business;
+
   useLayoutEffect(() => {
     if (userData?.businessId) {
       navigate("/admin/dashboard", { replace: true });
     }
   }, [userData, navigate]);
+
   const handleScrapeData = async (websiteUrl: string) => {
     setLoading(true);
     try {
@@ -59,7 +66,14 @@ export default function Index() {
           alt={`${appName} logo`}
         />
         <h1 className="text-2xl font-bold text-gray-800 sm:text-3xl">
-          hey<span className="text-purple-500">{appName}</span>
+          <span
+            style={{
+              color: colorTheme.secondaryColor(0.9),
+            }}
+          >
+            {" "}
+            hey{appName}
+          </span>
         </h1>
       </div>
       {/* Centered container */}
@@ -68,6 +82,7 @@ export default function Index() {
           <GoogleBusinessProfileSetup
             totalSteps={totalSteps}
             currentStep={currentStep}
+            placeId={placeId}
             setBusinessDetails={setBusinessDetails}
             setLoading={setLoading}
             setCurrentStep={setCurrentStep}

@@ -1,5 +1,6 @@
 import React from "react";
 import completeIcon from "../../assets/image/completeIcon.png";
+import websiteIcon from "../../assets/image/websiteIcon.png";
 import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
 import LeftInfoPanel from "./LeftInfoPanel";
@@ -18,7 +19,7 @@ export default function ScriptingProfile({
     { label: "Analyzing your website for data." },
     { label: "Processing your business information." },
     { label: "Optimizing your data for AI." },
-    { label: "Generating your custom Jasmin agent." },
+    { label: "Generating your custom agent." },
   ];
 
   return (
@@ -36,6 +37,7 @@ export default function ScriptingProfile({
         listItems={[
           {
             icon: "fa-solid fa-desktop",
+            iconImage: websiteIcon,
             text: `${appName} is scanning your website and available data.`,
           },
           {
@@ -57,7 +59,7 @@ export default function ScriptingProfile({
             />
             <span>
               Start risk-free:{" "}
-              <span className="font-semibold">5-day trial</span> with all
+              <span className="font-semibold">7-day trial</span> with all
               features
             </span>
           </div>

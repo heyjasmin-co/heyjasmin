@@ -2,9 +2,9 @@ import { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import completeIcon from "../../assets/image/completeIcon.png";
 import sparklesIcon from "../../assets/image/sparklesIcon.png";
+import websiteIcon from "../../assets/image/websiteIcon.png";
 import { appName } from "../../theme/appName";
 import LeftInfoPanel from "./LeftInfoPanel";
-
 export default function WebsiteProfileSetup({
   currentStep,
   totalSteps,
@@ -54,7 +54,8 @@ export default function WebsiteProfileSetup({
           },
           {
             icon: "fa-solid fa-robot",
-            text: "Your AI agent will be trained on your profile.",
+            iconImage: websiteIcon,
+            text: `${appName} will be trained on your profile.`,
           },
           {
             icon: "fa-solid fa-clock",
@@ -70,7 +71,7 @@ export default function WebsiteProfileSetup({
             />{" "}
             <span>
               Start risk-free:{" "}
-              <span className="font-semibold">5-day trial</span> with all
+              <span className="font-semibold">7-day trial</span> with all
               features
             </span>
           </div>

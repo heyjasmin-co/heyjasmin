@@ -1,8 +1,27 @@
 import { SignIn } from "@clerk/clerk-react";
+import { useEffect } from "react";
+import websiteIcon from "../../../assets/image/websiteIcon.png";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
-
 export default function Login() {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Select elements by Clerk's DOM structure
+      const title = document.querySelector(
+        "[data-localization-key='signIn.start.title']",
+      );
+      const subtitle = document.querySelector(
+        "[data-localization-key='signIn.start.subtitle']",
+      );
+
+      if (title) title.textContent = "Sign in to heyjasmin";
+      if (subtitle) subtitle.textContent = "Please sign in to continue";
+
+      if (title || subtitle) clearInterval(interval);
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, []);
   return (
     <div className="flex min-h-screen">
       {/* Left branding section */}
@@ -13,7 +32,8 @@ export default function Login() {
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
 
-        <div className="relative z-10 text-center">
+        <div className="relative z-10 flex flex-col items-center justify-center">
+          <img src={websiteIcon} className="h-28 w-28" />
           <h1 className="bg-gradient-to-r from-white via-purple-200 to-indigo-200 bg-clip-text text-5xl font-extrabold text-transparent drop-shadow-lg">
             {appName}
           </h1>
@@ -32,11 +52,8 @@ export default function Login() {
               className="text-3xl font-bold tracking-tight md:text-4xl"
               style={{ color: colorTheme.primary(1) }}
             >
-              Welcome Back 👋
+              Welcome Back
             </h2>
-            <p className="mt-3 text-base text-gray-500 md:text-lg">
-              Sign in to continue to {appName}
-            </p>
           </div>
 
           {/* Clerk Sign In (centered, larger fields) */}

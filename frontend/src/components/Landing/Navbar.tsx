@@ -9,11 +9,11 @@ function Navbar() {
   const [industriesOpen, setIndustriesOpen] = useState(false);
 
   const industriesList = [
-    { label: "Salon", href: "/industries/salon" },
-    { label: "Home Service", href: "/industries/home-service" },
+    { label: "Salons and Spas", href: "/industries/salon" },
+    { label: "Home Services", href: "/industries/home-service" },
     { label: "Legal Practices", href: "/industries/legal-practices" },
     { label: "Automotive Repair", href: "/industries/automotive-repair" },
-    { label: "Small Business", href: "/industries/small-business" },
+    { label: "Small Businesses", href: "/industries/small-business" },
     { label: "Real Estate", href: "/industries/real-estate" },
   ];
 

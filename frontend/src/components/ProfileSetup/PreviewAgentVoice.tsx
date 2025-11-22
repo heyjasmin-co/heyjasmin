@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction } from "react";
 import completeIcon from "../../assets/image/completeIcon.png";
 import sparklesIcon from "../../assets/image/sparklesIcon.png";
+import websiteIcon from "../../assets/image/websiteIcon.png";
 import { appName } from "../../theme/appName";
 import { BusinessCreationType } from "../../types/BusinessTypes";
 import LeftInfoPanel from "./LeftInfoPanel";
-
 export default function PreviewAgentVoice({
   currentStep,
   totalSteps,
@@ -31,6 +31,7 @@ export default function PreviewAgentVoice({
         listItems={[
           {
             icon: "fa-solid fa-graduation-cap",
+            iconImage: websiteIcon,
             text: `${appName} has been trained on your data.`,
           },
           {
@@ -56,7 +57,7 @@ export default function PreviewAgentVoice({
             />{" "}
             <span>
               Start risk-free:{" "}
-              <span className="font-semibold">5-day trial</span> with all
+              <span className="font-semibold">7-day trial</span> with all
               features
             </span>
           </div>

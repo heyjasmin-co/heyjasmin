@@ -10,7 +10,7 @@ import { errorToast, successToast } from "../../utils/react-toast";
 import BusinessProfileSetup from "./BusinessProfileSetup";
 import ConfirmBusinessProfileSetup from "./ConfirmBusinessProfileSetup";
 import LeftInfoPanel from "./LeftInfoPanel";
-
+import websiteIcon from "../../assets/image/websiteIcon.png";
 // Import your Publishable Key
 const VITE_GOOGLE_MAP_API = import.meta.env.VITE_GOOGLE_MAP_API;
 
@@ -20,6 +20,7 @@ if (!VITE_GOOGLE_MAP_API) {
 export default function GoogleBusinessProfileSetup({
   currentStep,
   totalSteps,
+  placeId,
   setCurrentStep,
   setScrapeType,
   setLoading,
@@ -27,6 +28,7 @@ export default function GoogleBusinessProfileSetup({
 }: {
   currentStep: number;
   totalSteps: number;
+  placeId?: string;
   setCurrentStep: Dispatch<SetStateAction<number>>;
   setScrapeType: Dispatch<SetStateAction<string>>;
   setLoading: Dispatch<SetStateAction<boolean>>;
@@ -88,8 +90,9 @@ export default function GoogleBusinessProfileSetup({
             text: "Find your profile by entering your business name.",
           },
           {
+            iconImage: websiteIcon,
             icon: "fa-solid fa-robot",
-            text: "Your AI agent will be trained on your Google profile.",
+            text: `${appName} will be trained on your Google profile.`,
           },
           {
             icon: "fa-solid fa-clock",
@@ -105,7 +108,7 @@ export default function GoogleBusinessProfileSetup({
             />{" "}
             <span>
               Start risk-free:{" "}
-              <span className="font-semibold">5-day trial</span> with all
+              <span className="font-semibold">7-day trial</span> with all
               features
             </span>
           </div>
@@ -115,6 +118,7 @@ export default function GoogleBusinessProfileSetup({
         <BusinessProfileSetup
           setScrapeType={setScrapeType}
           setGoogleBusinessData={setGoogleBusinessData}
+          placeId={placeId}
         />
       )}
       {googleBusinessData && (
