@@ -7,15 +7,9 @@ import LeftInfoPanel from "../../../components/ProfileSetup/LeftInfoPanel";
 import { useUserData } from "../../../context/UserDataContext";
 import { useApiClient } from "../../../lib/axios";
 import { colorTheme } from "../../../theme/colorTheme";
+import { UserBusinessesType } from "../../../types/UsersTypes";
 import { errorToast, successToast } from "../../../utils/react-toast";
 import { capitalizeString } from "../../../utils/string-utils";
-
-type UserBusiness = {
-  _id: string;
-  role: "admin" | "editor" | "viewer";
-  businessId: string;
-  businessName: string;
-};
 
 type FormValues = {
   businessId: string;
@@ -25,7 +19,7 @@ export default function SelectBusinessPage() {
   const { handleSubmit, watch, setValue } = useForm<FormValues>();
   const apiClient = useApiClient();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [userBusinesses, setUserBusinesses] = useState<UserBusiness[]>([]);
+  const [userBusinesses, setUserBusinesses] = useState<UserBusinessesType>([]);
   const [loading, setLoading] = useState({
     apiLoading: false,
     selectBusinessLoading: false,
@@ -42,13 +36,27 @@ export default function SelectBusinessPage() {
     const fetchUserBusinesses = async () => {
       setLoading((pv) => ({ ...pv, apiLoading: true }));
       try {
-        const response = await apiClient.get("/users/user-businesses");
+        const response = await apiClient.get<{
+          message: string;
+          success: boolean;
+          data: UserBusinessesType;
+        }>("/users/user-businesses");
         const businesses = response.data.data;
         setUserBusinesses(businesses);
 
         if (businesses.length === 1) {
-          const onlyBusinessId = businesses[0].businessId;
-          setValue("businessId", onlyBusinessId);
+          const onlyBusinessId = businesses[0];
+          setValue("businessId", onlyBusinessId.businessId);
+          setLoading((pv) => ({ ...pv, selectBusinessLoading: true }));
+          await apiClient.post(
+            `/users/select-business/` + onlyBusinessId.businessId,
+            {
+              role: onlyBusinessId.role,
+            },
+          );
+          await new Promise((res) => setTimeout(res, 2000));
+
+          window.location.href = "/admin/dashboard";
         }
         if (businesses.length === 0) {
           navigate("/admin/setup");
@@ -89,7 +97,13 @@ export default function SelectBusinessPage() {
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     await handleBusinessSelect(data.businessId);
   };
-
+  if (!loading.apiLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center text-gray-600">
+        Loading...
+      </div>
+    );
+  }
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-gray-50 p-4 sm:p-6 lg:p-8">
       <div className="h-auto min-h-[400px] w-full max-w-[1100px] sm:min-h-[500px] lg:h-[600px]">

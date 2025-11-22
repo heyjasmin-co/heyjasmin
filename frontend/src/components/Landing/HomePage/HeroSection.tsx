@@ -1,13 +1,38 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { usePlacesWidget } from "react-google-autocomplete";
+import { useNavigate } from "react-router-dom";
 import waveImage from "../../../assets/image/waveImage.png";
 import websiteIcon from "../../../assets/image/websiteIcon.png";
 import { colorTheme } from "../../../theme/colorTheme";
-
+const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAP_API;
 export default function HeroSection() {
-  const [businessName, setBusinessName] = useState("");
+  const navigate = useNavigate();
+  const [selectedBusiness, setSelectedBusiness] = useState("");
+
+  if (!GOOGLE_KEY) throw new Error("Google Map API key missing in .env");
+
+  const { ref } = usePlacesWidget({
+    apiKey: GOOGLE_KEY,
+    onPlaceSelected: (place: any) => {
+      const name = place?.place_id;
+      if (name) setSelectedBusiness(name);
+    },
+    options: {
+      types: ["establishment"],
+      componentRestrictions: { country: "ca" },
+    },
+  });
+  const handleContinue = () => {
+    if (!selectedBusiness) return;
+
+    navigate("/admin/setup", {
+      state: { business: selectedBusiness },
+    });
+  };
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-purple-50 via-white to-pink-50 px-4 pt-20 pb-12 sm:px-6 md:pt-28 md:pb-20 lg:px-8 lg:pt-32 lg:pb-24">
@@ -39,24 +64,30 @@ export default function HeroSection() {
           <div className="mx-auto mb-10 flex max-w-sm flex-col items-center gap-3 sm:max-w-lg sm:flex-row sm:gap-4 md:mx-0">
             <input
               type="text"
+              ref={ref}
               placeholder="Enter your business name"
-              value={businessName}
-              onChange={(e) => setBusinessName(e.target.value)}
               className="w-full rounded-full border border-gray-300 px-5 py-3 text-center text-sm text-gray-800 shadow-sm transition-all duration-300 focus:ring-2 focus:ring-purple-400 focus:outline-none sm:text-left sm:text-base"
             />
             <div
-              className="flex w-50 items-center justify-center rounded-full px-5 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95"
+              className={`flex w-50 items-center justify-center rounded-full px-5 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95 ${
+                selectedBusiness
+                  ? "bg-purple-600 text-white hover:bg-purple-700"
+                  : "cursor-not-allowed bg-gray-200 text-gray-600"
+              }`}
               style={{
-                backgroundColor: colorTheme.secondaryColor(0.9),
+                backgroundColor: selectedBusiness
+                  ? colorTheme.secondaryColor(0.9)
+                  : "",
               }}
             >
-              <a
-                href="/admin/setup"
+              <button
+                onClick={handleContinue}
+                disabled={!selectedBusiness}
                 className="w-full text-center"
                 style={{ color: "white" }}
               >
                 Get Started
-              </a>
+              </button>
             </div>
           </div>
 

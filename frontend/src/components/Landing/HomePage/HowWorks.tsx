@@ -43,6 +43,8 @@ function HowWorks() {
     },
   ];
 
+  const timelineDelay = [0, 0.25, 0.45];
+
   const handleContinue = () => {
     if (!selectedBusiness) return;
 
@@ -89,6 +91,10 @@ function HowWorks() {
             {mainFeatures.map((feature, idx) => (
               <motion.div
                 key={idx}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: timelineDelay[idx] }}
+                viewport={{ once: true, amount: 0.4 }}
                 className="relative z-10 mx-auto w-full max-w-md rounded-2xl bg-white p-6 shadow-md transition-transform hover:scale-[1.01]"
                 whileHover={{ y: -3 }}
               >
@@ -141,11 +147,10 @@ function HowWorks() {
                   </div>
                 )}
 
-                {/* Step 2 — Business Info Card */}
+                {/* Step 2 — Business Info */}
                 {idx === 1 && (
                   <div className="mt-6 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100/40 p-4 shadow">
                     <div className="rounded-lg border border-gray-100 bg-white p-3 shadow-sm">
-                      {/* Header */}
                       <div className="mb-3 flex items-center gap-2">
                         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-purple-100 text-sm text-purple-600">
                           <i className="fas fa-clipboard-list"></i>
@@ -218,7 +223,6 @@ function HowWorks() {
                           ))}
                         </div>
 
-                        {/* Disabled Add Input / Hidden UI */}
                         <div className="mt-2 flex cursor-not-allowed gap-2 opacity-50">
                           <input
                             type="text"
@@ -238,9 +242,9 @@ function HowWorks() {
                   </div>
                 )}
 
+                {/* Step 3 — Stats */}
                 {idx === 2 && (
                   <div className="mt-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                    {/* Header */}
                     <div className="mb-3 flex items-center justify-between">
                       <h4 className="flex items-center gap-2 text-sm font-semibold text-gray-800">
                         <i className="fas fa-chart-bar text-purple-600"></i>
@@ -249,7 +253,6 @@ function HowWorks() {
                       <span className="text-xs text-gray-500">Last 24 hrs</span>
                     </div>
 
-                    {/* Stats Grid */}
                     <div className="grid grid-cols-2 gap-3 text-center">
                       <div className="rounded-lg bg-purple-50 p-3 shadow-sm">
                         <div className="text-xl font-bold text-purple-700">
@@ -286,7 +289,6 @@ function HowWorks() {
                       </div>
                     </div>
 
-                    {/* Footer */}
                     <p className="mt-4 text-center text-xs leading-relaxed text-gray-600">
                       Jasmin handled 98% of your calls automatically — keeping
                       you free while still capturing every lead.

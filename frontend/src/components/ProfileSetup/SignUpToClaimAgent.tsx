@@ -69,7 +69,7 @@ export default function SignUpToClaimAgent({
             />{" "}
             <span>
               Start risk-free:{" "}
-              <span className="font-semibold">5-day trial</span> with all
+              <span className="font-semibold">7-day trial</span> with all
               features
             </span>
           </div>

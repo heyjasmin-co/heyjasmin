@@ -17,7 +17,7 @@ function Industries() {
   const industries = [
     {
       name: "Real Estate",
-      image: realestateImage,
+      image: clinicImage,
       icon: "fa-solid fa-building",
       path: "/industries/real-estate",
     },
@@ -47,7 +47,7 @@ function Industries() {
     },
     {
       name: "Small Business",
-      image: clinicImage,
+      image: realestateImage,
       icon: "fa-solid fa-shop",
       path: "/industries/small-business",
     },
@@ -66,7 +66,7 @@ function Industries() {
             className="bg-clip-text text-transparent"
             style={{
               backgroundImage: `linear-gradient(to right, ${colorTheme.secondaryColor(
-                1
+                1,
               )}, #8b5cf6)`,
             }}
           >
@@ -97,7 +97,7 @@ function Industries() {
           className="absolute flex h-20 w-20 items-center justify-center rounded-full sm:h-30 sm:w-30 md:h-40 md:w-40"
           style={{
             background: `radial-gradient(circle, ${colorTheme.secondaryColor(
-              1
+              1,
             )} 0%, ${colorTheme.secondaryColor(0.9)} 60%)`,
             boxShadow: `0 0 40px 10px ${colorTheme.secondaryColor(0.4)}`,
           }}
