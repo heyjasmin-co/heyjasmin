@@ -1,7 +1,11 @@
 import { ClientSession } from 'mongoose'
+import config from '../config'
 import clerkClient from '../config/clerk'
+import transporter from '../config/nodemailer'
 import { Business, BusinessUser, User } from '../models'
 import { BusinessUserInvitation } from '../models/BusinessUserInvitation'
+import { newUserNotificationTemplate } from '../template/newUserTemplate'
+import { welcomeAfterVerificationTemplate } from '../template/registerTemplate'
 type ClerkOrganizationInvitationAccepted = {
 	created_at: number
 	email_address: string
@@ -51,6 +55,8 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 				role: 'owner',
 				status: 'active',
 			})
+			const registerTemplate = welcomeAfterVerificationTemplate(userData.firstName + ' ' + userData.lastName, userData.email)
+			const newUserTemplate = newUserNotificationTemplate(userData.firstName + ' ' + userData.lastName, userData.email)
 
 			// Create Clerk organization + update metadata
 			const [org] = await Promise.all([
@@ -66,6 +72,18 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 						role: 'owner',
 						selectedClientId: null,
 					},
+				}),
+				transporter.sendMail({
+					from: config.NODEMAILER_EMAIL_USER,
+					to: userData.email,
+					subject: 'Welcome to heyjasmin 🎉',
+					html: registerTemplate,
+				}),
+				transporter.sendMail({
+					from: config.NODEMAILER_EMAIL_USER,
+					to: config.NODEMAILER_EMAIL_USER,
+					subject: 'New User Onboard to heyjasmin 🎉',
+					html: newUserTemplate,
 				}),
 			])
 
