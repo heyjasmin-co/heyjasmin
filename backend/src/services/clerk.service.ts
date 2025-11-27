@@ -55,8 +55,6 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 				role: 'owner',
 				status: 'active',
 			})
-			const registerTemplate = welcomeAfterVerificationTemplate(userData.firstName + ' ' + userData.lastName, userData.email)
-			const newUserTemplate = newUserNotificationTemplate(userData.firstName + ' ' + userData.lastName, userData.email)
 
 			// Create Clerk organization + update metadata
 			const [org] = await Promise.all([
@@ -73,18 +71,6 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 						selectedClientId: null,
 					},
 				}),
-				transporter.sendMail({
-					from: config.NODEMAILER_EMAIL_USER,
-					to: userData.email,
-					subject: 'Welcome to heyjasmin 🎉',
-					html: registerTemplate,
-				}),
-				transporter.sendMail({
-					from: config.NODEMAILER_EMAIL_USER,
-					to: config.NODEMAILER_EMAIL_USER,
-					subject: 'New User Onboard to heyjasmin 🎉',
-					html: newUserTemplate,
-				}),
 			])
 
 			// Update Business with Clerk Organization ID
@@ -95,6 +81,7 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 			await businessMember.save({ session })
 
 			// Final metadata update (optional but clean)
+
 			await clerkClient.users.updateUser(savedUser.clerkId, {
 				publicMetadata: {
 					businessId: businessId,
@@ -102,6 +89,22 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 				},
 			})
 		}
+		const registerTemplate = welcomeAfterVerificationTemplate(userData.firstName + ' ' + userData.lastName, userData.email)
+		const newUserTemplate = newUserNotificationTemplate(userData.firstName + ' ' + userData.lastName, userData.email)
+		await Promise.all([
+			transporter.sendMail({
+				from: config.NODEMAILER_EMAIL_USER,
+				to: userData.email,
+				subject: 'Welcome to heyjasmin 🎉',
+				html: registerTemplate,
+			}),
+			transporter.sendMail({
+				from: config.NODEMAILER_EMAIL_USER,
+				to: config.NODEMAILER_EMAIL_USER,
+				subject: 'New User Onboard to heyjasmin 🎉',
+				html: newUserTemplate,
+			}),
+		])
 
 		return {
 			success: true,
