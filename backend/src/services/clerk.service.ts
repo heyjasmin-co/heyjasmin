@@ -1,7 +1,11 @@
 import { ClientSession } from 'mongoose'
+import config from '../config'
 import clerkClient from '../config/clerk'
+import transporter from '../config/nodemailer'
 import { Business, BusinessUser, User } from '../models'
 import { BusinessUserInvitation } from '../models/BusinessUserInvitation'
+import { newUserNotificationTemplate } from '../template/newUserTemplate'
+import { welcomeAfterVerificationTemplate } from '../template/registerTemplate'
 type ClerkOrganizationInvitationAccepted = {
 	created_at: number
 	email_address: string
@@ -77,6 +81,7 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 			await businessMember.save({ session })
 
 			// Final metadata update (optional but clean)
+
 			await clerkClient.users.updateUser(savedUser.clerkId, {
 				publicMetadata: {
 					businessId: businessId,
@@ -84,6 +89,22 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 				},
 			})
 		}
+		const registerTemplate = welcomeAfterVerificationTemplate(userData.firstName + ' ' + userData.lastName, userData.email)
+		const newUserTemplate = newUserNotificationTemplate(userData.firstName + ' ' + userData.lastName, userData.email)
+		await Promise.all([
+			transporter.sendMail({
+				from: config.NODEMAILER_EMAIL_USER,
+				to: userData.email,
+				subject: 'Welcome to heyjasmin 🎉',
+				html: registerTemplate,
+			}),
+			transporter.sendMail({
+				from: config.NODEMAILER_EMAIL_USER,
+				to: config.NODEMAILER_EMAIL_USER,
+				subject: 'New User Onboard to heyjasmin 🎉',
+				html: newUserTemplate,
+			}),
+		])
 
 		return {
 			success: true,

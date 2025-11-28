@@ -20,6 +20,8 @@ interface Config {
 	TWILIO_AUTH_TOKEN: string
 	BACKEND_URL: string
 	ELEVENLABS_API_KEY: string
+	NODEMAILER_EMAIL_USER: string
+	NODEMAILER_EMAIL_PASS: string
 }
 
 const config: Config = {
@@ -58,6 +60,10 @@ const config: Config = {
 
 	//ELEVENLABS
 	ELEVENLABS_API_KEY: process.env.ELEVENLABS_API_KEY!,
+
+	//Nodemailer
+	NODEMAILER_EMAIL_USER: process.env.NODEMAILER_EMAIL_USER!,
+	NODEMAILER_EMAIL_PASS: process.env.NODEMAILER_EMAIL_PASS!,
 }
 
 export default config
