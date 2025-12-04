@@ -107,6 +107,8 @@ function BusinessInfo({
       }
       if (Object.keys(errors).length) {
         setErrors(errors);
+        const showError = Object.keys(errors)[0];
+        errorToast(errors[showError]);
         return;
       } else {
         setErrors({
