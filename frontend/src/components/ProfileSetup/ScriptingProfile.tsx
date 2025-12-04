@@ -30,8 +30,7 @@ export default function ScriptingProfile({
         setCurrentStep={setCurrentStep}
         heading={
           <>
-            Building your{" "}
-            <span className="text-purple-300">{appName} Agent</span>
+            Building your <span className="text-purple-300">Agent</span>
           </>
         }
         listItems={[
