@@ -72,7 +72,7 @@ export default function Index() {
             }}
           >
             {" "}
-            hey{appName}
+            hey{appName.toLocaleLowerCase()}
           </span>
         </h1>
       </div>

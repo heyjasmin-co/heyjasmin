@@ -43,7 +43,7 @@ const IndustryHeroSection: React.FC<IndustryHeroSectionProps> = ({
   trialNote,
   heroImage,
   chatBubbles = [
-    { sender: "user", message: "Hey Jasmin, can you book my client?" },
+    { sender: "user", message: "heyjasmin, can you book my client?" },
     { sender: "bot", message: "Done! Your 2 PM slot is confirmed." },
   ],
   statCard = {
