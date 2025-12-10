@@ -4,35 +4,46 @@ export type BusinessDetailsType = {
   name: string;
   overview?: string;
   address?: string;
-  website: string;
+  website?: string;
   services: string[];
   businessHours: IBusinessHour[];
-  stripeCustomerId?: string | null;
-  stripeSubscriptionId?: string | null;
-  subscriptionStatus?:
-    | "trialing"
-    | "active"
-    | "past_due"
-    | "canceled"
-    | "incomplete"
-    | "incomplete_expired"
-    | "unpaid";
-  subscriptionPlan?: "core" | "pro" | "smart" | "infinity";
-  subscriptionStartDate?: Date | null;
-  subscriptionEndDate?: Date | null;
-  ownerUserId: string;
-  aiAgentSettings: {
+  totalCallMinutes: number;
+  stripeSettings?: {
+    stripeCustomerId?: string | null;
+    stripeSubscriptionId?: string | null;
+    subscriptionStatus?:
+      | "trial_active"
+      | "trial_end"
+      | "active"
+      | "canceled"
+      | "inactive"
+      | "unpaid";
+    subscriptionPlan?: "essential" | "pro" | "plus" | null;
+    stripePriceId?: string | null;
+    subscriptionStartDate?: Date | null;
+    subscriptionEndDate?: Date | null;
+  };
+
+  ownerUserId?: string;
+
+  aiAgentSettings?: {
     assistantId?: string;
     assistantName?: string;
     assistantPhoneNumberId?: string;
     assistantSetup?: string;
     twilioNumber?: string;
     twilioId?: string;
+    trainingData?: Record<string, any>;
+    voiceSettings?: Record<string, any>;
+    customInstructions?: string;
   };
+
+  clerkOrganizationId?: string;
   isSetupComplete: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
+
 export interface IBusinessHour {
   day:
     | "Monday"

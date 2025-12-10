@@ -3,6 +3,8 @@ import { FastifyRequest } from 'fastify'
 import config from '../config'
 import { vapiClient } from '../lib/vapiAgent'
 import { Business, Call } from '../models'
+import { runTransaction } from '../utils/transaction'
+import { checkBusinessSubscription } from './subscription.service'
 
 interface BusinessData {
 	businessName: string
@@ -244,28 +246,48 @@ export async function unlinkTwilioNumberFromAIAssistant(args: { mobileNumber: st
 
 export async function handleCreateAssistantCall(request: FastifyRequest, vapiMessage: any) {
 	try {
-		const findAssistantBusiness = await Business.findOne({
+		const business = await Business.findOne({
 			'aiAgentSettings.assistantId': vapiMessage?.assistant?.id,
 		})
-		if (!findAssistantBusiness) {
+		if (!business) {
 			request.log.error(`No business found for assistant ID: ${vapiMessage?.assistant?.id}`)
 			return null
 		}
+		const durationMinutes = vapiMessage.durationMinutes ?? 0
 		const data = {
-			businessId: findAssistantBusiness?._id,
+			businessId: business?._id,
 			callId: vapiMessage?.call?.id,
 			summary: vapiMessage?.analysis?.summary,
 			recordingUrl: vapiMessage.recordingUrl,
 			status: vapiMessage.analysis.successEvaluation ? 'completed' : 'missed',
 			durationMs: vapiMessage.durationMs,
 			durationSeconds: vapiMessage.durationSeconds,
-			durationMinutes: vapiMessage.durationMinutes,
+			durationMinutes: durationMinutes,
 			customerPhoneNumber: vapiMessage?.call?.customer?.number ?? null,
 		}
-		const createdCall = await Call.create(data)
-
+		business.totalCallMinutes = (business.totalCallMinutes ?? 0) + durationMinutes
 		request.log.info(`✅ Call created successfully`)
-		return createdCall
+
+		const businessSubscription = await checkBusinessSubscription((business._id as any).toString())
+
+		if (businessSubscription.remainingMinutes !== 'unlimited' && business.totalCallMinutes >= businessSubscription.remainingMinutes) {
+			if (businessSubscription.isTrial) {
+				business.stripeSettings.subscriptionStatus = 'trial_end'
+			} else if (businessSubscription.isActive && businessSubscription.plan === 'essential') {
+				business.stripeSettings.subscriptionStatus = 'inactive'
+			}
+			business.stripeSettings.subscriptionEndDate = new Date()
+
+			// TODO: Disable Twilio number for this business
+			// await disableTwilioNumber(business)
+		}
+		if (business)
+			return await runTransaction(async (session) => {
+				const call = new Call(data)
+				await call.save({ session })
+				business.save({ session })
+				return call
+			})
 	} catch (error: any) {
 		console.error('❌ Failed to create call:', error?.response?.data || error?.message || error)
 		throw new Error('Failed to create call record')

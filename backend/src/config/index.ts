@@ -22,6 +22,7 @@ interface Config {
 	ELEVENLABS_API_KEY: string
 	NODEMAILER_EMAIL_USER: string
 	NODEMAILER_EMAIL_PASS: string
+	TRIAL_MINUTES: number
 }
 
 const config: Config = {
@@ -64,6 +65,9 @@ const config: Config = {
 	//Nodemailer
 	NODEMAILER_EMAIL_USER: process.env.NODEMAILER_EMAIL_USER!,
 	NODEMAILER_EMAIL_PASS: process.env.NODEMAILER_EMAIL_PASS!,
+
+	//Trial Minutes
+	TRIAL_MINUTES: Number(process.env.TRIAL_MINUTES)!,
 }
 
 export default config

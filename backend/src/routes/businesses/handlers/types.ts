@@ -25,24 +25,38 @@ export const updateBusinessDetailsByIdBodySchema = z.object({
 		)
 		.optional(),
 
-	stripeCustomerId: z.string().optional(),
-	stripeSubscriptionId: z.string().nullable().optional(),
-	subscriptionStatus: z.enum(['trialing', 'active', 'past_due', 'canceled', 'incomplete', 'incomplete_expired', 'unpaid']).optional(),
-	subscriptionPlan: z.enum(['core', 'pro', 'smart', 'infinity']).optional(),
-	subscriptionStartDate: z.date().nullable().optional(),
-	subscriptionEndDate: z.date().nullable().optional(),
+	// Stripe Settings nested
+	stripeSettings: z
+		.object({
+			stripeCustomerId: z.string().nullable().optional(),
+			stripeSubscriptionId: z.string().nullable().optional(),
+			subscriptionStatus: z.enum(['trial_active', 'trial_end', 'active', 'inactive', 'canceled', 'unpaid']).optional(),
+			subscriptionPlan: z.enum(['essential', 'pro', 'plus']).nullable().optional(),
+			stripePriceId: z.string().nullable().optional(),
+			subscriptionStartDate: z.date().nullable().optional(),
+			subscriptionEndDate: z.date().nullable().optional(),
+		})
+		.optional(),
 
 	ownerUserId: z.string().optional(),
 
+	// AI Agent Settings nested
 	aiAgentSettings: z
 		.object({
-			agentId: z.string().optional(),
-			agentNumber: z.string().optional(),
+			assistantId: z.string().optional(),
+			assistantPhoneNumberId: z.string().optional(),
+			assistantSetup: z.string().optional(),
+			assistantName: z.string().optional(),
+			twilioNumber: z.string().optional(),
+			twilioId: z.string().optional(),
 			trainingData: z.record(z.any()).optional(),
 			voiceSettings: z.record(z.any()).optional(),
 			customInstructions: z.string().optional(),
 		})
 		.optional(),
+
+	clerkOrganizationId: z.string().optional(),
+	isSetupComplete: z.boolean().optional(),
 })
 export const updateBusinessDetailsByIdParamsSchema = z.object({
 	businessId: z.string(),
