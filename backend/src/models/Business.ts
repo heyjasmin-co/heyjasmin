@@ -16,17 +16,10 @@ interface IBusiness extends Document {
 	services: string[]
 	businessHours: IBusinessHour[]
 
-	stripeSettings: {
-		stripeCustomerId?: string | null
-		stripeSubscriptionId?: string | null
-		subscriptionStatus?: 'trial_active' | 'trial_end' | 'active' | 'canceled' | 'unpaid' | 'inactive'
-		subscriptionPlan?: 'essential' | 'pro' | 'plus'
-		stripePriceId?: string | null
-		subscriptionStartDate?: Date | null
-		subscriptionEndDate?: Date | null
-	}
+	stripeCustomerId?: string | null
 
 	totalCallMinutes: number
+
 	ownerUserId?: mongoose.Types.ObjectId
 	aiAgentSettings: {
 		assistantId?: string
@@ -68,27 +61,21 @@ const businessSchema = new Schema<IBusiness>(
 			},
 		],
 
-		// Stripe Settings (nested)
-		stripeSettings: {
-			stripeCustomerId: { type: String, default: null, unique: true, sparse: true },
-			stripeSubscriptionId: { type: String, default: null },
-			subscriptionStatus: {
-				type: String,
-				enum: ['trial_active', 'trial_end', 'active', 'inactive', 'canceled', 'unpaid'],
-				default: 'trial_active',
-			},
-			subscriptionPlan: {
-				type: String,
-				enum: ['essential', 'pro', 'plus'],
-				default: null,
-			},
-			stripePriceId: { type: String, default: null },
-			subscriptionStartDate: { type: Date, default: null },
-			subscriptionEndDate: { type: Date, default: null },
+		// Stripe
+		stripeCustomerId: {
+			type: String,
+			default: null,
+			unique: true,
+			sparse: true,
+			index: true,
 		},
 
 		// Owner
-		ownerUserId: { type: Schema.Types.ObjectId, ref: 'User' },
+		ownerUserId: {
+			type: Schema.Types.ObjectId,
+			ref: 'User',
+			index: true,
+		},
 
 		//Call Usage
 		totalCallMinutes: { type: Number, default: 0 },
@@ -112,8 +99,6 @@ const businessSchema = new Schema<IBusiness>(
 	{ timestamps: true }
 )
 
-businessSchema.index({ name: 1 })
-businessSchema.index({ ownerUserId: 1 })
 businessSchema.plugin(aggregatePaginate)
 
 const Business: Model<IBusiness> = mongoose.model<IBusiness>('Business', businessSchema)

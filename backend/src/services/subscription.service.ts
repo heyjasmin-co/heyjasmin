@@ -1,5 +1,6 @@
 import config from '../config'
 import { Business, IBusiness } from '../models/Business'
+import { ITrial, Trial } from '../models/Trial'
 
 interface SubscriptionStatus {
 	isTrial: boolean
@@ -13,6 +14,7 @@ export async function checkBusinessSubscription(businessId: string): Promise<Sub
 	if (!business) {
 		throw new Error('Business not found')
 	}
+	const businessTrial: ITrial | null = await Trial.findOne({ businessId: business._id })
 
 	const { stripeSettings, totalCallMinutes } = business
 	const usedMinutes = totalCallMinutes || 0

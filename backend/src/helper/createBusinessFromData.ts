@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import clerkClient from '../config/clerk'
 import { Business, BusinessUser } from '../models'
+import { Trial } from '../models/Trial'
 import { createElevenlabsAudioClip } from '../services/elevenlabs.service'
 import { BusinessData } from '../utils/extract-website-data'
 import { runTransaction } from '../utils/transaction'
@@ -29,15 +30,14 @@ export const createBusinessFromData = async ({
 			services: businessData.services ?? [],
 			businessHours: businessData.business_hours ?? [],
 			website: businessData.website,
-			stripeSettings: {
-				subscriptionStatus: 'trial_active',
-				subscriptionStartDate: new Date(),
-				subscriptionEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-			},
 			ownerUserId,
 			isSetupComplete: true,
 		})
-
+		const businessTrial = new Trial({
+			businessId: newBusiness._id,
+			trialStartedAt: new Date(),
+			trialEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+		})
 		let businessMember: any = null
 		if (ownerUserId) {
 			businessMember = new BusinessUser({
@@ -66,6 +66,7 @@ export const createBusinessFromData = async ({
 		}
 
 		await newBusiness.save({ session })
+		await businessTrial.save({ session })
 		if (businessMember) {
 			await businessMember.save({ session })
 
