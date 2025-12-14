@@ -56,7 +56,7 @@ export const createBusinessPlan = async (
 
 	const subscription = getSubscriptionByPriceId(priceId)
 	// Create or update BusinessPlan
-	if (business.aiAgentSettings && !business.aiAgentSettings.assistantPhoneNumberId) {
+	if (business.aiAgentSettings && business.aiAgentSettings.assistantId && !business.aiAgentSettings.assistantPhoneNumberId) {
 		const response = await linkTwilioNumberToAIAssistant({
 			businessName: business.name,
 			assistantId: business.aiAgentSettings.assistantId!,
