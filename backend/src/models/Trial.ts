@@ -5,6 +5,7 @@ export interface ITrial extends Document {
 	businessId: mongoose.Types.ObjectId
 	trialStartedAt: Date
 	trialEndDate?: Date
+	trialStatus: string
 	createdAt: Date
 	updatedAt: Date
 }
@@ -24,6 +25,11 @@ const trialSchema = new Schema<ITrial>(
 		},
 		trialEndDate: {
 			type: Date,
+		},
+		trialStatus: {
+			type: String,
+			enum: ['trial_active', 'trial_ended'],
+			default: 'trial_active',
 		},
 	},
 	{

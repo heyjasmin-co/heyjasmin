@@ -47,16 +47,14 @@ export default function SelectBusinessPage() {
         if (businesses.length === 1) {
           const onlyBusinessId = businesses[0];
           setValue("businessId", onlyBusinessId.businessId);
-          setLoading((pv) => ({ ...pv, selectBusinessLoading: true }));
-          await apiClient.post(
-            `/users/select-business/` + onlyBusinessId.businessId,
-            {
-              role: onlyBusinessId.role,
-            },
-          );
-          await new Promise((res) => setTimeout(res, 2000));
-
-          window.location.href = "/admin/dashboard";
+          // setLoading((pv) => ({ ...pv, selectBusinessLoading: true }));
+          // await apiClient.post(
+          //   `/users/select-business/` + onlyBusinessId.businessId,
+          //   {
+          //     role: onlyBusinessId.role,
+          //   },
+          // );
+          // window.location.href = "/admin/dashboard";
         }
         if (businesses.length === 0) {
           navigate("/admin/setup");
@@ -97,7 +95,7 @@ export default function SelectBusinessPage() {
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     await handleBusinessSelect(data.businessId);
   };
-  if (!loading.apiLoading) {
+  if (loading.apiLoading) {
     return (
       <div className="flex h-screen items-center justify-center text-gray-600">
         Loading...

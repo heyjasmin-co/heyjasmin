@@ -24,9 +24,7 @@ export const useApiClient = (timeout: number = 10000): AxiosInstance => {
 
     client.interceptors.request.use(
       async (config) => {
-        const token = await getToken({
-          skipCache: config.url?.includes("/me"),
-        });
+        const token = await getToken();
 
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;

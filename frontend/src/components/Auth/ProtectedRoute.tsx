@@ -36,9 +36,6 @@ export default function ProtectedRoute({
     return <Navigate to="/admin/setup" replace />;
   }
 
-  if (requireSubscription && userData && !userData.hasSubscription) {
-    return <Navigate to="/admin/subscription" replace />;
-  }
   if (requireSubscription && userData && userData.isSetupComplete) {
     return <Navigate to="/admin/dashboard" replace />;
   }

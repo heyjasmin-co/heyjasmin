@@ -29,6 +29,8 @@ type ClerkOrganizationInvitationAccepted = {
 }
 
 export const handleUserCreated = async (clerkUser: any, session: ClientSession) => {
+	// const clerkUserId: string | null = null
+	// let clerkOrgId: string | null = null
 	try {
 		const userData = {
 			clerkId: clerkUser.id,
@@ -72,7 +74,7 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 					},
 				}),
 			])
-
+			// clerkOrgId = org.id
 			// Update Business with Clerk Organization ID
 			business.clerkOrganizationId = org.id
 			await business.save({ session })
@@ -112,6 +114,21 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 		}
 	} catch (error) {
 		console.error('Error creating user from webhook:', error)
+
+		// // Prepare cleanup promises
+		// const cleanupPromises: Promise<any>[] = []
+
+		// if (clerkUserId) {
+		// 	cleanupPromises.push(clerkClient.users.deleteUser(clerkUserId))
+		// }
+
+		// if (clerkOrgId) {
+		// 	cleanupPromises.push(clerkClient.organizations.deleteOrganization(clerkOrgId))
+		// }
+
+		// // Run all cleanup operations concurrently
+		// await Promise.all(cleanupPromises)
+
 		throw new Error('Failed to create user from webhook')
 	}
 }

@@ -24,7 +24,7 @@ interface IBusiness extends Document {
 	aiAgentSettings: {
 		assistantId?: string
 		assistantName?: string
-		assistantPhoneNumberId?: string
+		assistantPhoneNumberId?: string | null
 		assistantSetup?: string
 		twilioNumber?: string
 		twilioId?: string

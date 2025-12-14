@@ -130,9 +130,16 @@ function BusinessInfo({
         data: BusinessDetailsType;
       }>("/businesses/" + userData?.businessId, updateData);
       setUserData((pv) => ({
-        ...pv,
+        ...pv!,
         businessName: response.data.data.name,
-        subscriptionNumbersLeft: "20",
+        dbUserId: pv?.dbUserId ?? null,
+        clerkId: pv?.clerkId ?? null,
+        businessId: pv?.businessId ?? null,
+        isSetupComplete: pv?.isSetupComplete ?? false,
+        role: pv?.role ?? null,
+        assistantNumber:
+          response.data.data.aiAgentSettings.twilioNumber ?? null,
+        subscription: pv?.subscription ?? null,
       }));
       setBusinessDetails(response.data.data);
       successToast(response.data.message);

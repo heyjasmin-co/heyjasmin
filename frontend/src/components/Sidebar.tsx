@@ -42,7 +42,7 @@ export default function Sidebar() {
         <button
           onClick={toggleSidebar}
           type="button"
-          className="fixed top-4 left-4 z-50 rounded-lg bg-white p-2 text-gray-500 shadow-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none lg:hidden"
+          className="fixed top-12 left-4 z-50 rounded-lg bg-white p-2 text-gray-500 shadow-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none lg:hidden"
         >
           <svg
             className="h-6 w-6"
@@ -313,9 +313,14 @@ export default function Sidebar() {
                     <div className="flex w-full items-center justify-center gap-2 border-b border-white/30 py-2 text-white">
                       <i className="fa-solid fa-phone-volume text-base sm:text-lg"></i>
                       <span className="truncate">
-                        {userData?.assistantNumber
-                          ? formatPhoneNumber(userData?.assistantNumber)
-                          : "No Number Available"}
+                        {userData.subscription?.plan === "trial" &&
+                        userData.subscription.status === "trial_ended"
+                          ? "Trial has Ended"
+                          : userData.subscription?.status === "inactive"
+                            ? "Subscription has Ended"
+                            : userData?.assistantNumber
+                              ? formatPhoneNumber(userData.assistantNumber)
+                              : "No Number Available"}
                       </span>
                     </div>
 
@@ -323,7 +328,8 @@ export default function Sidebar() {
                     <div className="flex w-full items-center justify-center gap-2 py-2 font-medium text-white">
                       <i className="fa-solid fa-circle-info text-base sm:text-lg"></i>
                       <span className="truncate">
-                        {userData?.subscriptionNumbersLeft} MIN LEFT
+                        {userData?.subscription!.remainingMinutesFormatted} MIN
+                        LEFT
                       </span>
                     </div>
                   </div>

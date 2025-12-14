@@ -7,35 +7,19 @@ export type BusinessDetailsType = {
   website?: string;
   services: string[];
   businessHours: IBusinessHour[];
+
+  stripeCustomerId?: string | null;
+
   totalCallMinutes: number;
-  stripeSettings?: {
-    stripeCustomerId?: string | null;
-    stripeSubscriptionId?: string | null;
-    subscriptionStatus?:
-      | "trial_active"
-      | "trial_end"
-      | "active"
-      | "canceled"
-      | "inactive"
-      | "unpaid";
-    subscriptionPlan?: "essential" | "pro" | "plus" | null;
-    stripePriceId?: string | null;
-    subscriptionStartDate?: Date | null;
-    subscriptionEndDate?: Date | null;
-  };
 
   ownerUserId?: string;
-
-  aiAgentSettings?: {
+  aiAgentSettings: {
     assistantId?: string;
     assistantName?: string;
     assistantPhoneNumberId?: string;
     assistantSetup?: string;
     twilioNumber?: string;
     twilioId?: string;
-    trainingData?: Record<string, any>;
-    voiceSettings?: Record<string, any>;
-    customInstructions?: string;
   };
 
   clerkOrganizationId?: string;

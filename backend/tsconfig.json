@@ -16,7 +16,7 @@
         "typeRoots": ["./node_modules/@types", "./src/types"],
         "types": ["node"]
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "src/routes/stripe/handlers/confirm-payment-subscription.ts"],
     "exclude": ["node_modules", "dist"],
     "ts-node": {
         "files": true

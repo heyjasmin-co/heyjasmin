@@ -123,9 +123,7 @@ export default function CallsList() {
                         <p className="mt-0.5 text-xs text-gray-500">
                           Duration:{" "}
                           {call.durationSeconds
-                            ? `${Math.floor(call.durationSeconds / 3600)}h ${Math.floor(
-                                (call.durationSeconds % 3600) / 60,
-                              )}m`
+                            ? `${Math.floor(call.durationSeconds / 60)}:${String(Math.floor(call.durationSeconds % 60)).padStart(2, "0")}`
                             : "N/A"}
                         </p>
                         <p

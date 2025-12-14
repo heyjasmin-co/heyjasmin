@@ -60,7 +60,7 @@ function CTA() {
           </a>
 
           <a
-            href="mailto:info@heyjasmin.co"
+            href={`mailto:${import.meta.env.VITE_ADMIN_MAIL}`}
             className="inline-flex items-center gap-2 rounded-full border-2 border-purple-200 bg-white/50 px-8 py-4 text-lg font-semibold text-purple-700 backdrop-blur-sm transition-all duration-300 hover:border-purple-300 hover:bg-white hover:shadow-lg"
           >
             <svg

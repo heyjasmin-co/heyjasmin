@@ -1,14 +1,14 @@
 import { clerkPlugin } from '@clerk/fastify'
 import dotenv from 'dotenv'
-dotenv.config()
-
 import Fastify from 'fastify'
+import fastifyRawBody from 'fastify-raw-body'
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod'
 import config from './config/index'
 import mongoosePlugin from './plugins/mongoose'
 import swaggerPlugin from './plugins/swagger'
 import routes from './routes/index'
 import { AppError } from './utils/errors'
+dotenv.config()
 
 export const createApp = async () => {
 	const app = await Fastify({
@@ -36,16 +36,21 @@ export const createApp = async () => {
 		origin: true,
 		credentials: true,
 	})
-
+	await app.register(fastifyRawBody, {
+		field: 'rawBody',
+		global: false,
+		encoding: false,
+		runFirst: true,
+		routes: ['/api/v1/webhooks-stripe'],
+	})
 	await app.register(clerkPlugin, {
-		publishableKey: config.CLERK_PUBLISHABLE_KEY,
-		secretKey: config.CLERK_SECRET_KEY,
+		publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+		secretKey: process.env.CLERK_SECRET_KEY,
 	})
 	await app.register(require('@fastify/sensible'))
 	await app.register(mongoosePlugin)
 	await app.register(swaggerPlugin)
 	await app.register(routes)
-
 	app.setErrorHandler((error, request, reply) => {
 		if (error.validation) {
 			return reply.code(400).send({

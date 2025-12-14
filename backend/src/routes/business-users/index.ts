@@ -10,6 +10,7 @@ import {
 } from './handlers/types'
 import { updateBusinessUsersByIdHandler } from './handlers/update-business-user-by-id'
 import { createContext } from '../../context'
+import { requireActiveSubscription } from '../../middleware/subscription'
 
 export default async function businessUsersRoute(fastify: FastifyInstance) {
 	// Get Business Users by Id
@@ -25,7 +26,7 @@ export default async function businessUsersRoute(fastify: FastifyInstance) {
 
 	// Delete Business User by Id
 	fastify.delete('/:businessUserId', {
-		preHandler: [createContext, authenticate],
+		preHandler: [createContext, authenticate,requireActiveSubscription],
 		schema: {
 			tags: ['business-users'],
 			description: 'Remove Business User By Id',
@@ -36,7 +37,7 @@ export default async function businessUsersRoute(fastify: FastifyInstance) {
 
 	// Update Business User by Id
 	fastify.patch('/:businessUserId', {
-		preHandler: [createContext, authenticate],
+		preHandler: [createContext, authenticate,requireActiveSubscription],
 		schema: {
 			tags: ['business-users'],
 			description: 'Update Business User By Id',

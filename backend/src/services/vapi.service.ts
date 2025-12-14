@@ -1,11 +1,13 @@
 import { Assistant, PhoneNumbersCreateResponse } from '@vapi-ai/server-sdk/dist/cjs/api'
+import Decimal from 'decimal.js'
 import { FastifyRequest } from 'fastify'
 import config from '../config'
 import { vapiClient } from '../lib/vapiAgent'
 import { Business, Call } from '../models'
+import { BusinessPlan } from '../models/BusinessPlan'
+import { Trial } from '../models/Trial'
 import { runTransaction } from '../utils/transaction'
 import { checkBusinessSubscription } from './subscription.service'
-
 interface BusinessData {
 	businessName: string
 	services: string[]
@@ -216,14 +218,34 @@ export async function deleteAIAssistant(assistantId: string) {
 		throw error
 	}
 }
+/**
+ * Get phone number linked to a specific AI Assistant
+ */
+export async function getAssistantPhoneNumber(assistantId: string): Promise<string | null> {
+	try {
+		// Fetch all phone numbers
+		const phoneNumbers = await vapiClient.phoneNumbers.list()
 
+		// Find the number linked to this assistant
+		const linkedNumber = phoneNumbers.find((pn) => pn.assistantId === assistantId)
+
+		if (!linkedNumber) {
+			console.warn(`No phone number linked to assistant ID: ${assistantId}`)
+			return null
+		}
+
+		return linkedNumber.number ?? null // return the phone number as string
+	} catch (error: any) {
+		console.error('✗ Error fetching assistant phone number:', error?.response?.data || error?.message || error)
+		throw error
+	}
+}
 /**
  * Unlinks a Twilio number from an AI Assistant
  */
-export async function unlinkTwilioNumberFromAIAssistant(args: { mobileNumber: string; assistantId: string }) {
+export async function unlinkTwilioNumberFromAIAssistant(args: { mobileNumber: string; assistantId: string; businessName?: string }) {
+	const { mobileNumber, assistantId, businessName } = args
 	try {
-		const { mobileNumber } = args
-
 		// Get all phone numbers to find the one to delete
 		const phoneNumbers = await vapiClient.phoneNumbers.list()
 		const phoneNumberToDelete = phoneNumbers.find((pn) => pn.number === mobileNumber)
@@ -236,6 +258,34 @@ export async function unlinkTwilioNumberFromAIAssistant(args: { mobileNumber: st
 		return await vapiClient.phoneNumbers.delete(phoneNumberToDelete.id)
 	} catch (error: any) {
 		console.error('✗ Error unlinking Twilio number:', error?.response?.data || error?.message || error)
+		await linkTwilioNumberToAIAssistant({
+			mobileNumber,
+			assistantId,
+			businessName: businessName!,
+		})
+		throw error
+	}
+}
+/**
+ * Unlinks assistant from phone number (keeps the phone number active)
+ */
+export async function unlinkAssistantFromPhoneNumber(assistantPhoneNumberId: string) {
+	try {
+		const phoneNumbers = await vapiClient.phoneNumbers.list()
+		const phoneNumber = phoneNumbers.find((pn) => pn.id === assistantPhoneNumberId)
+
+		if (!phoneNumber) {
+			console.warn('Phone number not found in VAPI')
+			return false
+		}
+
+		await vapiClient.phoneNumbers.update(phoneNumber.id, {
+			assistantId: undefined,
+		})
+
+		console.log(`✓ Assistant unlinked from phone number ${phoneNumber.number}`)
+	} catch (error: any) {
+		console.error('✗ Error unlinking assistant:', error?.response?.data || error?.message || error)
 		throw error
 	}
 }
@@ -246,14 +296,19 @@ export async function unlinkTwilioNumberFromAIAssistant(args: { mobileNumber: st
 
 export async function handleCreateAssistantCall(request: FastifyRequest, vapiMessage: any) {
 	try {
+		let assistantId = vapiMessage?.assistant?.id
 		const business = await Business.findOne({
-			'aiAgentSettings.assistantId': vapiMessage?.assistant?.id,
+			'aiAgentSettings.assistantId': assistantId,
 		})
+
 		if (!business) {
-			request.log.error(`No business found for assistant ID: ${vapiMessage?.assistant?.id}`)
+			request.log.error(`No business found for assistant ID: ${assistantId}`)
 			return null
 		}
-		const durationMinutes = vapiMessage.durationMinutes ?? 0
+
+		const durationMinutes = vapiMessage.durationMinutes
+			? new Decimal(vapiMessage.durationMinutes).toDecimalPlaces(2, Decimal.ROUND_HALF_EVEN).toNumber()
+			: 0
 		const data = {
 			businessId: business?._id,
 			callId: vapiMessage?.call?.id,
@@ -265,29 +320,59 @@ export async function handleCreateAssistantCall(request: FastifyRequest, vapiMes
 			durationMinutes: durationMinutes,
 			customerPhoneNumber: vapiMessage?.call?.customer?.number ?? null,
 		}
-		business.totalCallMinutes = (business.totalCallMinutes ?? 0) + durationMinutes
-		request.log.info(`✅ Call created successfully`)
-
+		business.totalCallMinutes = new Decimal(business.totalCallMinutes ?? 0).plus(durationMinutes).toDecimalPlaces(2).toNumber()
 		const businessSubscription = await checkBusinessSubscription((business._id as any).toString())
 
-		if (businessSubscription.remainingMinutes !== 'unlimited' && business.totalCallMinutes >= businessSubscription.remainingMinutes) {
-			if (businessSubscription.isTrial) {
-				business.stripeSettings.subscriptionStatus = 'trial_end'
-			} else if (businessSubscription.isActive && businessSubscription.plan === 'essential') {
-				business.stripeSettings.subscriptionStatus = 'inactive'
-			}
-			business.stripeSettings.subscriptionEndDate = new Date()
+		return await runTransaction(async (session) => {
+			if (
+				businessSubscription.remainingMinutes !== 'unlimited' &&
+				business.totalCallMinutes >= businessSubscription.remainingMinutes
+			) {
+				if (businessSubscription.isTrial) {
+					await Trial.findOneAndUpdate(
+						{ businessId: business._id },
+						{
+							$set: {
+								trialEndDate: new Date(),
+								trialStatus: 'trial_ended',
+							},
+						},
+						{
+							session,
+							upsert: false,
+						}
+					)
+				} else if (businessSubscription.isActive && businessSubscription.plan === 'essential') {
+					await BusinessPlan.findOneAndUpdate(
+						{ businessId: business._id },
+						{
+							$set: {
+								subscriptionEndDate: new Date(),
+								subscriptionStatus: 'inactive',
+							},
+						},
+						{
+							session,
+							upsert: false,
+						}
+					)
+				}
 
-			// TODO: Disable Twilio number for this business
-			// await disableTwilioNumber(business)
-		}
-		if (business)
-			return await runTransaction(async (session) => {
-				const call = new Call(data)
-				await call.save({ session })
-				business.save({ session })
-				return call
-			})
+				// TODO: Disable Twilio number for this business
+				await unlinkTwilioNumberFromAIAssistant({
+					mobileNumber: business.aiAgentSettings.twilioNumber!,
+					assistantId,
+					businessName: business.name,
+				})
+				business.aiAgentSettings.assistantPhoneNumberId = null
+			}
+			const call = new Call(data)
+			await call.save({ session })
+			await business.save({ session })
+
+			request.log.info(`✅ Call record created for business ${business._id}`)
+			return call
+		})
 	} catch (error: any) {
 		console.error('❌ Failed to create call:', error?.response?.data || error?.message || error)
 		throw new Error('Failed to create call record')

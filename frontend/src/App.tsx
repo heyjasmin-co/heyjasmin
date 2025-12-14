@@ -21,7 +21,6 @@ import Settings from "./pages/Admin/Dashboard/Settings";
 import AppointmentInfo from "./pages/Admin/Dashboard/Settings/AppointmentInfo";
 import BusinessDetailsPage from "./pages/Admin/Dashboard/Settings/BusinessDetailsPage";
 import SelectBusiness from "./pages/Admin/SelectBusiness";
-import SubscriptionPage from "./pages/Admin/Subscription";
 import LandingPage from "./pages/LandingPage";
 import HomePage from "./pages/LandingPage/HomePage";
 import IndustriesPage from "./pages/LandingPage/IndustriesPages";
@@ -55,6 +54,8 @@ export default function App() {
               <Route path="real-estate" element={<RealEstatePage />} />
             </Route>
           </Route>
+
+          {/* Admin routes */}
           <Route path="/admin" element={<Login />} />
           <Route path="/admin/sign-in" element={<Login />} />
           <Route path="/admin/sign-up" element={<Register />} />
@@ -74,19 +75,19 @@ export default function App() {
             }
           />
           {/* Subscription page - requires auth + subscription */}
-          <Route
+          {/* <Route
             path="/admin/subscription"
             element={
               <ProtectedRoute requireSetup>
                 <SubscriptionPage />
               </ProtectedRoute>
             }
-          />
+          /> */}
 
-          {/* Setup page - requires auth only */}
+          {/* Setup page*/}
           <Route path="/admin/setup" element={<BusinessProfileSetup />} />
 
-          {/* Dashboard routes - requires auth + subscription + setup */}
+          {/* Dashboard routes - requires auth + setup */}
           <Route
             path="/admin/dashboard"
             element={

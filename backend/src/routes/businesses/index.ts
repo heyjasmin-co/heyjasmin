@@ -29,7 +29,7 @@ import { requireActiveSubscription } from '../../middleware/subscription'
 export default async function businessRoute(fastify: FastifyInstance) {
 	// Get Business Details by Id
 	fastify.get('/:businessId', {
-		preHandler: [createContext, authenticate, requireActiveSubscription],
+		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['businesses'],
 			description: 'Get Business Details information',

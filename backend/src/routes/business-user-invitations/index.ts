@@ -12,6 +12,7 @@ import {
 	getBusinessUserInvitationsByIdParamsSchema,
 	revokeBusinessUserInvitationByIdParamsSchema,
 } from './handlers/types'
+import { requireActiveSubscription } from '../../middleware/subscription'
 export default async function businessUserInvitationsRoute(fastify: FastifyInstance) {
 	// Get Business User Invitation
 	fastify.get('/:businessId', {
@@ -26,7 +27,7 @@ export default async function businessUserInvitationsRoute(fastify: FastifyInsta
 
 	// Create Business User Invitation
 	fastify.post('/create/:businessId', {
-		preHandler: [createContext, authenticate],
+		preHandler: [createContext, authenticate, requireActiveSubscription],
 		schema: {
 			tags: ['business-user-invitations'],
 			description: 'Create Business User Invitation',
@@ -37,7 +38,7 @@ export default async function businessUserInvitationsRoute(fastify: FastifyInsta
 	})
 	// Create Business User Invitation
 	fastify.delete('/revoke/:invitationId', {
-		preHandler: [createContext, authenticate],
+		preHandler: [createContext, authenticate, requireActiveSubscription],
 		schema: {
 			tags: ['business-user-invitations'],
 			description: 'Revoke Business User Invitation',
