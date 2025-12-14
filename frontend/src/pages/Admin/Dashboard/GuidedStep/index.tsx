@@ -105,7 +105,7 @@ export default function Dashboard() {
               />
               {businessDetails && (
                 <>
-                  <TrainingSources businessWebsite={businessDetails.website} />
+                  <TrainingSources businessWebsite={businessDetails.website!} />
                   <BusinessInfo
                     businessDetails={businessDetails}
                     setBusinessDetails={setBusinessDetails}

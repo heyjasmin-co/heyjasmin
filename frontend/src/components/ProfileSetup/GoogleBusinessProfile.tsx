@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Dispatch, SetStateAction, useState } from "react";
 import completeIcon from "../../assets/image/completeIcon.png";
+import websiteIcon from "../../assets/image/websiteIcon.png";
 import { useScrapeApiClient } from "../../lib/axios";
 import { appName } from "../../theme/appName";
 import { BusinessCreationType } from "../../types/BusinessTypes";
@@ -10,7 +11,6 @@ import { errorToast, successToast } from "../../utils/react-toast";
 import BusinessProfileSetup from "./BusinessProfileSetup";
 import ConfirmBusinessProfileSetup from "./ConfirmBusinessProfileSetup";
 import LeftInfoPanel from "./LeftInfoPanel";
-import websiteIcon from "../../assets/image/websiteIcon.png";
 // Import your Publishable Key
 const VITE_GOOGLE_MAP_API = import.meta.env.VITE_GOOGLE_MAP_API;
 
@@ -36,6 +36,7 @@ export default function GoogleBusinessProfileSetup({
 }) {
   const [googleBusinessData, setGoogleBusinessData] =
     useState<GooglePlaceDetails | null>(null);
+  console.log("googleBusinessData", googleBusinessData);
   const scrapeApiClient = useScrapeApiClient();
   const handleGoogleProfileData = async () => {
     setLoading(true);

@@ -18,16 +18,24 @@ export type CreateUserOutput = IUser
 
 //
 export type MeUserInput = FastifyRequest
-export type MeUserOutput = {
-	dbUserId?: string | null
-	clerkId?: string | null
-	businessId?: string | null
-	isSetupComplete?: boolean | null
-	hasSubscription?: boolean | null
-	assistantNumber?: string | null
-	businessName?: string | null
-	subscriptionNumbersLeft?: string | null
-	role?: string | null
+export interface MeUserOutput {
+	dbUserId: string | null
+	clerkId: string | null
+	businessId: string | null
+	isSetupComplete: boolean
+	role: string | null
+	assistantNumber: string | null
+	businessName: string | null
+	subscription: SubscriptionDetails | null
+}
+
+export interface SubscriptionDetails {
+	plan: 'essential' | 'pro' | 'plus' | 'trial'
+	remainingMinutes: number | 'unlimited'
+	remainingMinutesFormatted: string
+	usedMinutes: number
+	status: 'trial_active' | 'trial_ended' | 'canceled' | 'active' | 'inactive' | 'unpaid'
+	stripePriceId?: string | null
 }
 
 //

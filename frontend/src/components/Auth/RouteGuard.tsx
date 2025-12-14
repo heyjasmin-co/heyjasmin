@@ -28,9 +28,6 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   if (!userData?.isSetupComplete) {
     return <Navigate to="/admin/setup" replace />;
   }
-  if (!userData?.hasSubscription) {
-    return <Navigate to="/admin/subscription" replace />;
-  }
 
   return <>{children}</>;
 }

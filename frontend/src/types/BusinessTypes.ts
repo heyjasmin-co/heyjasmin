@@ -4,23 +4,15 @@ export type BusinessDetailsType = {
   name: string;
   overview?: string;
   address?: string;
-  website: string;
+  website?: string;
   services: string[];
   businessHours: IBusinessHour[];
+
   stripeCustomerId?: string | null;
-  stripeSubscriptionId?: string | null;
-  subscriptionStatus?:
-    | "trialing"
-    | "active"
-    | "past_due"
-    | "canceled"
-    | "incomplete"
-    | "incomplete_expired"
-    | "unpaid";
-  subscriptionPlan?: "core" | "pro" | "smart" | "infinity";
-  subscriptionStartDate?: Date | null;
-  subscriptionEndDate?: Date | null;
-  ownerUserId: string;
+
+  totalCallMinutes: number;
+
+  ownerUserId?: string;
   aiAgentSettings: {
     assistantId?: string;
     assistantName?: string;
@@ -29,10 +21,13 @@ export type BusinessDetailsType = {
     twilioNumber?: string;
     twilioId?: string;
   };
+
+  clerkOrganizationId?: string;
   isSetupComplete: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
+
 export interface IBusinessHour {
   day:
     | "Monday"

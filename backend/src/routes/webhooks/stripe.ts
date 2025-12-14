@@ -2,10 +2,11 @@ import { FastifyInstance } from 'fastify'
 import Stripe from 'stripe'
 import config from '../../config/index'
 import stripe from '../../config/stripe'
+import { handleSubscriptionCanceled, handleSubscriptionRenewed } from '../../services/stripe.service'
 
 export default async function stripeWebhook(fastify: FastifyInstance) {
 	fastify.post(
-		'/stripe',
+		'/',
 		{
 			config: {
 				rawBody: true,
@@ -32,9 +33,19 @@ export default async function stripeWebhook(fastify: FastifyInstance) {
 
 			try {
 				switch (event.type) {
-					case 'customer.subscription.created':
-					case 'customer.subscription.updated':
-						await handleSubscriptionUpdate(event.data.object, fastify)
+					// Run when subscription is canceled or ended (deleted)
+					case 'customer.subscription.deleted':
+						fastify.log.info('Subscription deleted: subscription canceled or ended')
+						return await handleSubscriptionCanceled(event.data.object as Stripe.Subscription, fastify)
+
+					// Run when an invoice payment succeeds (including renewals)
+					case 'invoice.payment_succeeded':
+						fastify.log.info('Invoice payment succeeded')
+						const invoice = event.data.object as Stripe.Invoice
+						if (event.data.object.billing_reason === 'subscription_cycle') {
+							fastify.log.info('Subscription renewal invoice paid')
+							return await handleSubscriptionRenewed(invoice, fastify)
+						}
 						break
 
 					default:
@@ -48,8 +59,4 @@ export default async function stripeWebhook(fastify: FastifyInstance) {
 			}
 		}
 	)
-}
-
-async function handleSubscriptionUpdate(subscription: Stripe.Subscription, fastify: FastifyInstance) {
-	fastify.log.info(`Subscription updated: ${subscription.id}`)
 }

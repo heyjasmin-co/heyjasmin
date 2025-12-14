@@ -1,4 +1,5 @@
 import subscriptionImage from "../../../assets/image/subscriptionImage.png";
+import { useUserData } from "../../../context/UserDataContext";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
 
@@ -7,6 +8,8 @@ export default function BillingInfo({
 }: {
   handleSubscription: (state: string) => void;
 }) {
+  const { userData } = useUserData();
+
   return (
     <div
       className="flex h-full w-full flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-5 shadow-lg sm:px-6 sm:py-6"
@@ -25,9 +28,9 @@ export default function BillingInfo({
       {/* Text Content */}
       <div className="flex max-w-md flex-col items-center justify-center space-y-3 px-2 text-center sm:px-0">
         <h2 className="text-center text-base font-semibold text-black sm:text-lg md:text-xl">
-          Free trial in progress. Complete the quick start guide to activate{" "}
-          <span className="font-bold text-purple-600">{appName}</span> agent and
-          start taking calls.
+          {userData?.subscription?.status === "trial_ended"
+            ? `Your free trial has ended. Subscribe to continue using the ${appName} agent.`
+            : `Free trial in progress. Complete the quick start guide to activate the ${appName} agent and start taking calls.`}
         </h2>
 
         <button

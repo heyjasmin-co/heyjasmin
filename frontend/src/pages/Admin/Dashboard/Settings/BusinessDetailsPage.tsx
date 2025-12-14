@@ -99,7 +99,7 @@ export default function BusinessDetailsPage() {
                 handleUpdateAgent={handleUpdateAgent}
                 subtitle={`This business information gives ${appName} the context to handle your calls.`}
               />
-              <TrainingSources businessWebsite={businessDetails.website} />
+              <TrainingSources businessWebsite={businessDetails.website!} />
               <BusinessDetails
                 setBusinessDetails={setBusinessDetails}
                 businessOverview={businessDetails.overview!}

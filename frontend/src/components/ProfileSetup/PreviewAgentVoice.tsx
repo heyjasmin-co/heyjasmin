@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import completeIcon from "../../assets/image/completeIcon.png";
 import sparklesIcon from "../../assets/image/sparklesIcon.png";
 import websiteIcon from "../../assets/image/websiteIcon.png";
+import { useUserData } from "../../context/UserDataContext";
 import { appName } from "../../theme/appName";
 import { BusinessCreationType } from "../../types/BusinessTypes";
 import LeftInfoPanel from "./LeftInfoPanel";
@@ -16,6 +17,14 @@ export default function PreviewAgentVoice({
   currentStep: number;
   totalSteps: number;
 }) {
+  const { userData } = useUserData();
+  const handleClaimAgent = () => {
+    if (userData?.clerkId && userData.dbUserId) {
+      window.location.href = "/admin/dashboard";
+    } else {
+      setCurrentStep(5);
+    }
+  };
   return (
     <div className="flex h-full w-full flex-col rounded-2xl bg-white shadow-2xl lg:h-full lg:flex-row">
       {/* Left Info Panel */}
@@ -97,7 +106,7 @@ export default function PreviewAgentVoice({
         </p>
 
         <button
-          onClick={() => setCurrentStep(5)}
+          onClick={handleClaimAgent}
           className="mt-6 flex w-full max-w-md items-center justify-center rounded-full bg-purple-600 px-8 py-4 text-lg font-semibold text-white shadow-md transition hover:bg-purple-700 active:scale-95"
           style={{
             color: "white",

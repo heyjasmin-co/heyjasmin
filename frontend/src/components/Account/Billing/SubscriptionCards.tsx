@@ -1,70 +1,57 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import infoIcon from "../../../assets/image/infoIcon.png";
+import { useUserData } from "../../../context/UserDataContext";
+import { useApiClient } from "../../../lib/axios";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
-
-interface Subscription {
-  id: number;
-  name: string;
-  price: string;
-  subtitle: string;
-  features: string[];
+import { errorToast } from "../../../utils/react-toast";
+import type { SubscriptionCard } from "../../../utils/subscriptionCards";
+import { subscriptionCards } from "../../../utils/subscriptionCards";
+interface SubscriptionCardsProps {
+  handleCreatePaymentIntent: ({
+    clientSecret,
+    priceId,
+  }: {
+    clientSecret: string;
+    priceId: string;
+  }) => void;
 }
+function SubscriptionCards({
+  handleCreatePaymentIntent,
+}: SubscriptionCardsProps) {
+  const [subscriptions] = useState<SubscriptionCard[]>(subscriptionCards);
+  const [loadingId, setLoadingId] = useState<number | null>(null);
+  const apiClient = useApiClient();
+  const { userData } = useUserData();
+  const currentSusbcription = userData?.subscription?.stripePriceId;
+  const handleSubscribe = async (sub: SubscriptionCard) => {
+    try {
+      setLoadingId(sub.id);
 
-function SubscriptionCards() {
-  const [subscriptions] = useState<Subscription[]>([
-    {
-      id: 1,
-      name: "Core",
-      price: "$99",
-      subtitle: "💡 Best for testing purposes",
-      features: [
-        "200 minutes",
-        "Limited agent customization",
-        "Appointment confirmation",
-        "SMS support only",
-      ],
-    },
-    {
-      id: 2,
-      name: "Pro",
-      price: "$149",
-      subtitle: "🚀 Ideal for startups & growing teams",
-      features: [
-        "350 minutes",
-        "Standard agent customization",
-        "Appointment confirmation",
-        "Smart spam detection",
-        "Priority SMS support",
-      ],
-    },
-    {
-      id: 3,
-      name: "Smart",
-      price: "$299",
-      subtitle: "🏢 Best for established or large businesses",
-      features: [
-        "600 minutes",
-        "Full agent customization",
-        "Advanced appointment & agent management",
-        "Smart spam detection",
-        "Phone + priority SMS support",
-      ],
-    },
-    {
-      id: 4,
-      name: "Infinity",
-      price: "Custom",
-      subtitle: "🏆 Best for enterprise-level operations",
-      features: [
-        "Enterprise-level customization",
-        "Full appointment & agent management",
-        "Dedicated success manager",
-        "24/7 support & SLAs",
-        "Tailored integrations",
-      ],
-    },
-  ]);
+      const response = await apiClient.post<{
+        success: boolean;
+        message: string;
+        data: { clientSecret: string };
+      }>("/stripe/create", {
+        businessId: userData?.businessId,
+        priceId: sub.priceId,
+      });
+
+      if (response.data.success) {
+        const clientSecret = response.data.data.clientSecret;
+        handleCreatePaymentIntent({
+          priceId: sub.priceId!,
+          clientSecret,
+        });
+      }
+    } catch (error: any) {
+      console.error("Payment Intent Error:", error);
+      errorToast("");
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
   return (
     <div
@@ -101,24 +88,27 @@ function SubscriptionCards() {
         className="flex flex-col gap-3 px-3 py-4"
         style={{ backgroundColor: colorTheme.secondaryColor(0.05) }}
       >
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-1 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
           {subscriptions.map((sub) => {
-            const isPopular = sub.name === "Smart"; // Smart Plan
-
+            const isPopular = sub.name === "Pro";
+            const isCurrent = sub.priceId === currentSusbcription;
+            const isExpired =
+              isCurrent && userData?.subscription?.status !== "active";
             return (
               <div
                 key={sub.id}
                 className={`relative flex flex-col justify-between rounded-2xl border p-4 shadow-sm transition-all hover:shadow-md`}
                 style={{
                   backgroundColor: "white",
-                  borderColor: isPopular
+                  borderColor: isCurrent
                     ? colorTheme.secondaryColor(1)
-                    : "#e5e7eb",
+                    : isPopular
+                      ? colorTheme.secondaryColor(1)
+                      : "#e5e7eb",
                   minHeight: "200px",
                 }}
               >
-                {/* Most Popular Badge */}
-                {isPopular && (
+                {isPopular && !isCurrent && (
                   <span
                     className="absolute -top-2 right-2 rounded-full px-2 py-0.5 text-xs font-semibold text-white shadow-md"
                     style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
@@ -127,14 +117,20 @@ function SubscriptionCards() {
                   </span>
                 )}
 
-                {/* Card Content */}
+                {isCurrent && (
+                  <span
+                    className="absolute -top-2 right-2 rounded-full px-2 py-0.5 text-xs font-semibold text-white shadow-md"
+                    style={{ backgroundColor: colorTheme.secondaryColor(1) }}
+                  >
+                    Current Plan
+                  </span>
+                )}
+
                 <div>
-                  <h5 className="mb-1 text-base font-semibold text-gray-900">
+                  <h5 className="mb-2 text-base font-semibold text-gray-900">
                     {sub.name}
                   </h5>
-                  <p className="mb-1 text-xs text-gray-500">{sub.subtitle}</p>
-
-                  <div className="mb-1 flex items-baseline text-gray-900">
+                  <div className="mb-2 flex items-baseline text-gray-900">
                     {sub.price.startsWith("$") ? (
                       <>
                         <span className="text-xl font-bold">{sub.price}</span>
@@ -145,16 +141,6 @@ function SubscriptionCards() {
                     ) : (
                       <span className="text-xl font-bold">{sub.price}</span>
                     )}
-                  </div>
-
-                  {/* Always show both trials */}
-                  <div className="mb-2 flex flex-col gap-1">
-                    <p className="text-xs font-medium text-purple-600">
-                      5 Days Free Trial
-                    </p>
-                    <p className="text-xs font-medium text-purple-600">
-                      20 Minutes Free Trial
-                    </p>
                   </div>
 
                   <ul className="space-y-1">
@@ -177,15 +163,37 @@ function SubscriptionCards() {
                   </ul>
                 </div>
 
-                {/* Button */}
                 <div className="mt-4">
-                  <button
-                    type="button"
-                    className="w-full rounded-lg py-2 text-xs font-medium text-white shadow-sm transition hover:scale-105 hover:shadow-md"
-                    style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
-                  >
-                    Choose Plan
-                  </button>
+                  {sub.name === "Custom" ? (
+                    <a
+                      href={`mailto:${import.meta.env.VITE_ADMIN_MAIL}`}
+                      className="inline-block w-full rounded-lg py-2 text-center text-xs font-medium text-white shadow-sm transition hover:scale-95 hover:shadow-md"
+                      style={{
+                        color: "white",
+                        backgroundColor: colorTheme.secondaryColor(0.9),
+                      }}
+                    >
+                      {sub.buttonText}
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={loadingId !== null || (isCurrent && !isExpired)} // disable current plan button
+                      onClick={() => handleSubscribe(sub)}
+                      className="w-full rounded-lg py-2 text-xs font-medium text-white shadow-sm transition hover:scale-95 hover:shadow-md"
+                      style={{
+                        backgroundColor: colorTheme.secondaryColor(0.9),
+                      }}
+                    >
+                      {isCurrent
+                        ? isExpired
+                          ? "Renew Plan"
+                          : "Current Plan"
+                        : loadingId === sub.id
+                          ? "Processing..."
+                          : sub.buttonText}
+                    </button>
+                  )}
                 </div>
               </div>
             );

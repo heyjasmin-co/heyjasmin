@@ -7,9 +7,9 @@ interface Config {
 	NODE_ENV: string
 	LOG_LEVEL: string
 	MONGODB_URI: string
-	STRIPE_SECRET_KEY?: string
-	STRIPE_WEBHOOK_SECRET?: string
-	STRIPE_PUBLISHABLE_KEY?: string
+	STRIPE_SECRET_KEY: string
+	STRIPE_WEBHOOK_SECRET: string
+	// STRIPE_PUBLISHABLE_KEY?: string
 	CLERK_PUBLISHABLE_KEY: string
 	CLERK_SECRET_KEY: string
 	CLERK_WEBHOOK_SECRET: string
@@ -22,6 +22,7 @@ interface Config {
 	ELEVENLABS_API_KEY: string
 	NODEMAILER_EMAIL_USER: string
 	NODEMAILER_EMAIL_PASS: string
+	TRIAL_MINUTES: number
 }
 
 const config: Config = {
@@ -34,9 +35,9 @@ const config: Config = {
 	MONGODB_URI: process.env.MONGODB_URI!,
 
 	// Stripe
-	STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
-	STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-	STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY,
+	STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY!,
+	STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET!,
+	// STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY,
 
 	// Clerk
 	CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY!,
@@ -64,6 +65,9 @@ const config: Config = {
 	//Nodemailer
 	NODEMAILER_EMAIL_USER: process.env.NODEMAILER_EMAIL_USER!,
 	NODEMAILER_EMAIL_PASS: process.env.NODEMAILER_EMAIL_PASS!,
+
+	//Trial Minutes
+	TRIAL_MINUTES: Number(process.env.TRIAL_MINUTES)!,
 }
 
 export default config
