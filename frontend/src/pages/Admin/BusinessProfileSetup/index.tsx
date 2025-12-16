@@ -20,20 +20,20 @@ export default function Index() {
   const scrapeApiClient = useScrapeApiClient();
   const [loading, setLoading] = useState(false);
   const [scrapeType, setScrapeType] = useState("business");
-  const { userData } = useUserData();
+  // const { userData } = useUserData();
   const [businessDetails, setBusinessDetails] =
     useState<BusinessCreationType | null>(null);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const location = useLocation();
 
   const state = location.state || {};
   const placeId = state?.business;
 
-  useLayoutEffect(() => {
-    if (userData?.businessId) {
-      navigate("/admin/dashboard", { replace: true });
-    }
-  }, [userData, navigate]);
+  // useLayoutEffect(() => {
+  //   if (userData?.businessId) {
+  //     navigate("/admin/dashboard", { replace: true });
+  //   }
+  // }, [userData, navigate]);
 
   const handleScrapeData = async (websiteUrl: string) => {
     setLoading(true);
