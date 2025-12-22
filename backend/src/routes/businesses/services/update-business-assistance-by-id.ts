@@ -20,6 +20,7 @@ export const updateBusinessAssistantById = async (
 			businessName: updated?.name,
 			services: updated?.services,
 			businessHours: updated?.businessHours,
+			bookingLink: updated.appointmentSettings.schedulingLink ?? undefined,
 		},
 		updated?.aiAgentSettings.assistantId!
 	)
