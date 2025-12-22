@@ -1,11 +1,14 @@
 import { FastifyInstance } from 'fastify'
 import { createContext } from '../../context'
 import { authenticate } from '../../middleware/clerkAuth'
+import { requireActiveSubscription } from '../../middleware/subscription'
 import { createBusinessGoogleProfileHandler } from './handlers/create-business-google-profile'
 import { getBusinessDetailsByIdHandler } from './handlers/get-business-details-by-id'
 import {
 	createBusinessGoogleProfileBodySchema,
 	getBusinessDetailsByIdParamsSchema,
+	updateBusinessAppointmentByIdBodySchema,
+	updateBusinessAppointmentByIdParamsSchema,
 	updateBusinessAssistantByIdParamsSchema,
 	updateBusinessAssistantSetupByIdBodySchema,
 	updateBusinessAssistantSetupByIdParamsSchema,
@@ -18,13 +21,13 @@ import {
 	updateBusinessServicesByIdBodySchema,
 	updateBusinessServicesByIdParamsSchema,
 } from './handlers/types'
+import { updateBusinessAppointmentByIdHandler } from './handlers/update-business-appointment'
 import { updateBusinessAssistantByIdHandler } from './handlers/update-business-assistance-by-id'
 import { updateBusinessAssistantSetupByIdHandler } from './handlers/update-business-assistant-setup-by-id'
 import { updateBusinessDetailsByIdHandler } from './handlers/update-business-details-by-id'
 import { updateBusinessHoursByIdHandler } from './handlers/update-business-hours-by-id'
 import { updateBusinessInformationByIdHandler } from './handlers/update-business-information-by-id'
 import { updateBusinessServicesByIdHandler } from './handlers/update-business-services-by-id'
-import { requireActiveSubscription } from '../../middleware/subscription'
 
 export default async function businessRoute(fastify: FastifyInstance) {
 	// Get Business Details by Id
@@ -117,5 +120,17 @@ export default async function businessRoute(fastify: FastifyInstance) {
 			body: createBusinessGoogleProfileBodySchema,
 		},
 		handler: createBusinessGoogleProfileHandler,
+	})
+
+	//Update Business Appointment
+	fastify.patch('/appointment/:businessId', {
+		preHandler: [createContext, requireActiveSubscription],
+		schema: {
+			tags: ['businesses'],
+			description: 'Update Business Appointment',
+			body: updateBusinessAppointmentByIdBodySchema,
+			params: updateBusinessAppointmentByIdParamsSchema,
+		},
+		handler: updateBusinessAppointmentByIdHandler,
 	})
 }
