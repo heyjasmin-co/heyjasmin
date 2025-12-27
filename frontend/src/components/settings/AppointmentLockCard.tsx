@@ -10,7 +10,8 @@ function AppointmentLockCard({
 }) {
   const navigate = useNavigate();
   return (
-    <div className="flex h-full w-full items-center justify-center">
+    <div className="relative flex h-full w-full items-center justify-center">
+      <div className="absolute inset-0 rounded-lg bg-gray-200/30 backdrop-blur-sm"></div>
       <div className="relative mx-auto flex max-w-md flex-col items-center justify-center gap-6 rounded-3xl border border-gray-200 bg-white p-12 text-center shadow-2xl">
         {/* Lock Icon with 3D effect */}
         <div

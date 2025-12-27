@@ -20,6 +20,20 @@ function HomeServicePage() {
         ctaText="Get Started"
         trialNote="Try Jasmin free for 7 days — no credit card required."
         heroImage={HomeServiceHero}
+           chatBubbles={[
+          {
+            sender: "user",
+            message: "Hi, my sink is leaking. Can someone come today?",
+          },
+          {
+            sender: "bot",
+            message: "Absolutely! Let me find the next available technician.",
+          },
+          {
+            sender: "bot",
+            message: "You're booked for today at 3:30 PM!",
+          },
+        ]}
         statCard={{
           icon: "fa-solid fa-house",
           title: "New Jobs Scheduled",
