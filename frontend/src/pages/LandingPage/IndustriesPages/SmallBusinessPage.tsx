@@ -20,6 +20,20 @@ function SmallBusinessPage() {
         ctaText="Get Started"
         trialNote="Try Jasmin free for 7 days — no credit card required."
         heroImage={smallBusinessImage}
+        chatBubbles={[
+          {
+            sender: "user",
+            message: "Hi, I’d like to book a consultation for my business.",
+          },
+          {
+            sender: "bot",
+            message: "Absolutely! When would you like to schedule it?",
+          },
+          {
+            sender: "bot",
+            message: "Your consultation is booked for Thursday at 3:00 PM.",
+          },
+        ]}
         statCard={{
           icon: "fa-solid fa-briefcase",
           title: "New Leads Captured",

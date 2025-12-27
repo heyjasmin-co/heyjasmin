@@ -20,6 +20,20 @@ function RealEstatePage() {
         ctaText="Get Started"
         trialNote="Try Jasmin free for 7 days — no credit card required."
         heroImage={realEstateImage}
+           chatBubbles={[
+    {
+      sender: "user",
+      message: "Hi, I’m interested in scheduling a viewing for a 3-bedroom house.",
+    },
+    {
+      sender: "bot",
+      message: "Sure! I can help with that. What date works best for you?",
+    },
+    {
+      sender: "bot",
+      message: "Your property tour is booked for tomorrow at 4:00 PM.",
+    },
+  ]}
         statCard={{
           icon: "fa-solid fa-house-chimney",
           title: "Leads Captured",
