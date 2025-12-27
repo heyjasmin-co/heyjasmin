@@ -12,13 +12,27 @@ function SalonPage() {
   return (
     <div>
       <IndustryHeroSection
-        titleLines={["Keep your chairs full."]}
+        titleLines={["Never miss a call.", "Keep your chairs full."]}
         highlightText="Meet Jasmin — your salon’s 24/7 front desk assistant."
         description="Jasmin helps your salon stay fully booked by answering calls, scheduling clients, and managing appointments — even after hours."
         placeholder="Enter your salon name"
         ctaText="Get Started"
         trialNote="Try Jasmin free for 7 days — no credit card required."
         heroImage={SalonHero}
+          chatBubbles={[
+          {
+            sender: "user",
+            message: "Hi, I’d like to book a haircut appointment for Friday.",
+          },
+          {
+            sender: "bot",
+            message: "Sure! What time works best for you?",
+          },
+          {
+            sender: "bot",
+            message: "Your appointment is booked for Friday at 2:00 PM.",
+          },
+        ]}
         statCard={{
           icon: "fa-solid fa-scissors",
           title: "New Bookings",

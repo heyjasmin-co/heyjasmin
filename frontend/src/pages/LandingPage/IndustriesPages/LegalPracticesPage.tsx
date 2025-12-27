@@ -20,6 +20,20 @@ function LegalPracticesPage() {
         ctaText="Get Started"
         trialNote="Try Jasmin free for 7 days — no credit card required."
         heroImage={legalPracticesImage}
+        chatBubbles={[
+          {
+            sender: "user",
+            message: "Hi, I’d like to speak with a lawyer about a personal injury case.",
+          },
+          {
+            sender: "bot",
+            message: "Of course. I can help schedule a consultation for you.",
+          },
+          {
+            sender: "bot",
+            message: "You’re booked for a consultation tomorrow at 11:00 AM.",
+          },
+        ]}
         statCard={{
           icon: "fa-solid fa-scale-balanced",
           title: "New Consultations Booked",

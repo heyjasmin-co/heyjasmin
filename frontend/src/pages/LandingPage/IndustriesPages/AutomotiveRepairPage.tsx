@@ -20,6 +20,20 @@ function AutomotiveRepairPage() {
         ctaText="Get Started"
         trialNote="Try Jasmin free for 7 days — no credit card required."
         heroImage={repairImage}
+        chatBubbles={[
+          {
+            sender: "user",
+            message: "My check engine light is on!",
+          },
+          {
+            sender: "bot",
+            message: "Let’s have you in for an appointment",
+          },
+          {
+            sender: "bot",
+            message: "Appointment booked!",
+          },
+        ]}
         statCard={{
           icon: "fa-solid fa-car",
           title: "New Repair Appointments",
