@@ -2,6 +2,7 @@ import { IBusiness } from '../../../models'
 import {
 	CreateBusinessGoogleProfileSchemaInput,
 	GetBusinessDetailsByIdParamsSchemaInput,
+	UpdateBusinessAppointmentByIdBodySchemaInput,
 	UpdateBusinessAssistantByIdSchemaInput,
 	UpdateBusinessAssistantSetupByIdBodySchemaInput,
 	UpdateBusinessDetailsByIdBodySchemaInput,
@@ -49,3 +50,7 @@ export type CreateBusinessGoogleProfileOutput = {
 	messageAudio: any
 	greetingAudio: any
 } | null
+
+//
+export type UpdateBusinessAppointmentByIdInput = UpdateBusinessAppointmentByIdBodySchemaInput
+export type UpdateBusinessAppointmentByIdOutput = IBusiness['appointmentSettings'] | null

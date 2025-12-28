@@ -29,7 +29,11 @@ interface IBusiness extends Document {
 		twilioNumber?: string
 		twilioId?: string
 	}
-
+	appointmentSettings: {
+		appointmentEnabled: boolean
+		appointmentMessage: string | null
+		schedulingLink: string | null
+	}
 	clerkOrganizationId?: string
 	isSetupComplete: boolean
 	createdAt: Date
@@ -85,6 +89,13 @@ const businessSchema = new Schema<IBusiness>(
 			assistantName: { type: String, default: null },
 			twilioNumber: { type: String, default: null },
 			twilioId: { type: String, default: null },
+		},
+
+		// Appointment Settings
+		appointmentSettings: {
+			appointmentEnabled: { type: Boolean, default: false },
+			appointmentMessage: { type: String, default: null },
+			schedulingLink: { type: String, default: null },
 		},
 
 		// Setup Status

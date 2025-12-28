@@ -21,7 +21,11 @@ export type BusinessDetailsType = {
     twilioNumber?: string;
     twilioId?: string;
   };
-
+  appointmentSettings: {
+    appointmentEnabled: boolean;
+    appointmentMessage: string | null;
+    schedulingLink: string | null;
+  };
   clerkOrganizationId?: string;
   isSetupComplete: boolean;
   createdAt: Date;
@@ -48,3 +52,9 @@ export interface BusinessCreationType {
   messageAudio: any;
   greetingAudio: any;
 }
+
+export type BusinessAppointmentOutputType = {
+  appointmentEnabled: boolean;
+  appointmentMessage: string | null;
+  schedulingLink: string | null;
+} | null;

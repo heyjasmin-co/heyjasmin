@@ -139,3 +139,15 @@ export const createBusinessGoogleProfileBodySchema = z.object({
 		.min(1, 'Please include at least one business hours entry'),
 })
 export type CreateBusinessGoogleProfileSchemaInput = z.infer<typeof createBusinessGoogleProfileBodySchema>
+
+//Update Business Appointment
+export const updateBusinessAppointmentByIdBodySchema = z.object({
+	appointmentEnabled: z.boolean(),
+	appointmentMessage: z.string().optional(),
+	schedulingLink: z.string().optional(),
+})
+export const updateBusinessAppointmentByIdParamsSchema = z.object({
+	businessId: z.string(),
+})
+export type UpdateBusinessAppointmentByIdBodySchemaInput = z.infer<typeof updateBusinessAppointmentByIdBodySchema> &
+	z.infer<typeof updateBusinessAppointmentByIdParamsSchema>
