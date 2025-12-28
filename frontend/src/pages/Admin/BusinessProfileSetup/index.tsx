@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useLayoutEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import websiteIcon from "../../../assets/image/websiteIcon.png";
 import GoogleBusinessProfileSetup from "../../../components/ProfileSetup/GoogleBusinessProfile";
 import PreviewAgentVoice from "../../../components/ProfileSetup/PreviewAgentVoice";
 import ScriptingProfile from "../../../components/ProfileSetup/ScriptingProfile";
 import SignUpToClaimAgent from "../../../components/ProfileSetup/SignUpToClaimAgent";
 import WebsiteProfileSetup from "../../../components/ProfileSetup/WebsiteProfileSetup";
-import { useUserData } from "../../../context/UserDataContext";
 import { useScrapeApiClient } from "../../../lib/axios";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
