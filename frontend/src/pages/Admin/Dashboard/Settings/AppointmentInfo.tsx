@@ -27,7 +27,7 @@ export default function AppointmentInfo() {
   
 
   const subscriptionPlan = userData?.subscription?.plan; // essential / pro / plus / trial
-  const hasAccess = subscriptionPlan === "trial" || subscriptionPlan === "plus";
+  const hasAccess = subscriptionPlan === "pro" || subscriptionPlan === "plus";
   const isTrial = subscriptionPlan === "trial";
 
   const fetchAccountDetails = async () => {
