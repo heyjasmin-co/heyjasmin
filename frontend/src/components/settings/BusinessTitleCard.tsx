@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useUserData } from "@/context/UserDataContext";
 import { isEqual } from "lodash";
 import { useState } from "react";
 import { BusinessDetailsType } from "../../types/BusinessTypes";
@@ -20,7 +21,7 @@ function BusinessTitleCard({
 }) {
   const [loading, setLoading] = useState(false);
   const hasChanges = !isEqual(businessDetails, checkBusinessDetails);
-
+  const { userData } = useUserData();
   const handlePublishAgent = async () => {
     setLoading(true);
     await handleUpdateAgent();
@@ -42,7 +43,7 @@ function BusinessTitleCard({
         </div>
 
         {/* Button */}
-        {canEdit && (
+        {userData?.assistantNumber && canEdit && (
           <button
             disabled={!hasChanges || loading}
             onClick={handlePublishAgent}
