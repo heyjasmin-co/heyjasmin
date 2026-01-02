@@ -27,8 +27,11 @@ export async function getCountryCodeFromAddress(address: string): Promise<string
 export async function getTwilioAvailableNumbers(address: string): Promise<IncomingPhoneNumberInstance> {
 	try {
 		const countryCode = await getCountryCodeFromAddress(address)
+
 		// Step 1: Fetch available numbers
-		const availableNumbers = await twilioClient.availablePhoneNumbers(countryCode).local.list({
+		const LOCAL_SUPPORTED_COUNTRIES = ['US', 'CA', 'GB', 'AU']
+		const effectiveCountryCode = LOCAL_SUPPORTED_COUNTRIES.includes(countryCode) ? countryCode : 'US'
+		const availableNumbers = await twilioClient.availablePhoneNumbers(effectiveCountryCode as string).local.list({
 			smsEnabled: true,
 			voiceEnabled: true,
 			limit: 10,
