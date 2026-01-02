@@ -23,6 +23,7 @@ interface Config {
 	NODEMAILER_EMAIL_USER: string
 	NODEMAILER_EMAIL_PASS: string
 	TRIAL_MINUTES: number
+	GOOGLE_MAP_API: string
 }
 
 const config: Config = {
@@ -68,6 +69,9 @@ const config: Config = {
 
 	//Trial Minutes
 	TRIAL_MINUTES: Number(process.env.TRIAL_MINUTES)!,
+
+	//Google Maps API
+	GOOGLE_MAP_API: process.env.GOOGLE_MAP_API!,
 }
 
 export default config
