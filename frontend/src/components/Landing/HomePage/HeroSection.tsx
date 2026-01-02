@@ -270,11 +270,8 @@ export default function HeroSection() {
                     +
                   </button>
                   <div className="flex-1 rounded-full bg-gray-100 px-3 py-1.5 text-[11px] text-gray-400 sm:px-4 sm:py-2 sm:text-xs">
-                    iMessage
+                    Text here
                   </div>
-                  <button className="text-base text-gray-400 sm:text-lg">
-                    🎤
-                  </button>
                 </div>
               </div>
             </div>
