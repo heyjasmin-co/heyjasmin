@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
+import ReactGoogleAutocomplete from "react-google-autocomplete";
 import editIcon from "../../assets/image/editIcon.png";
 import infoIcon from "../../assets/image/infoIcon.png";
 import nextIcon from "../../assets/image/nextIcon.png";
@@ -32,7 +33,6 @@ function BusinessInfo({
     businessDetails.overview ?? "",
   );
   const [address, setAddress] = useState<string>(businessDetails.address ?? "");
-
   const [services, setServices] = useState<string[]>(businessDetails.services);
   const [newService, setNewService] = useState("");
   const [errors, setErrors] = useState<{
@@ -44,7 +44,6 @@ function BusinessInfo({
     overview: null,
     address: null,
   });
-
   const [businessHours, setBusinessHours] = useState(
     businessDetails.businessHours.map((hour) => ({
       ...hour,
@@ -227,24 +226,34 @@ function BusinessInfo({
           {/* Primary Address */}
           <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
             <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
-              Primary Address:
+              Business Address:
             </span>
-            <div className="w-full">
-              <input
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Enter business address"
-                className={`w-full rounded-lg border px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none ${
-                  errors.address ? "border-red-400" : "border-gray-300"
-                }`}
-              />
-              {errors.address && (
-                <p className="mt-1 text-xs font-medium text-red-600">
-                  {errors.address}
-                </p>
-              )}
-            </div>
+            <ReactGoogleAutocomplete
+              apiKey={import.meta.env.VITE_GOOGLE_MAP_API}
+              onChange={(e: any) => {
+                setAddress(e.target.value);
+              }}
+              onPlaceSelected={(place) => {
+                if (!place?.formatted_address) {
+                  return;
+                }
+                setAddress(place.formatted_address);
+              }}
+              options={{
+                types: ["address"],
+                fields: ["formatted_address", "geometry"],
+              }}
+              placeholder="Search business address"
+              className={`w-full rounded-lg border px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none ${
+                errors.address ? "border-red-400" : "border-gray-300"
+              }`}
+            />
+
+            {errors.address && (
+              <p className="mt-1 text-xs font-medium text-red-600">
+                {errors.address}
+              </p>
+            )}
           </div>
         </div>
 
