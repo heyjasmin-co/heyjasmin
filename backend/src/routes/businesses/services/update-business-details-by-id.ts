@@ -24,7 +24,7 @@ export const updateBusinessDetailsById = async (
 		return await runTransaction(async (session) => {
 			// Step 1: Update business info
 			const updatedBusinessInfo = await Business.findByIdAndUpdate(businessId, { $set: { ...updateData } }, { new: true, session })
-			
+
 			if (!updatedBusinessInfo) {
 				throw new Error(`No business found with the provided ID: ${businessId}`)
 			}
@@ -41,7 +41,7 @@ export const updateBusinessDetailsById = async (
 			}
 
 			// Step 3: Purchase Twilio number
-			twilioNumber = await getTwilioAvailableNumbers()
+			twilioNumber = await getTwilioAvailableNumbers(updateData.address!)
 			if (!twilioNumber?.phoneNumber) {
 				throw new Error('Failed to purchase a Twilio number')
 			}
