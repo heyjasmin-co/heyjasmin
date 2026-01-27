@@ -3,7 +3,7 @@ import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import websiteLogo from "../assets/image/websiteLogo.png";
 import { useUserData } from "../context/UserDataContext";
-import { useApiClient } from "../lib/axios";
+import { useLogout } from "../hooks/api/useAuthMutations";
 import { colorTheme } from "../theme/colorTheme";
 import { errorToast, successToast } from "../utils/react-toast";
 import { formatPhoneNumber } from "../utils/string-utils";
@@ -13,25 +13,25 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const location = useLocation();
-  const apiClient = useApiClient();
+  // const apiClient = useApiClient();
+  const { mutateAsync: logout, isPending: isLoggingOut } = useLogout();
+
   const toggleSidebar = () => setIsOpen(!isOpen);
   const { userData } = useUserData();
   const isPathActive = (path: string) => location.pathname.startsWith(path);
 
   const handleSignOut = async () => {
-    setLoading(true);
+    // setLoading(true);
     try {
-      await apiClient.post("/users/logout");
+      await logout();
       successToast("User logged out successfully.");
 
       await new Promise((res) => setTimeout(res, 2000));
       await signOut({ redirectUrl: "/admin/sign-in" });
     } catch {
       errorToast("Failed to log out. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -338,14 +338,14 @@ export default function Sidebar() {
 
               <button
                 onClick={handleSignOut}
-                disabled={loading}
+                disabled={isLoggingOut}
                 className={`group flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium transition-all duration-200 sm:text-base ${
-                  loading
+                  isLoggingOut
                     ? "cursor-not-allowed bg-gray-100 text-gray-400"
                     : "text-gray-700 hover:bg-red-50 hover:text-red-600 active:scale-95"
                 }`}
               >
-                {loading ? (
+                {isLoggingOut ? (
                   <>
                     <i className="fa-solid fa-spinner fa-spin text-sm sm:text-base"></i>
                     <span>Logging out...</span>

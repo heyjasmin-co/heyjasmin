@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import infoIcon from "@/assets/image/infoIcon.png";
 import { Textarea, TextInput, ToggleSwitch } from "flowbite-react";
@@ -5,7 +6,8 @@ import { useEffect, useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
+// import { useApiClient } from "../../lib/axios";
+import { useUpdateAppointmentSettings } from "../../hooks/api/useBusinessMutations";
 import { colorTheme } from "../../theme/colorTheme";
 import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
@@ -31,7 +33,7 @@ function AppointmentDetails({
   const [appointmentEnabled, setAppointmentEnabled] = useState(initialEnabled);
   const [message, setMessage] = useState(appointmentMessage);
   const [link, setLink] = useState(schedulingLink);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   const [errors, setErrors] = useState<{
     message: string | null;
@@ -41,7 +43,9 @@ function AppointmentDetails({
     link: null,
   });
 
-  const apiClient = useApiClient();
+  // const apiClient = useApiClient();
+  const { mutateAsync: updateAppointment, isPending: loading } =
+    useUpdateAppointmentSettings();
   const { userData } = useUserData();
 
   const handleSave = async () => {
@@ -76,16 +80,17 @@ function AppointmentDetails({
     }
 
     setErrors({ message: null, link: null });
-    setLoading(true);
+    setErrors({ message: null, link: null });
+    // setLoading(true);
     try {
-      const response = await apiClient.patch(
-        `/businesses/appointment/${userData?.businessId}`,
-        {
+      const response = await updateAppointment({
+        businessId: userData?.businessId!,
+        data: {
           appointmentEnabled,
           appointmentMessage: message,
           schedulingLink: link,
         },
-      );
+      });
 
       setBusinessDetails((prev) => {
         if (!prev) return null;
@@ -99,14 +104,14 @@ function AppointmentDetails({
         };
       });
 
-      successToast(response.data?.message || "Appointment settings updated");
+      successToast(response?.message || "Appointment settings updated");
       setIsEditing(false);
     } catch (error: any) {
       errorToast(
         error?.response?.data?.error || "Failed to update appointment settings",
       );
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 

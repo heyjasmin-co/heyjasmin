@@ -5,9 +5,9 @@ import { useNavigate } from "react-router-dom";
 import completeIcon from "../../../assets/image/completeIcon.png";
 import LeftInfoPanel from "../../../components/ProfileSetup/LeftInfoPanel";
 import { useUserData } from "../../../context/UserDataContext";
-import { useApiClient } from "../../../lib/axios";
+import { useSelectBusiness } from "../../../hooks/api/useAuthMutations";
+import { useGetUserBusinesses } from "../../../hooks/api/useUserQueries";
 import { colorTheme } from "../../../theme/colorTheme";
-import { UserBusinessesType } from "../../../types/UsersTypes";
 import { errorToast, successToast } from "../../../utils/react-toast";
 import { capitalizeString } from "../../../utils/string-utils";
 
@@ -17,13 +17,20 @@ type FormValues = {
 
 export default function SelectBusinessPage() {
   const { handleSubmit, watch, setValue } = useForm<FormValues>();
-  const apiClient = useApiClient();
+
+  // const apiClient = useApiClient(); // Replaced by hooks
+  const { mutateAsync: selectBusiness, isPending: isSelecting } =
+    useSelectBusiness();
+  const { data: userBusinesses = [], isLoading: isBusinessesLoading } =
+    useGetUserBusinesses();
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [userBusinesses, setUserBusinesses] = useState<UserBusinessesType>([]);
-  const [loading, setLoading] = useState({
-    apiLoading: false,
-    selectBusinessLoading: false,
-  });
+  // const [userBusinesses, setUserBusinesses] = useState<UserBusinessesType>([]);
+  // const [loading, setLoading] = useState({
+  //   apiLoading: false,
+  //   selectBusinessLoading: false,
+  // });
+
   const navigate = useNavigate();
   const selectedBusiness = watch("businessId");
   const { userData } = useUserData();
@@ -33,52 +40,26 @@ export default function SelectBusinessPage() {
       navigate("/admin/dashboard");
       return;
     }
-    const fetchUserBusinesses = async () => {
-      setLoading((pv) => ({ ...pv, apiLoading: true }));
-      try {
-        const response = await apiClient.get<{
-          message: string;
-          success: boolean;
-          data: UserBusinessesType;
-        }>("/users/user-businesses");
-        const businesses = response.data.data;
-        setUserBusinesses(businesses);
+  }, [userData, navigate]);
 
-        if (businesses.length === 1) {
-          const onlyBusinessId = businesses[0];
-          setValue("businessId", onlyBusinessId.businessId);
-          // setLoading((pv) => ({ ...pv, selectBusinessLoading: true }));
-          // await apiClient.post(
-          //   `/users/select-business/` + onlyBusinessId.businessId,
-          //   {
-          //     role: onlyBusinessId.role,
-          //   },
-          // );
-          // window.location.href = "/admin/dashboard";
-        }
-        if (businesses.length === 0) {
-          navigate("/admin/setup");
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading((pv) => ({ ...pv, apiLoading: false }));
-      }
-    };
-
-    fetchUserBusinesses();
-  }, []);
+  useLayoutEffect(() => {
+    if (userBusinesses.length === 1) {
+      const onlyBusinessId = userBusinesses[0];
+      setValue("businessId", onlyBusinessId.businessId);
+    }
+    if (!isBusinessesLoading && userBusinesses.length === 0) {
+      navigate("/admin/setup");
+    }
+  }, [userBusinesses, isBusinessesLoading, setValue, navigate]);
 
   const handleBusinessSelect = async (businessId: string) => {
     if (!businessId) return;
-    setLoading((pv) => ({ ...pv, selectBusinessLoading: true }));
+    // setLoading((pv) => ({ ...pv, selectBusinessLoading: true }));
     const [findRole] = userBusinesses.filter(
       (business) => business.businessId === businessId,
     );
     try {
-      await apiClient.post(`/users/select-business/` + businessId, {
-        role: findRole.role,
-      });
+      await selectBusiness({ businessId, role: findRole.role });
 
       successToast("Business selected successfully.");
 
@@ -86,16 +67,14 @@ export default function SelectBusinessPage() {
       window.location.href = "/admin/dashboard";
     } catch (error: any) {
       console.error(error);
-      errorToast(error.response.data.error);
-    } finally {
-      setLoading((pv) => ({ ...pv, selectBusinessLoading: false }));
+      errorToast(error.response?.data?.error || "Failed to select business");
     }
   };
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     await handleBusinessSelect(data.businessId);
   };
-  if (loading.apiLoading) {
+  if (isBusinessesLoading) {
     return (
       <div className="flex h-screen items-center justify-center text-gray-600">
         Loading...
@@ -168,7 +147,7 @@ export default function SelectBusinessPage() {
                     type="button"
                     onClick={() => setDropdownOpen((prev) => !prev)}
                     className="flex w-full items-center justify-between rounded-full border border-gray-300 bg-white px-6 py-4 text-lg text-gray-800 shadow-md focus:border-purple-500 focus:ring-2 focus:ring-purple-300 disabled:cursor-not-allowed disabled:bg-gray-100"
-                    disabled={loading.apiLoading}
+                    disabled={isBusinessesLoading}
                   >
                     <span>
                       {selectedBusiness
@@ -216,14 +195,14 @@ export default function SelectBusinessPage() {
 
               <button
                 type="submit"
-                disabled={!selectedBusiness || loading.selectBusinessLoading}
+                disabled={!selectedBusiness || isSelecting}
                 className={`flex w-full items-center justify-center gap-2 rounded-xl px-8 py-4 text-lg font-semibold text-white shadow-lg transition active:scale-95 ${
-                  selectedBusiness && !loading.selectBusinessLoading
+                  selectedBusiness && !isSelecting
                     ? "bg-purple-600 hover:bg-purple-700"
                     : "cursor-not-allowed bg-gray-300"
                 }`}
               >
-                {loading.selectBusinessLoading ? "Processing..." : "Continue"}
+                {isSelecting ? "Processing..." : "Continue"}
                 <i className="fa-solid fa-arrow-right text-lg text-white"></i>
               </button>
               <button

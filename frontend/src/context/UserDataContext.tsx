@@ -1,32 +1,8 @@
 import { useUser } from "@clerk/clerk-react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { useApiClient } from "../lib/axios";
-
-export interface UserData {
-  dbUserId: string | null;
-  clerkId: string | null;
-  businessId: string | null;
-  isSetupComplete: boolean;
-  role: string | null;
-  assistantNumber: string | null;
-  businessName: string | null;
-  subscription: SubscriptionDetails | null;
-}
-
-export interface SubscriptionDetails {
-  plan: "essential" | "pro" | "plus" | "trial";
-  remainingMinutes: number | "unlimited";
-  remainingMinutesFormatted: string;
-  usedMinutes: number;
-  stripePriceId: string | null;
-  status:
-    | "trial_active"
-    | "trial_ended"
-    | "canceled"
-    | "active"
-    | "inactive"
-    | "unpaid";
-}
+import { useGetMe } from "../hooks/api/useUserQueries";
+import { queryClient } from "../lib/react-query";
+import { UserData } from "../types/UsersTypes";
 
 interface UserDataContextType {
   userData: UserData | null;
@@ -42,9 +18,7 @@ const UserDataContext = createContext<UserDataContextType | undefined>(
 
 export function UserDataProvider({ children }: { children: React.ReactNode }) {
   const { user, isSignedIn } = useUser();
-  const apiClient = useApiClient();
-
-  const [userData, setUserData] = useState<UserData | null>(null);
+  /* const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchUserData = async () => {
@@ -80,19 +54,44 @@ export function UserDataProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }; */
+
+  const { data: userDataStr, isLoading } = useGetMe(!!user && !!isSignedIn);
+
+  const [userData, setUserData] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    if (userDataStr) {
+      setUserData(userDataStr);
+    } else if (!isLoading && !userDataStr) {
+      // Fallback user data or just null if not logged in
+      if (user && isSignedIn) {
+        // If logged in but failed to fetch/empty
+        setUserData({
+          dbUserId: null,
+          clerkId: null,
+          businessId: null,
+          isSetupComplete: false,
+          role: null,
+          assistantNumber: null,
+          businessName: null,
+          subscription: null,
+        });
+      } else {
+        setUserData(null);
+      }
+    }
+  }, [userDataStr, isLoading, user, isSignedIn]);
+
+  const loading = isLoading;
 
   const updateUserData = (data: Partial<UserData>) => {
     setUserData((prev) => (prev ? { ...prev, ...data } : null));
   };
 
   const refreshUserData = async () => {
-    await fetchUserData();
+    await queryClient.invalidateQueries({ queryKey: ["users", "me"] });
   };
-
-  useEffect(() => {
-    fetchUserData();
-  }, [isSignedIn]);
 
   const contextValue = useMemo(
     () => ({ userData, loading, updateUserData, refreshUserData, setUserData }),

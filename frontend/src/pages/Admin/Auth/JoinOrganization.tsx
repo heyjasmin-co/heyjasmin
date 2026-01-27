@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useApiClient } from "../../../lib/axios";
+import { useJoinOrganization } from "../../../hooks/api/useTeamMutations";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
 
 export default function JoinOrganization() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const apiClient = useApiClient();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const { mutateAsync: joinOrganization } = useJoinOrganization();
 
   // Get URL parameters
   const userId = searchParams.get("userId");
@@ -27,7 +28,7 @@ export default function JoinOrganization() {
 
     try {
       // Call your API to join the organization
-      await apiClient.post(`/business-user-invitations/accept`, {
+      await joinOrganization({
         userId,
         businessId,
         clerkOrganizationId,

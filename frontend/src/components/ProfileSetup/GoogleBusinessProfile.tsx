@@ -3,7 +3,7 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import completeIcon from "../../assets/image/completeIcon.png";
 import websiteIcon from "../../assets/image/websiteIcon.png";
-import { useScrapeApiClient } from "../../lib/axios";
+import { useScrapeGoogleBusiness } from "../../hooks/api/useBusinessMutations";
 import { appName } from "../../theme/appName";
 import { BusinessCreationType } from "../../types/BusinessTypes";
 import { GooglePlaceDetails } from "../../types/GooglePlaceDetails";
@@ -37,7 +37,8 @@ export default function GoogleBusinessProfileSetup({
   const [googleBusinessData, setGoogleBusinessData] =
     useState<GooglePlaceDetails | null>(null);
   console.log("googleBusinessData", googleBusinessData);
-  const scrapeApiClient = useScrapeApiClient();
+  const { mutateAsync: scrapeGoogleBusiness } = useScrapeGoogleBusiness();
+
   const handleGoogleProfileData = async () => {
     setLoading(true);
     if (!googleBusinessData) {
@@ -56,17 +57,12 @@ export default function GoogleBusinessProfileSetup({
         business_hours: googleBusinessData.current_opening_hours?.weekday_text,
       };
 
-      const response = await scrapeApiClient.post<{
-        message: string;
-        success: boolean;
-        data: BusinessCreationType;
-      }>(`/businesses`, formatData);
-      successToast(response.data.message);
-      setBusinessDetails(response.data.data);
+      const data = await scrapeGoogleBusiness(formatData);
+      successToast(data.message);
+      setBusinessDetails(data.data);
       setCurrentStep(4);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_error: any) {
-      const message = _error.response.data.message;
+      const message = _error.response?.data?.message || "An error occurred";
       errorToast(message);
       setCurrentStep(1);
     } finally {

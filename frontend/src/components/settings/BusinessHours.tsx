@@ -3,26 +3,21 @@ import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
+import { useUpdateBusinessHours } from "../../hooks/api/useBusinessMutations";
 import { colorTheme } from "../../theme/colorTheme";
-import { BusinessDetailsType, IBusinessHour } from "../../types/BusinessTypes";
+import { IBusinessHour } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
 type BusinessHoursProps = {
   hours: IBusinessHour[];
   canEdit: boolean;
-  setBusinessDetails: React.Dispatch<
-    React.SetStateAction<BusinessDetailsType | null>
-  >;
 };
-function BusinessHours({
-  hours,
-  setBusinessDetails,
-  canEdit,
-}: BusinessHoursProps) {
+function BusinessHours({ hours, canEdit }: BusinessHoursProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [businessHours, setBusinessHours] = useState(hours);
-  const [saving, setSaving] = useState(false);
-  const apiClient = useApiClient();
+  // const [saving, setSaving] = useState(false);
+  // const apiClient = useApiClient();
+  const { mutateAsync: updateBusinessHours, isPending: saving } =
+    useUpdateBusinessHours();
   const { userData } = useUserData();
 
   const handleToggleDay = (index: number) => {
@@ -52,31 +47,23 @@ function BusinessHours({
 
   const handleSave = async () => {
     if (!userData?.businessId) return;
-    setSaving(true);
+    // setSaving(true);
     try {
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: IBusinessHour[];
-      }>(`/businesses/hours/${userData.businessId}`, { businessHours });
-
-      const updateHours = response.data.data;
-      setBusinessDetails((pv) => {
-        if (!pv) return null;
-
-        return {
-          ...pv,
-          businessHours: updateHours,
-        };
+      const response = await updateBusinessHours({
+        businessId: userData.businessId,
+        businessHours,
       });
-      successToast(response.data.message);
+
+      // Removed setBusinessDetails manual update
+
+      successToast(response.message);
       setIsEditing(false);
     } catch (error: any) {
       errorToast(
         error?.response?.data?.error || "Failed to update business hours.",
       );
     } finally {
-      setSaving(false);
+      // setSaving(false);
     }
   };
 

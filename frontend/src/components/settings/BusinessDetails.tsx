@@ -1,28 +1,20 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Textarea, TextInput } from "flowbite-react";
 import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
+// import { useApiClient } from "../../lib/axios";
+import { useUpdateBusinessInfo } from "../../hooks/api/useBusinessMutations";
 import { colorTheme } from "../../theme/colorTheme";
-import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
-
-type UpdateBusinessInformationResponse = {
-  name: string;
-  overview: string;
-  address: string;
-};
 
 type BusinessDetailsProps = {
   businessOverview: string;
   businessName: string;
   businessAddress: string;
   canEdit: boolean;
-  setBusinessDetails: React.Dispatch<
-    React.SetStateAction<BusinessDetailsType | null>
-  >;
 };
 
 function BusinessDetails({
@@ -30,13 +22,11 @@ function BusinessDetails({
   businessName,
   businessAddress,
   canEdit,
-  setBusinessDetails,
 }: BusinessDetailsProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(businessName);
   const [overview, setOverview] = useState(businessOverview);
   const [address, setAddress] = useState(businessAddress);
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{
     businessName: string | null;
     overview: string | null;
@@ -47,7 +37,8 @@ function BusinessDetails({
     address: null,
   });
 
-  const apiClient = useApiClient();
+  const { mutateAsync: updateBusiness, isPending: loading } =
+    useUpdateBusinessInfo();
   const { userData } = useUserData();
 
   const handleSave = async () => {
@@ -70,33 +61,18 @@ function BusinessDetails({
       address: null,
     });
 
-    setLoading(true);
     try {
       const updateData = { name, overview, address };
 
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: UpdateBusinessInformationResponse;
-      }>(`/businesses/information/${userData?.businessId}`, updateData);
-
-      const updated = response.data.data;
-
-      setBusinessDetails((pv) => {
-        if (!pv) return null;
-
-        return {
-          ...pv,
-          name: updated.name,
-          overview: updated.overview || "",
-          address: updated.address || "",
-        };
+      const response = await updateBusiness({
+        businessId: userData?.businessId!,
+        data: updateData,
       });
-      localStorage.setItem(
-        "businessDetails",
-        JSON.stringify(response.data.data),
-      );
-      successToast(response.data.message);
+
+      // Removed setBusinessDetails manual update
+      // Parent will re-render due to query invalidation
+
+      successToast(response.message);
     } catch (error: any) {
       console.error(error);
       errorToast(
@@ -104,7 +80,6 @@ function BusinessDetails({
       );
     } finally {
       setIsEditing(false);
-      setLoading(false);
     }
   };
 

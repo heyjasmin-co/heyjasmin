@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import celebIcon from "../../../../assets/image/celebIcon.png";
 import websiteIcon from "../../../../assets/image/websiteIcon.png";
 import Breadcrumb from "../../../../components/dashboard/Breadcrumb";
@@ -9,63 +9,37 @@ import TalkToAgent from "../../../../components/dashboard/TalkToAgent";
 import TrainingSources from "../../../../components/dashboard/TrainingSources";
 import Loading from "../../../../components/Loading";
 import { useUserData } from "../../../../context/UserDataContext";
-import { useApiClient } from "../../../../lib/axios";
+import { useUpdateAssistantSetup } from "../../../../hooks/api/useBusinessMutations";
+import { useGetBusinessDetails } from "../../../../hooks/api/useBusinessQueries";
 import { appName } from "../../../../theme/appName";
-import { BusinessDetailsType } from "../../../../types/BusinessTypes";
 import { errorToast, successToast } from "../../../../utils/react-toast";
 export default function Dashboard() {
   const [guideStep, setGuideStep] = useState(0);
-  const apiClient = useApiClient();
   const { userData } = useUserData();
-  const [loading, setLoading] = useState(false);
-  const [businessDetails, setBusinessDetails] =
-    useState<BusinessDetailsType | null>(null);
 
-  const fetchBusinessDetails = async () => {
-    setLoading(true);
-    try {
-      const response = await apiClient.get<{
-        success: boolean;
-        message: string;
-        data: BusinessDetailsType;
-      }>("/businesses/" + userData?.businessId);
+  const { data: businessDetails, isLoading: loadingBusiness } =
+    useGetBusinessDetails(userData?.businessId || null);
 
-      setBusinessDetails(response.data.data);
-      successToast(response.data.message);
-    } catch (error: any) {
-      const message = error.response.data.error;
-      errorToast(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  /* const { mutateAsync: updateAssistantSetup } =
+    useUpdateAssistantSetup(); */
+  // NOTE: updateAssistantSetup is used in handleLaunchAgent. Keeping reference.
+  const { mutateAsync: updateAssistantSetup } = useUpdateAssistantSetup();
+
   const handleLaunchAgent = async (assistantSetup: string) => {
-    setLoading(true);
+    if (!userData?.businessId) return;
     try {
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: BusinessDetailsType["aiAgentSettings"];
-      }>("/businesses/update-assistant-setup/" + userData?.businessId, {
+      const response = await updateAssistantSetup({
+        businessId: userData.businessId,
         assistantSetup,
       });
-      const aiAgentSettings = response.data.data;
-      setBusinessDetails((prev) =>
-        prev ? { ...prev, aiAgentSettings } : prev,
-      );
-      successToast(response.data.message);
+      successToast(response.message);
     } catch (error: any) {
-      const message = error.response.data.error;
+      const message =
+        error.response?.data?.error || "Failed to update settings";
       errorToast(message);
-    } finally {
-      setLoading(false);
     }
   };
 
-  // UseEffect
-  useLayoutEffect(() => {
-    fetchBusinessDetails();
-  }, []);
   useEffect(() => {
     if (businessDetails) {
       if (
@@ -85,7 +59,7 @@ export default function Dashboard() {
   return (
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
       {/* Container */}
-      {loading && !businessDetails ? (
+      {loadingBusiness && !businessDetails ? (
         <Loading />
       ) : (
         <div className="mx-auto flex w-full max-w-3xl flex-col space-y-6">
@@ -108,7 +82,6 @@ export default function Dashboard() {
                   <TrainingSources businessWebsite={businessDetails.website!} />
                   <BusinessInfo
                     businessDetails={businessDetails}
-                    setBusinessDetails={setBusinessDetails}
                     canEdit={userData?.role !== "viewer"}
                   />
                 </>
@@ -128,8 +101,6 @@ export default function Dashboard() {
               subtitle={` Well done! Forward your business number to ${appName} so she can start answering your calls.`}
             />
           )}
-
-      
         </div>
       )}
     </div>

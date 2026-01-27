@@ -58,3 +58,12 @@ export type BusinessAppointmentOutputType = {
   appointmentMessage: string | null;
   schedulingLink: string | null;
 } | null;
+
+export type GoogleBusinessScrapeType = {
+  address: string;
+  name: string;
+  website?: string;
+  overview?: string;
+  service: string[];
+  business_hours?: string[];
+};

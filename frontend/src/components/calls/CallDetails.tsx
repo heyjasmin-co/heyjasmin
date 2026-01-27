@@ -1,45 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
-import { CallType } from "../../types/CallsType";
-import { errorToast, successToast } from "../../utils/react-toast";
+// import { useApiClient } from "../../lib/axios";
+import { useGetCallDetails } from "../../hooks/api/useCallQueries";
 import { formatPhoneNumber } from "../../utils/string-utils";
 import Loading from "../Loading";
 
 export default function CallDetails() {
   const { callId } = useParams<{ callId: string }>();
   const { userData } = useUserData();
-  const apiClient = useApiClient();
+  // const apiClient = useApiClient();
 
-  const [call, setCall] = useState<CallType | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { data: call = null, isLoading: loading } = useGetCallDetails(
+    callId,
+    userData?.businessId || null,
+  );
 
-  const fetchCallDetails = async () => {
-    if (!userData?.businessId || !callId) return;
-
-    setLoading(true);
-    try {
-      const res = await apiClient.get<{
-        success: boolean;
-        message: string;
-        data: CallType;
-      }>(`/calls/call/${callId}?businessId=${userData.businessId}`);
-
-      setCall(res.data.data);
-      successToast(res.data.message);
-    } catch (err: any) {
-      console.error(err);
-      errorToast("Failed to fetch call details");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCallDetails();
-  }, [callId, userData?.businessId]);
+  // const [call, setCall] = useState<CallType | null>(null);
+  // const [loading, setLoading] = useState(false);
 
   if (!call)
     return (

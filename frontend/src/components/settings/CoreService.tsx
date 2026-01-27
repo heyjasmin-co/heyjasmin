@@ -3,26 +3,20 @@ import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
+import { useUpdateCoreServices } from "../../hooks/api/useBusinessMutations";
 import { colorTheme } from "../../theme/colorTheme";
-import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
 type BusinessServiceProps = {
   businessServices: string[];
   canEdit: boolean;
-  setBusinessDetails: React.Dispatch<
-    React.SetStateAction<BusinessDetailsType | null>
-  >;
 };
-function CoreService({
-  businessServices,
-  setBusinessDetails,
-  canEdit,
-}: BusinessServiceProps) {
+function CoreService({ businessServices, canEdit }: BusinessServiceProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [services, setServices] = useState<string[]>(businessServices);
-  const [saving, setSaving] = useState(false);
-  const apiClient = useApiClient();
+  // const [saving, setSaving] = useState(false);
+  // const apiClient = useApiClient();
+  const { mutateAsync: updateServices, isPending: saving } =
+    useUpdateCoreServices();
   const { userData } = useUserData();
 
   const [newService, setNewService] = useState("");
@@ -42,29 +36,21 @@ function CoreService({
 
   const handleSave = async () => {
     if (!userData?.businessId) return;
-    setSaving(true);
+    // setSaving(true);
     try {
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: string[];
-      }>(`/businesses/services/${userData.businessId}`, { services });
-
-      const updateService = response.data.data;
-      setBusinessDetails((pv) => {
-        if (!pv) return null;
-
-        return {
-          ...pv,
-          services: updateService,
-        };
+      const response = await updateServices({
+        businessId: userData.businessId,
+        services,
       });
-      successToast(response.data.message);
+
+      // Removed setBusinessDetails manual update
+
+      successToast(response.message);
       setIsEditing(false);
     } catch (error: any) {
       errorToast(error?.response?.data?.error || "Failed to update services.");
     } finally {
-      setSaving(false);
+      // setSaving(false);
     }
   };
 

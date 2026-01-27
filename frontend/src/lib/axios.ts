@@ -1,9 +1,10 @@
 import { useAuth, useOrganizationList } from "@clerk/clerk-react";
 import axios, { AxiosInstance } from "axios";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
+import { TokenManager } from "./api/token-manager";
 
 export const useApiClient = (timeout: number = 10000): AxiosInstance => {
-  const { getToken, isLoaded } = useAuth();
+  const { getToken } = useAuth();
   const { setActive } = useOrganizationList();
 
   useEffect(() => {
@@ -12,8 +13,14 @@ export const useApiClient = (timeout: number = 10000): AxiosInstance => {
     }
   }, [setActive]);
 
-  const apiClient = useMemo(() => {
-    const client = axios.create({
+  // Initialize TokenManager with the Clerk getToken function
+  useEffect(() => {
+    if (getToken) {
+      TokenManager.getInstance().setGetToken(getToken);
+    }
+  }, [getToken]);
+
+  const apiClient =axios.create({
       baseURL:
         import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:3000/api/v1",
       timeout,
@@ -22,11 +29,10 @@ export const useApiClient = (timeout: number = 10000): AxiosInstance => {
       },
     });
 
-    client.interceptors.request.use(
+    apiClient.interceptors.request.use(
       async (config) => {
-        const token = await getToken({
-          skipCache:true,
-        });
+        // Use TokenManager to fetch the token (handles caching & deduplication)
+        const token = await TokenManager.getInstance().getToken();
 
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
@@ -37,10 +43,8 @@ export const useApiClient = (timeout: number = 10000): AxiosInstance => {
       (error) => Promise.reject(error),
     );
 
-    return client;
-  }, [getToken, isLoaded, timeout]);
+    return apiClient;
 
-  return apiClient;
 };
 
 export const useScrapeApiClient = () => useApiClient(90000);

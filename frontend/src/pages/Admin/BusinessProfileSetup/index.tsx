@@ -8,7 +8,7 @@ import PreviewAgentVoice from "../../../components/ProfileSetup/PreviewAgentVoic
 import ScriptingProfile from "../../../components/ProfileSetup/ScriptingProfile";
 import SignUpToClaimAgent from "../../../components/ProfileSetup/SignUpToClaimAgent";
 import WebsiteProfileSetup from "../../../components/ProfileSetup/WebsiteProfileSetup";
-import { useScrapeApiClient } from "../../../lib/axios";
+import { useScrapeWebsite } from "../../../hooks/api/useBusinessMutations";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
 import { BusinessCreationType } from "../../../types/BusinessTypes";
@@ -16,8 +16,9 @@ import { errorToast, successToast } from "../../../utils/react-toast";
 export default function Index() {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 5;
-  const scrapeApiClient = useScrapeApiClient();
+  // const scrapeApiClient = useScrapeApiClient();
   const [loading, setLoading] = useState(false);
+  const { mutateAsync: scrapeWebsite } = useScrapeWebsite();
   const [scrapeType, setScrapeType] = useState("business");
   // const { userData } = useUserData();
   const [businessDetails, setBusinessDetails] =
@@ -35,24 +36,18 @@ export default function Index() {
   // }, [userData, navigate]);
 
   const handleScrapeData = async (websiteUrl: string) => {
-    setLoading(true);
+    // setLoading(true);
     try {
       setCurrentStep(3);
-      const response = await scrapeApiClient.post<{
-        message: string;
-        data: BusinessCreationType;
-        success: boolean;
-      }>(`/scrape`, {
-        websiteUrl,
-      });
-      successToast(response.data.message);
+      const data = await scrapeWebsite({ websiteUrl });
+      successToast(data.message);
       setCurrentStep(4);
-      setBusinessDetails(response.data.data);
+      setBusinessDetails(data.data);
     } catch (_error) {
       errorToast("Failed to train the agent. Please try again.");
       setCurrentStep(1);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import infoIcon from "../../../assets/image/infoIcon.png";
 import { useUserData } from "../../../context/UserDataContext";
-import { useApiClient } from "../../../lib/axios";
+import { useCreateStripePaymentIntent } from "../../../hooks/api/useBillingMutations";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast } from "../../../utils/react-toast";
@@ -22,24 +22,20 @@ function SubscriptionCards({
 }: SubscriptionCardsProps) {
   const [subscriptions] = useState<SubscriptionCard[]>(subscriptionCards);
   const [loadingId, setLoadingId] = useState<number | null>(null);
-  const apiClient = useApiClient();
+  const { mutateAsync: createPaymentIntent } = useCreateStripePaymentIntent();
   const { userData } = useUserData();
   const currentSusbcription = userData?.subscription?.stripePriceId;
   const handleSubscribe = async (sub: SubscriptionCard) => {
     try {
       setLoadingId(sub.id);
 
-      const response = await apiClient.post<{
-        success: boolean;
-        message: string;
-        data: { clientSecret: string };
-      }>("/stripe/create", {
-        businessId: userData?.businessId,
-        priceId: sub.priceId,
+      const response = await createPaymentIntent({
+        businessId: userData?.businessId!,
+        priceId: sub.priceId!,
       });
 
-      if (response.data.success) {
-        const clientSecret = response.data.data.clientSecret;
+      if (response.success) {
+        const clientSecret = response.data.clientSecret;
         handleCreatePaymentIntent({
           priceId: sub.priceId!,
           clientSecret,

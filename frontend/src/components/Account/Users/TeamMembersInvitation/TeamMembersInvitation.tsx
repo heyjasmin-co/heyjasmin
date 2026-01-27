@@ -2,7 +2,10 @@
 import { useState } from "react";
 import infoIcon from "../../../../assets/image/infoIcon.png";
 import { useUserData } from "../../../../context/UserDataContext";
-import { useApiClient } from "../../../../lib/axios";
+import {
+  useCreateTeamInvitation,
+  useRevokeTeamInvitation,
+} from "../../../../hooks/api/useTeamMutations";
 import { appName } from "../../../../theme/appName";
 import { colorTheme } from "../../../../theme/colorTheme";
 import { BusinessUserInvitationsType } from "../../../../types/BusinessUserInvitationsTypes";
@@ -34,8 +37,11 @@ function TeamMembersInvitation({
   const [removeMode, setRemoveMode] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
-  const apiClient = useApiClient();
+  // const apiClient = useApiClient();
   const { userData } = useUserData();
+
+  const { mutateAsync: revokeInvitation } = useRevokeTeamInvitation();
+  const { mutateAsync: createInvitation } = useCreateTeamInvitation();
 
   // Handlers
   const handleModal = () => {
@@ -56,16 +62,12 @@ function TeamMembersInvitation({
 
   const handleRemoveMember = async (clerkInvitationId: string) => {
     try {
-      const response = await apiClient.delete<{
-        success: boolean;
-        message: string;
-        data: BusinessUserInvitationsType;
-      }>(`/business-user-invitations/revoke/${clerkInvitationId}`);
+      const response = await revokeInvitation(clerkInvitationId);
 
       setMembers((prev) =>
         prev.filter((member) => member.clerkInvitationId !== clerkInvitationId),
       );
-      successToast(response.data.message);
+      successToast(response.message);
     } catch (error: any) {
       errorToast(
         error?.response?.data?.error || "Failed to cancel invitation.",
@@ -75,14 +77,13 @@ function TeamMembersInvitation({
   };
   const handleAddMember = async (member: { email: string; role: string }) => {
     try {
-      const response = await apiClient.post<{
-        success: boolean;
-        message: string;
-        data: BusinessUserInvitationsType;
-      }>(`/business-user-invitations/create/${userData?.businessId}`, member);
+      const response = await createInvitation({
+        businessId: userData?.businessId!,
+        data: member,
+      });
 
-      setMembers((prev) => [...prev, response.data.data]);
-      successToast(response.data.message);
+      setMembers((prev) => [...prev, response.data]);
+      successToast(response.message);
     } catch (error: any) {
       errorToast(error?.response?.data?.error || "Failed to send invitation.");
     }

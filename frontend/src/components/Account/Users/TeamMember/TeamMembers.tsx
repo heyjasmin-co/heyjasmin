@@ -2,13 +2,13 @@
 import { useState } from "react";
 import infoIcon from "../../../../assets/image/infoIcon.png";
 import { useUserData } from "../../../../context/UserDataContext";
-import { useApiClient } from "../../../../lib/axios";
+import {
+  useRemoveTeamMember,
+  useUpdateTeamMemberRole,
+} from "../../../../hooks/api/useTeamMutations";
 import { appName } from "../../../../theme/appName";
 import { colorTheme } from "../../../../theme/colorTheme";
-import {
-  BusinessUsersDetailsType,
-  BusinessUserType,
-} from "../../../../types/BusinessUsersTypes";
+import { BusinessUsersDetailsType } from "../../../../types/BusinessUsersTypes";
 import { errorToast, successToast } from "../../../../utils/react-toast";
 import { canEdit } from "../../../../utils/role-base";
 import { capitalizeString } from "../../../../utils/string-utils";
@@ -34,7 +34,8 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
   const [removeMode, setRemoveMode] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const { userData } = useUserData();
-  const apiClient = useApiClient();
+  const { mutateAsync: updateRole } = useUpdateTeamMemberRole();
+  const { mutateAsync: removeMember } = useRemoveTeamMember();
 
   // Handlers
   const handleModal = () => {
@@ -74,19 +75,15 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
   }) => {
     try {
       const { businessUserId, role } = member;
-      const response = await apiClient.patch<{
-        message: string;
-        success: boolean;
-        data: BusinessUserType;
-      }>(`/business-users/${businessUserId}`, { role });
+      const response = await updateRole({ businessUserId, role });
 
-      const updatedUser = response.data.data;
+      const updatedUser = response.data;
       setMembers((prevMembers) =>
         prevMembers.map((m) =>
           m._id === updatedUser._id ? { ...m, ...updatedUser } : m,
         ),
       );
-      successToast(response.data.message);
+      successToast(response.message);
     } catch (error: any) {
       const message = error.response?.data?.error || "Something went wrong.";
       errorToast(message);
@@ -95,15 +92,11 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
 
   const handleRemoveMember = async (businessUserId: string) => {
     try {
-      const response = await apiClient.delete<{
-        message: string;
-        success: boolean;
-        data: BusinessUserType;
-      }>("/business-users/" + businessUserId);
-      const user = response.data.data;
+      const response = await removeMember(businessUserId);
+      const user = response.data;
 
       setMembers(members.filter((member) => member._id !== user._id));
-      successToast(response.data.message);
+      successToast(response.message);
     } catch (error: any) {
       const message = error.response?.data?.error || "Something went wrong.";
       errorToast(message);

@@ -6,7 +6,7 @@ import infoIcon from "../../assets/image/infoIcon.png";
 import nextIcon from "../../assets/image/nextIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
+import { useUpdateBusinessProfile } from "../../hooks/api/useBusinessMutations";
 import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
 import { BusinessDetailsType } from "../../types/BusinessTypes";
@@ -16,16 +16,9 @@ import { convertTo24Hour, formatTime } from "../../utils/time";
 type BusinessInfoProps = {
   businessDetails: BusinessDetailsType;
   canEdit: boolean;
-  setBusinessDetails: React.Dispatch<
-    React.SetStateAction<BusinessDetailsType | null>
-  >;
 };
 
-function BusinessInfo({
-  businessDetails,
-  canEdit,
-  setBusinessDetails,
-}: BusinessInfoProps) {
+function BusinessInfo({ businessDetails, canEdit }: BusinessInfoProps) {
   //States
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState<string>(businessDetails.name ?? "");
@@ -59,8 +52,8 @@ function BusinessInfo({
   );
   const [loading, setLoading] = useState(false);
   // Hooks
-  const apiClient = useApiClient();
   const { userData, setUserData } = useUserData();
+  const { mutateAsync: updateBusinessProfile } = useUpdateBusinessProfile();
 
   // Handles
   const handleAddService = () => {
@@ -123,28 +116,32 @@ function BusinessInfo({
         services,
         businessHours,
       };
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: BusinessDetailsType;
-      }>("/businesses/" + userData?.businessId, updateData);
+
+      if (!userData?.businessId) return;
+
+      const response = await updateBusinessProfile({
+        businessId: userData.businessId,
+        data: updateData,
+      });
+
       setUserData((pv) => ({
         ...pv!,
-        businessName: response.data.data.name,
+        businessName: response.data.name,
         dbUserId: pv?.dbUserId ?? null,
         clerkId: pv?.clerkId ?? null,
         businessId: pv?.businessId ?? null,
         isSetupComplete: pv?.isSetupComplete ?? false,
         role: pv?.role ?? null,
-        assistantNumber:
-          response.data.data.aiAgentSettings.twilioNumber ?? null,
+        assistantNumber: response.data.aiAgentSettings.twilioNumber ?? null,
         subscription: pv?.subscription ?? null,
       }));
-      setBusinessDetails(response.data.data);
-      successToast(response.data.message);
+      // setBusinessDetails(response.data.data); // Removed as we use invalidated query
+      successToast(response.message);
     } catch (error: any) {
       console.error(error);
-      errorToast(error.response.data.error);
+      const msg =
+        error?.response?.data?.error || "Failed to update business info";
+      errorToast(msg);
     } finally {
       setLoading(false);
     }

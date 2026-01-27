@@ -1,6 +1,6 @@
 import { useClerk } from "@clerk/clerk-react";
 import { useState } from "react";
-import { useApiClient } from "../../../lib/axios";
+import { useLogout } from "../../../hooks/api/useAuthMutations";
 import { colorTheme } from "../../../theme/colorTheme";
 import { UserDetailsType } from "../../../types/UsersTypes";
 import { errorToast, successToast } from "../../../utils/react-toast";
@@ -9,14 +9,14 @@ type AccountDetailsProps = {
   accountInformation: UserDetailsType;
 };
 function AccountDetails({ accountInformation }: AccountDetailsProps) {
-  const apiClient = useApiClient();
+  const { mutateAsync: logout } = useLogout();
   const { signOut } = useClerk();
   const [loading, setLoading] = useState(false);
 
   const handleSignOut = async () => {
     setLoading(true);
     try {
-      await apiClient.post("/users/logout");
+      await logout();
       successToast("User logged out successfully.");
 
       await new Promise((res) => setTimeout(res, 2000));

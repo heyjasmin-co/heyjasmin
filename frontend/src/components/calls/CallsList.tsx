@@ -1,50 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useLayoutEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
+import { useGetCalls } from "../../hooks/api/useCallQueries";
 import { colorTheme } from "../../theme/colorTheme";
-import { CallsType } from "../../types/CallsType";
-import { errorToast, successToast } from "../../utils/react-toast";
 import { formatPhoneNumber } from "../../utils/string-utils";
 import Loading from "../Loading";
 
 export default function CallsList() {
-  const apiClient = useApiClient();
-  const [calls, setCalls] = useState<CallsType>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { userData } = useUserData();
+  const {
+    data: calls = [],
+    isLoading: loading,
+    error,
+    refetch,
+  } = useGetCalls(userData?.businessId || null);
 
-  const fetchCalls = async () => {
-    if (!userData?.businessId) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const res = await apiClient.get<{
-        success: boolean;
-        message: string;
-        data: CallsType;
-      }>(`/calls/${userData.businessId}`);
-
-      setCalls(res.data.data);
-      successToast(res.data.message);
-    } catch (err: any) {
-      console.error(err);
-      setError("Failed to fetch calls");
-      errorToast("Failed to fetch calls");
-    } finally {
-      setLoading(false);
-    }
+  const fetchCalls = () => {
+    refetch();
   };
-
-  useLayoutEffect(() => {
-    if (userData?.businessId) {
-      fetchCalls();
-    }
-  }, [userData?.businessId]);
 
   return (
     <div
@@ -56,7 +29,9 @@ export default function CallsList() {
         <Loading />
       ) : error ? (
         <div className="flex h-full flex-col items-center justify-center">
-          <p className="text-sm text-red-500">{error}</p>
+          <p className="text-sm text-red-500">
+            {error ? "Failed to fetch calls" : null}
+          </p>
           <button
             onClick={fetchCalls}
             className="mt-3 rounded-md bg-purple-500 px-4 py-1.5 text-sm text-white shadow-sm hover:bg-purple-600"
@@ -73,7 +48,7 @@ export default function CallsList() {
             </h5>
             <div className="mt-1 flex items-center text-sm text-gray-700 sm:mt-0">
               <span className="font-semibold tracking-wide">
-                All ({calls.length})
+                All ({calls?.length || 0})
               </span>
               <i
                 className="fa-solid fa-rotate-right ml-3 cursor-pointer text-sm text-gray-400 hover:text-gray-600"
@@ -83,7 +58,7 @@ export default function CallsList() {
           </div>
 
           {/* No Calls */}
-          {calls.length === 0 ? (
+          {calls?.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-4">
               <div className="flex w-full max-w-sm flex-col items-center rounded-xl bg-purple-50 p-8 text-center shadow-sm">
                 <div
@@ -104,7 +79,7 @@ export default function CallsList() {
             // Calls list
             <div className="flex-1 overflow-y-auto">
               <ul className="flex flex-col gap-4">
-                {calls.map((call) => (
+                {calls?.map((call) => (
                   <li
                     key={call._id}
                     className="rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md"

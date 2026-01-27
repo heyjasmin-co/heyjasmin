@@ -1,4 +1,4 @@
-import { UserData } from "../context/UserDataContext";
+import { UserData } from "../types/UsersTypes";
 
 export const canEdit = (targetRole: string, userData: UserData | null) => {
   if (!userData) return false;
