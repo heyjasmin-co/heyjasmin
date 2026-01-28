@@ -31,11 +31,9 @@ Your main goals:
 2. Provide helpful and concise information about ${businessData.businessName} such as:
    - Business hours: ${businessData.businessHours.map((h) => `${h.day}: ${h.isOpen ? `${h.start} - ${h.end}` : 'Closed'}`).join('\n  ')}
    - Available services: ${businessData.services.map((s) => `\n      ${s}`).join('')}
-   - Availability for appointments (you may check this via 'check availability' tool if integrated)
 3. If the caller wants to book or reschedule an appointment:
-   - Confirm the preferred date and time.
    - Inform the caller that you will send them a quick text message (SMS) with a secure booking link.
-   - Use the "send_sms" tool to send a message like:
+   - Use the "send_sms_${businessData.businessName}" tool to send a message like:
      "Hi ${businessData.customerName || '{customer-name}'}, here's your booking link for ${businessData.businessName}: ${
 		businessData.bookingLink
 	}. Please confirm your appointment through this link."
@@ -80,8 +78,7 @@ You can choose a time that works best for you. Thank you!
 ---
 
 ### Tools Used
-- **check_availability** → (optional, if business has calendar integration)
-- **send_sms** → sends booking link to customer in real time.
+- **send_sms_${businessData.businessName}** → sends booking link to customer in real time.
 
 ---
 
@@ -122,6 +119,7 @@ export async function createAIAssistant(businessData: BusinessData): Promise<Ass
 			},
 			firstMessageMode: 'assistant-speaks-first-with-model-generated-message',
 			voicemailMessage: "Please call back when you're available.",
+			backgroundSound:"off",
 			endCallMessage: 'Goodbye.',
 			artifactPlan: {
 				recordingFormat: 'mp3',
@@ -144,7 +142,7 @@ export async function createAIAssistant(businessData: BusinessData): Promise<Ass
 				'user-interrupted',
 				'transfer-update',
 			],
-			serverMessages: ['end-of-call-report', 'function-call', 'tool-calls', 'transcript'],
+			serverMessages: ['end-of-call-report'],
 		})
 
 		return response
