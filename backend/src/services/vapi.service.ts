@@ -9,6 +9,7 @@ import { BusinessPlan } from '../models/BusinessPlan'
 import { Trial } from '../models/Trial'
 import { runTransaction } from '../utils/transaction'
 import { checkBusinessSubscription } from './subscription.service'
+
 interface BusinessData {
 	businessName: string
 	services: string[]
@@ -124,60 +125,66 @@ You can choose a time that works best for you. Thank you!
 
 	return systemPrompt
 }
+function createAssistantData(businessData: BusinessData): any {
+	const assistantData = {
+		name: businessData.businessName,
+		transcriber: {
+			provider: 'deepgram',
+			model: 'nova-2',
+			language: 'en',
+		},
+		model: {
+			provider: 'openai',
+			model: 'gpt-4o-mini',
+			messages: [
+				{
+					role: 'system',
+					content: createContentForAssistant(businessData),
+				},
+			],
+			temperature: 0.2,
+		},
+		voice: {
+			model: 'eleven_turbo_v2_5',
+			voiceId: 'jBzLvP03992lMFEkj2kJ',
+			provider: '11labs',
+			stability: 0.5,
+			similarityBoost: 0.75,
+		},
+		firstMessageMode: 'assistant-speaks-first-with-model-generated-message',
+		voicemailMessage: "Please call back when you're available.",
+		backgroundSound: 'off',
+		endCallMessage: 'Goodbye.',
+		artifactPlan: {
+			recordingFormat: 'mp3',
+		},
+		server: {
+			url: `${config.BACKEND_URL}/api/v1/webhooks-vapi`,
+		},
+
+		clientMessages: [
+			'function-call',
+			'model-output',
+			'transcript',
+			'tool-calls',
+			'conversation-update',
+			'function-call-result',
+			'hang',
+			'speech-update',
+			'status-update',
+			'voice-input',
+			'user-interrupted',
+			'transfer-update',
+		],
+		serverMessages: ['end-of-call-report'],
+	}
+
+	return assistantData
+}
+
 export async function createAIAssistant(businessData: BusinessData): Promise<Assistant> {
 	try {
-		const response = await vapiClient.assistants.create({
-			name: businessData.businessName,
-			transcriber: {
-				provider: 'deepgram',
-				model: 'nova-2',
-				language: 'en',
-			},
-			model: {
-				provider: 'openai',
-				model: 'gpt-4o-mini',
-				messages: [
-					{
-						role: 'system',
-						content: createContentForAssistant(businessData),
-					},
-				],
-				temperature: 0.2,
-			},
-			voice: {
-				model: 'eleven_turbo_v2_5',
-				voiceId: 'jBzLvP03992lMFEkj2kJ',
-				provider: '11labs',
-				stability: 0.5,
-				similarityBoost: 0.75,
-			},
-			firstMessageMode: 'assistant-speaks-first-with-model-generated-message',
-			voicemailMessage: "Please call back when you're available.",
-			backgroundSound: 'off',
-			endCallMessage: 'Goodbye.',
-			artifactPlan: {
-				recordingFormat: 'mp3',
-			},
-			server: {
-				url: `${config.BACKEND_URL}/api/v1/webhooks-vapi`,
-			},
-
-			clientMessages: [
-				'function-call',
-				'model-output',
-				'transcript',
-				'tool-calls',
-				'conversation-update',
-				'function-call-result',
-				'hang',
-				'speech-update',
-				'status-update',
-				'voice-input',
-				'user-interrupted',
-				'transfer-update',
-			],
-			serverMessages: ['end-of-call-report'],
-		})
+		const response = await vapiClient.assistants.create(createAssistantData(businessData))
 
 		return response
 	} catch (error: any) {
@@ -191,19 +198,7 @@ export async function createAIAssistant(businessData: BusinessData): Promise<Ass
  */
 export async function updateAIAssistant(businessData: BusinessData, assistantId: string): Promise<Assistant> {
 	try {
-		const updatedAssistant = await vapiClient.assistants.update(assistantId, {
-			model: {
-				provider: 'openai',
-				model: 'gpt-4o-mini',
-				messages: [
-					{
-						role: 'system',
-						content: createContentForAssistant(businessData),
-					},
-				],
-				temperature: 0.2,
-			},
-		})
+		const updatedAssistant = await vapiClient.assistants.update(assistantId, createAssistantData(businessData))
 
 		return updatedAssistant
 	} catch (error: any) {
@@ -464,20 +459,7 @@ export async function updateAIAssistantWithSendSMSTool({
 	assistantId: string
 }) {
 	try {
-		const update = await vapiClient.assistants.update(assistantId, {
-			model: {
-				provider: 'openai',
-				model: 'gpt-4o-mini',
-				messages: [
-					{
-						role: 'system',
-						content: createContentForAssistant(businessData),
-					},
-				],
-				toolIds: [toolId],
-				temperature: 0.2,
-			},
-		})
+		const update = await vapiClient.assistants.update(assistantId, createAssistantData(businessData))
 
 		return update
 	} catch (error: any) {
