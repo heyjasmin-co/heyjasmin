@@ -49,7 +49,7 @@ export const useUpdateBusinessProfile = () => {
       data,
     }: {
       businessId: string;
-      data: any; // Type strictly if possible, but for now match generic update
+      data: Partial<BusinessDetailsType>;
     }) => {
       const response = await apiClient.patch<{
         success: boolean;

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export type BusinessDetailsType = {
   _id?: string;
   name: string;
@@ -49,8 +48,8 @@ export interface IBusinessHour {
 export interface BusinessCreationType {
   id: string;
   name: string;
-  messageAudio: any;
-  greetingAudio: any;
+  messageAudio: string | null;
+  greetingAudio: string | null;
 }
 
 export type BusinessAppointmentOutputType = {
