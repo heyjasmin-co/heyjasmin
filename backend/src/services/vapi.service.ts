@@ -1,4 +1,5 @@
 import { Assistant, PhoneNumbersCreateResponse } from '@vapi-ai/server-sdk/dist/cjs/api'
+import axios from 'axios'
 import Decimal from 'decimal.js'
 import { FastifyRequest } from 'fastify'
 import config from '../config'
@@ -20,6 +21,39 @@ interface BusinessData {
 	bookingLink?: string
 	customerName?: string
 }
+interface SmsFunctionCall {
+	id: string
+	createdAt: string // ISO date string
+	updatedAt: string // ISO date string
+	type: 'sms'
+
+	function: {
+		name: string
+		description: string
+		parameters: {
+			type: 'object'
+			properties: Record<string, unknown>
+			required: string[]
+		}
+	}
+
+	messages: Array<{
+		type: string
+		blocking: boolean
+	}>
+
+	metadata: {
+		from: string
+	}
+
+	orgId: string
+}
+
+interface SendSMSToolData {
+	businessName: string
+	twilioPhoneNumber: string
+}
+
 function createContentForAssistant(businessData: BusinessData): string {
 	const systemPrompt = `You are a friendly and professional AI voice assistant named Jasmin representing ${businessData.businessName}. 
 You handle both inbound and outbound calls for ${
@@ -35,8 +69,8 @@ Your main goals:
    - Inform the caller that you will send them a quick text message (SMS) with a secure booking link.
    - Use the "send_sms_${businessData.businessName}" tool to send a message like:
      "Hi ${businessData.customerName || '{customer-name}'}, here's your booking link for ${businessData.businessName}: ${
-		businessData.bookingLink
-	}. Please confirm your appointment through this link."
+			businessData.bookingLink
+		}. Please confirm your appointment through this link."
    - After sending the SMS, kindly guide them to open it to finalize their booking.
 4. If the customer only needs information (not booking), provide accurate details and ask if they'd like you to send a link with more info.
 5. Always be friendly, calm, natural, and human-like — never robotic or pushy.
@@ -50,8 +84,8 @@ Your main goals:
      Example: "Hi, this is Jasmin with ${businessData.businessName}. How can I help you today?"
    - If outbound: Greet warmly, confirm the customer's name, and explain the purpose of the call.
      Example: "Hi ${businessData.customerName || '{customer-name}'}, this is Jasmin from ${
-		businessData.businessName
-	}. I just wanted to reach out about our services — do you have a quick moment?"
+			businessData.businessName
+		}. I just wanted to reach out about our services — do you have a quick moment?"
 
 2. **Intent Handling**
    - If customer wants to book, reschedule, or inquire, follow the structured flow:
@@ -119,7 +153,7 @@ export async function createAIAssistant(businessData: BusinessData): Promise<Ass
 			},
 			firstMessageMode: 'assistant-speaks-first-with-model-generated-message',
 			voicemailMessage: "Please call back when you're available.",
-			backgroundSound:"off",
+			backgroundSound: 'off',
 			endCallMessage: 'Goodbye.',
 			artifactPlan: {
 				recordingFormat: 'mp3',
@@ -197,7 +231,6 @@ export async function linkTwilioNumberToAIAssistant(args: {
 			twilioAccountSid: config.TWILIO_ACCOUNT_SID!,
 			twilioAuthToken: config.TWILIO_AUTH_TOKEN!,
 		})
-
 		return response
 	} catch (error: any) {
 		console.error('✗ Error linking Twilio number to assistant:', error?.response?.data || error?.message || error)
@@ -374,5 +407,93 @@ export async function handleCreateAssistantCall(request: FastifyRequest, vapiMes
 	} catch (error: any) {
 		console.error('❌ Failed to create call:', error?.response?.data || error?.message || error)
 		throw new Error('Failed to create call record')
+	}
+}
+
+/**
+ * Creates a Send SMS tool for the AI assistant
+ */
+export async function createSendSMSTool(businessData: SendSMSToolData): Promise<SmsFunctionCall> {
+	try {
+		const payload = {
+			type: 'sms',
+			function: {
+				name: `send_sms_${businessData.businessName.toLowerCase().replace(/\s+/g, '_')}`,
+				description: 'Send an SMS message to the customer with booking information, confirmations, or general details.',
+				parameters: {
+					type: 'object',
+					properties: {},
+					required: [],
+				},
+			},
+			messages: [
+				{
+					type: 'request-start',
+					blocking: false,
+				},
+			],
+			metadata: {
+				from: businessData.twilioPhoneNumber,
+			},
+		}
+
+		const response = await axios.post('https://api.vapi.ai/tool/', payload, {
+			headers: {
+				Authorization: `Bearer ${config.VAPI_API_KEY}`,
+				'Content-Type': 'application/json',
+			},
+		})
+
+		return response.data
+	} catch (error: any) {
+		console.error('Failed to create VAPI SMS tool:', error.response?.data || error.message)
+		throw error
+	}
+}
+
+/**
+ * Updates the AI assistant with the Send SMS tool
+ */
+export async function updateAIAssistantWithSendSMSTool({
+	businessData,
+	toolId,
+	assistantId,
+}: {
+	businessData: BusinessData
+	toolId: string
+	assistantId: string
+}) {
+	try {
+		const update = await vapiClient.assistants.update(assistantId, {
+			model: {
+				provider: 'openai',
+				model: 'gpt-4o-mini',
+				messages: [
+					{
+						role: 'system',
+						content: createContentForAssistant(businessData),
+					},
+				],
+				toolIds: [toolId],
+				temperature: 0.2,
+			},
+		})
+
+		return update
+	} catch (error: any) {
+		console.error('Failed to update VAPI SMS tool:', error.response?.data || error.message)
+		throw error
+	}
+}
+
+/**
+ * Deletes the Send SMS tool for the AI assistant
+ */
+export async function deleteSendSMSTool(toolId: string) {
+	try {
+		await vapiClient.tools.delete(toolId)
+	} catch (error: any) {
+		console.error('Failed to delete VAPI SMS tool:', error.response?.data || error.message)
+		throw error
 	}
 }
