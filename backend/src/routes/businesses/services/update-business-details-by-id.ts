@@ -4,9 +4,12 @@ import { Business } from '../../../models'
 import { getTwilioAvailableNumbers, releaseTwilioNumber } from '../../../services/twilio.service'
 import {
 	createAIAssistant,
+	createSendSMSTool,
 	deleteAIAssistant,
+	deleteSendSMSTool,
 	linkTwilioNumberToAIAssistant,
 	unlinkTwilioNumberFromAIAssistant,
+	updateAIAssistantWithSendSMSTool,
 } from '../../../services/vapi.service'
 import { runTransaction } from '../../../utils/transaction'
 import { UpdateBusinessDetailsByIdInput, UpdateBusinessDetailsByIdOutput } from './types'
@@ -20,6 +23,7 @@ export const updateBusinessDetailsById = async (
 	let aIAssistant: any | null = null
 	let twilioNumber: any | null = null
 	let linkedPhoneNumber: any | null = null
+	let sendSMSTool: any | null = null
 	try {
 		return await runTransaction(async (session) => {
 			// Step 1: Update business info
@@ -28,14 +32,14 @@ export const updateBusinessDetailsById = async (
 			if (!updatedBusinessInfo) {
 				throw new Error(`No business found with the provided ID: ${businessId}`)
 			}
-
-			// Step 2: Create AI Assistant (VAPI)
-			aIAssistant = await createAIAssistant({
+			const businessData = {
 				businessName: updatedBusinessInfo.name,
 				services: updatedBusinessInfo.services,
 				businessHours: updatedBusinessInfo.businessHours,
-			})
+			}
 
+			// Step 2: Create AI Assistant (VAPI)
+			aIAssistant = await createAIAssistant(businessData)
 			if (!aIAssistant?.id) {
 				throw new Error('Failed to create AI Assistant')
 			}
@@ -53,7 +57,23 @@ export const updateBusinessDetailsById = async (
 				assistantId: aIAssistant.id,
 			})
 
-			// Step 5: Update business with AI assistant settings
+			// Step 5: Create Send SMS tool
+			sendSMSTool = await createSendSMSTool({
+				businessName: updatedBusinessInfo.name,
+				twilioPhoneNumber: twilioNumber.phoneNumber,
+			})
+			if (!sendSMSTool?.id) {
+				throw new Error('Failed to create Send SMS tool')
+			}
+
+			// Step 6: Update AI Assistant with Send SMS tool
+			await updateAIAssistantWithSendSMSTool({
+				businessData,
+				toolId: sendSMSTool.id,
+				assistantId: aIAssistant.id,
+			})
+
+			// Step 7: Update business with AI assistant settings
 			const updatedBusinessDetails = await Business.findByIdAndUpdate(
 				businessId,
 				{
@@ -107,6 +127,16 @@ export const updateBusinessDetailsById = async (
 				await deleteAIAssistant(aIAssistant.id)
 			} catch (err: any) {
 				request.log.error('Failed to delete AI Assistant during rollback', err)
+				rollbackErrors.push(err)
+			}
+		}
+
+		// Step 5 rollback: Delete Send SMS tool
+		if (sendSMSTool?.id) {
+			try {
+				await deleteSendSMSTool(sendSMSTool.id)
+			} catch (err: any) {
+				request.log.error('Failed to delete Send SMS tool during rollback', err)
 				rollbackErrors.push(err)
 			}
 		}
