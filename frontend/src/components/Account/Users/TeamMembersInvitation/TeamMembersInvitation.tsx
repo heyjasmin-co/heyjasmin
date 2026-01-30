@@ -14,7 +14,7 @@ import TeamMemberInvitationRemoveModal from "./TeamMemberInvitationRemoveModal";
 interface Member {
   _id: string;
   businessId: string;
-  clerkInvitationId: string;
+  invitationToken: string;
   email: string;
   role: "admin" | "editor" | "viewer";
   status: "pending" | "active" | "removed";
@@ -54,16 +54,16 @@ function TeamMembersInvitation({
     setRemoveMode(false);
   };
 
-  const handleRemoveMember = async (clerkInvitationId: string) => {
+  const handleRemoveMember = async (invitationToken: string) => {
     try {
       const response = await apiClient.delete<{
         success: boolean;
         message: string;
         data: BusinessUserInvitationsType;
-      }>(`/business-user-invitations/revoke/${clerkInvitationId}`);
+      }>(`/business-user-invitations/revoke/${invitationToken}`);
 
       setMembers((prev) =>
-        prev.filter((member) => member.clerkInvitationId !== clerkInvitationId),
+        prev.filter((member) => member.invitationToken !== invitationToken),
       );
       successToast(response.data.message);
     } catch (error: any) {

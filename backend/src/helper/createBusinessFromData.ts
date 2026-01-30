@@ -38,36 +38,16 @@ export const createBusinessFromData = async ({
 			trialStartedAt: new Date(),
 			trialEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
 		})
-		let businessMember: any = null
+
+		await newBusiness.save({ session })
+		await businessTrial.save({ session })
+
 		if (ownerUserId) {
-			businessMember = new BusinessUser({
+			const businessMember = new BusinessUser({
 				userId: ownerUserId,
 				businessId: newBusiness._id,
 				role: 'owner',
 			})
-		}
-		if (ownerUserId) {
-			const [org] = await Promise.all([
-				clerkClient.organizations.createOrganization({
-					name: businessData.name,
-					createdBy: clerkId!,
-				}),
-				clerkClient.users.updateUserMetadata(clerkId!, {
-					publicMetadata: {
-						dbUserId: dbUserId!,
-						clerkId: clerkId!,
-						businessId: (newBusiness._id as any).toString(),
-						role: 'owner',
-						selectedClientId: null,
-					},
-				}),
-			])
-			newBusiness.clerkOrganizationId = org.id
-		}
-
-		await newBusiness.save({ session })
-		await businessTrial.save({ session })
-		if (businessMember) {
 			await businessMember.save({ session })
 
 			await clerkClient.users.updateUser(clerkId!, {

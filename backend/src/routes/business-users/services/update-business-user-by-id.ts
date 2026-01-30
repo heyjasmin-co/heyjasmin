@@ -15,6 +15,6 @@ export const updateBusinessUsersById = async (
 			runValidators: true,
 		}
 	)
-
+	request.log.info('Business user updated successfully')
 	return businessUser as UpdateBusinessUsersByIdOutput
 }

@@ -3,12 +3,13 @@ import aggregatePaginate from 'mongoose-aggregate-paginate-v2'
 
 interface IBusinessUserInvitation extends Document {
 	businessId: mongoose.Types.ObjectId
-	clerkInvitationId: string
+	invitationToken: string
 	email: string
 	role: 'editor' | 'admin' | 'viewer'
-	status: 'active' | 'pending' | 'removed'
+	status: 'active' | 'pending' | 'removed' | 'accepted' | 'expired'
 	createdAt: Date
 	updatedAt: Date
+	expiresAt: Date
 }
 
 const businessUserInvitationSchema = new Schema<IBusinessUserInvitation>(
@@ -18,7 +19,7 @@ const businessUserInvitationSchema = new Schema<IBusinessUserInvitation>(
 			ref: 'Business',
 			required: true,
 		},
-		clerkInvitationId: {
+		invitationToken: {
 			type: String,
 			required: true,
 		},
@@ -35,8 +36,12 @@ const businessUserInvitationSchema = new Schema<IBusinessUserInvitation>(
 
 		status: {
 			type: String,
-			enum: ['active', 'pending', 'removed'],
+			enum: ['active', 'pending', 'removed', 'accepted', 'expired'],
 			default: 'active',
+		},
+		expiresAt: {
+			type: Date,
+			default: Date.now() + 24 * 60 * 60 * 1000,
 		},
 	},
 	{
@@ -44,7 +49,7 @@ const businessUserInvitationSchema = new Schema<IBusinessUserInvitation>(
 	}
 )
 
-businessUserInvitationSchema.index({ businessId: 1, clerkInvitationId: 1 }, { unique: true })
+businessUserInvitationSchema.index({ businessId: 1, invitationToken: 1 }, { unique: true })
 businessUserInvitationSchema.plugin(aggregatePaginate)
 
 const BusinessUserInvitation: Model<IBusinessUserInvitation> = mongoose.model<IBusinessUserInvitation>(

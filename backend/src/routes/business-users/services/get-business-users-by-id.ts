@@ -52,6 +52,6 @@ export const getBusinessUsersById = async (request: FastifyRequest, args: GetBus
 			},
 		},
 	])
-
+	request.log.info('Business users fetched successfully')
 	return businessUsers as GetBusinessUsersOutput
 }
