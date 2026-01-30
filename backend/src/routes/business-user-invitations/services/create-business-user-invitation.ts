@@ -61,13 +61,13 @@ export const createBusinessUserInvitationById = async (
 	})
 
 	const invitation = await businessUserInvitation.save()
-	
+
 	// Build invitation URL
 	let invitationUrl: string
 
 	if (existingUser) {
 		// User exists - direct them to accept invitation page
-		invitationUrl = `${config.FRONTEND_URL}/admin/accept-invitation?invitationToken=${invitationToken}&userId=${existingUser._id}`
+		invitationUrl = `${config.FRONTEND_URL}/admin/accept-invitation?invitationToken=${invitationToken}&userId=${existingUser._id}&role=${role}&businessName=${business.name}&email=${email}`
 	} else {
 		// New user - direct them to sign up with invitation
 		invitationUrl = `${config.FRONTEND_URL}/admin/sign-up?invitationToken=${invitationToken}&email=${encodeURIComponent(email)}`
