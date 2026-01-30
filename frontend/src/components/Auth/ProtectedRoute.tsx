@@ -5,12 +5,10 @@ import { useUserData } from "../../context/UserDataContext";
 type ProtectedRouteProps = {
   children: React.ReactNode;
   requireSubscription?: boolean;
-  requireSetup?: boolean;
 };
 export default function ProtectedRoute({
   children,
   requireSubscription = false,
-  requireSetup = false,
 }: ProtectedRouteProps) {
   const { isSignedIn, isLoaded } = useUser();
   const { userData, loading } = useUserData();
@@ -32,11 +30,16 @@ export default function ProtectedRoute({
       </div>
     );
   }
-  if (requireSetup && userData && !userData.isSetupComplete) {
+  if (userData && userData.businessId && !userData.isSetupComplete) {
     return <Navigate to="/admin/setup" replace />;
   }
 
-  if (requireSubscription && userData && userData.isSetupComplete) {
+  if (
+    requireSubscription &&
+    userData &&
+    userData.businessId &&
+    userData.isSetupComplete
+  ) {
     return <Navigate to="/admin/dashboard" replace />;
   }
   return <>{children}</>;

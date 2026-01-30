@@ -37,7 +37,7 @@ export default function JoinOrganization() {
       });
 
       // Redirect to dashboard on success
-      navigate("/admin/dashboard");
+      navigate("/admin/sign-in");
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
     } finally {
@@ -46,7 +46,7 @@ export default function JoinOrganization() {
   };
 
   const handleDecline = () => {
-    navigate("/admin/dashboard");
+    navigate("/admin/sign-in");
   };
 
   return (

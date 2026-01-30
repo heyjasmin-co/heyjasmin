@@ -16,5 +16,10 @@ export const canEdit = (targetRole: string, userData: UserData | null) => {
     return targetRole !== "owner";
   }
 
+  // OWNER → can change anyone
+  if (userData.role === "owner") {
+    return true;
+  }
+
   return false;
 };
