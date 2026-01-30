@@ -25,7 +25,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   if (!userData?.businessId) {
     return <Navigate to="/admin/select-business" replace />;
   }
-  if (!userData?.isSetupComplete) {
+  if (userData && userData.businessId && !userData?.isSetupComplete) {
     return <Navigate to="/admin/setup" replace />;
   }
 

@@ -47,10 +47,7 @@ export default function SelectBusinessPage() {
       const onlyBusinessId = userBusinesses[0];
       setValue("businessId", onlyBusinessId.businessId);
     }
-    if (!isBusinessesLoading && userBusinesses.length === 0) {
-      navigate("/admin/setup");
-    }
-  }, [userBusinesses, isBusinessesLoading, setValue, navigate]);
+  }, [userBusinesses, setValue]);
 
   const handleBusinessSelect = async (businessId: string) => {
     if (!businessId) return;

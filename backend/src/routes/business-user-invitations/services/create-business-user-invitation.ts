@@ -2,7 +2,7 @@ import { OrganizationInvitation } from '@clerk/fastify'
 import { FastifyRequest } from 'fastify'
 import config from '../../../config'
 import clerkClient from '../../../config/clerk'
-import { Business, User } from '../../../models'
+import { Business, IUser, User } from '../../../models'
 import { BusinessUserInvitation } from '../../../models/BusinessUserInvitation'
 import { CreateBusinessUserInvitationInput, CreateBusinessUserInvitationOutput } from './types'
 
@@ -39,15 +39,21 @@ export const createBusinessUserInvitationById = async (
 	const clerkAccount = await clerkClient.users.getUserList({
 		emailAddress: [email],
 	})
-	const clerkUserId = clerkAccount.data[0].id
-	const dbUser = await User.findOne({ clerkId: clerkUserId })
-	if (!dbUser) {
-		throw new Error(`User not found in database for Clerk ID: ${clerkUserId}`)
+
+	let dbUser: IUser | null = null
+	let clerkUserId: string | undefined = undefined
+
+	if (clerkAccount.data.length > 0) {
+		clerkUserId = clerkAccount.data[0]?.id
+		dbUser = await User.findOne({ clerkId: clerkUserId })
+		if (!dbUser) {
+			throw new Error(`User not found in database for Clerk ID: ${clerkUserId}`)
+		}
 	}
 
 	//
 	let redirectUrl = `${config.FRONTEND_URL}/admin/sign-up`
-	if (clerkAccount.data.length > 0) {
+	if (clerkUserId && dbUser) {
 		redirectUrl = `${config.FRONTEND_URL}/admin/join-organization?userId=${dbUser._id}&clerkUserId=${clerkUserId}&businessId=${business._id}&businessName=${business.name}&email=${email}&clerkOrganizationId=${business.clerkOrganizationId}&role=${role}`
 	}
 

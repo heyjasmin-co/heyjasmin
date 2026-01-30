@@ -196,7 +196,12 @@ export const handleBusinessUserInvitationCreated = async (args: ClerkOrganizatio
 		},
 		{ session }
 	)
-
+	await clerkClient.users.updateUserMetadata(user_id, {
+		publicMetadata: {
+			businessId,
+			role,
+		},
+	})
 	return {
 		success: true,
 		data: findUserByClerkId,
