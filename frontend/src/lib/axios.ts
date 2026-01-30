@@ -14,7 +14,7 @@ export const useApiClient = (timeout: number = 10000): AxiosInstance => {
       },
     });
 
-    apiClient.interceptors.request.use(
+    client.interceptors.request.use(
       async (config) => {
         const token = await getToken({
           skipCache: true,
@@ -29,8 +29,10 @@ export const useApiClient = (timeout: number = 10000): AxiosInstance => {
       (error) => Promise.reject(error),
     );
 
-    return apiClient;
+    return client;
+  }, [getToken, isLoaded, timeout]);
 
+  return apiClient;
 };
 
 export const useScrapeApiClient = () => useApiClient(90000);
