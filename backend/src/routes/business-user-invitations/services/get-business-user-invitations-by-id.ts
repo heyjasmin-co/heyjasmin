@@ -9,6 +9,6 @@ export const getBusinessUserInvitationsById = async (
 	const { businessId } = args
 	
 	const businessUserInvitations = await BusinessUserInvitation.find({ businessId })
-
+	request.log.info('Business user invitations fetched successfully')
 	return businessUserInvitations as GetBusinessUserInvitationsOutput
 }

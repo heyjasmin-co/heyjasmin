@@ -62,7 +62,7 @@ export default function App() {
 
           {/* Handle organization invitations for existing users */}
           <Route
-            path="/admin/join-organization"
+            path="/admin/accept-invitation"
             element={<JoinOrganization />}
           />
 

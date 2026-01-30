@@ -1,9 +1,10 @@
-import { OrganizationInvitation } from '@clerk/fastify'
+import crypto from 'crypto'
 import { FastifyRequest } from 'fastify'
 import config from '../../../config'
-import clerkClient from '../../../config/clerk'
-import { Business, IUser, User } from '../../../models'
+import transporter from '../../../config/nodemailer'
+import { Business, BusinessUser, User } from '../../../models'
 import { BusinessUserInvitation } from '../../../models/BusinessUserInvitation'
+import { sendInviteToNewUserTemplate } from '../../../template/sendInviteToNewUserTemplate'
 import { CreateBusinessUserInvitationInput, CreateBusinessUserInvitationOutput } from './types'
 
 export const createBusinessUserInvitationById = async (
@@ -17,78 +18,82 @@ export const createBusinessUserInvitationById = async (
 	if (!business?._id) {
 		throw new Error('Business not found')
 	}
-	if (!business.clerkOrganizationId) {
-		throw new Error('Business does not have a linked Clerk organization')
-	}
 
-	// Verify the organization exists in Clerk
-	try {
-		const org = await clerkClient.organizations.getOrganization({
-			organizationId: business.clerkOrganizationId,
+	// Check if user already exists
+	const existingUser = await User.findOne({ email })
+
+	// If user exists, check if they are already a member of the business
+	if (existingUser) {
+		const existingMembership = await BusinessUser.findOne({
+			businessId,
+			userId: existingUser._id,
+			status: 'active', // only consider active members
 		})
 
-		if (!org) {
-			throw new Error(`Clerk organization ${business.clerkOrganizationId} not found`)
+		if (existingMembership) {
+			throw new Error('User is already an active member of this business')
 		}
-	} catch (error) {
-		console.error('Failed to fetch Clerk organization:', error)
-		throw new Error(`Invalid Clerk organization ID: ${business.clerkOrganizationId}`)
 	}
 
-	//
-	const clerkAccount = await clerkClient.users.getUserList({
-		emailAddress: [email],
+	// Check if invitation already exists and is pending
+	const existingInvitation = await BusinessUserInvitation.findOne({
+		businessId,
+		email,
+		status: 'pending',
 	})
 
-	let dbUser: IUser | null = null
-	let clerkUserId: string | undefined = undefined
-
-	if (clerkAccount.data.length > 0) {
-		clerkUserId = clerkAccount.data[0]?.id
-		dbUser = await User.findOne({ clerkId: clerkUserId })
-		if (!dbUser) {
-			throw new Error(`User not found in database for Clerk ID: ${clerkUserId}`)
-		}
+	if (existingInvitation) {
+		throw new Error('An invitation is already pending for this email')
 	}
 
-	//
-	let redirectUrl = `${config.FRONTEND_URL}/admin/sign-up`
-	if (clerkUserId && dbUser) {
-		redirectUrl = `${config.FRONTEND_URL}/admin/join-organization?userId=${dbUser._id}&clerkUserId=${clerkUserId}&businessId=${business._id}&businessName=${business.name}&email=${email}&clerkOrganizationId=${business.clerkOrganizationId}&role=${role}`
-	}
+	// Generate unique invitation token
+	const invitationToken = crypto.randomBytes(32).toString('hex')
+	const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days expiry
 
-	let response: OrganizationInvitation | null = null
-	try {
-		// Create invitation
-		response = await clerkClient.organizations.createOrganizationInvitation({
-			organizationId: business.clerkOrganizationId,
-			emailAddress: email,
-			role: role === 'admin' ? 'org:admin' : 'org:member',
-			redirectUrl: redirectUrl,
-			publicMetadata: {
-				businessId: businessId.toString(),
-				role: role,
-				eventType: 'business-invitation',
-			},
-		})
-	} catch (error) {
-		console.error('Failed to create Clerk invitation:', error)
-		throw new Error('Failed to create organization invitation')
-	}
-
-	if (!response) {
-		throw new Error('Invitation not sent')
-	}
-
-	// Save to database
+	// Create invitation in database
 	const businessUserInvitation = new BusinessUserInvitation({
 		businessId,
 		email,
 		role,
-		clerkInvitationId: response.id,
+		invitationToken,
+		expiresAt,
 		status: 'pending',
 	})
 
 	const invitation = await businessUserInvitation.save()
+
+	// Build invitation URL
+	let invitationUrl: string
+
+	if (existingUser) {
+		// User exists - direct them to accept invitation page
+		invitationUrl = `${config.FRONTEND_URL}/admin/accept-invitation?invitationToken=${invitationToken}&userId=${existingUser._id}&role=${role}&businessName=${business.name}&email=${email}`
+	} else {
+		// New user - direct them to sign up with invitation
+		invitationUrl = `${config.FRONTEND_URL}/admin/sign-up?invitationToken=${invitationToken}&email=${encodeURIComponent(email)}`
+	}
+
+	// Send invitation email
+	try {
+		const newInviteTemplate = sendInviteToNewUserTemplate({
+			businessName: business.name,
+			email,
+			invitationUrl,
+			role: role.charAt(0).toUpperCase() + role.slice(1),
+			expiresAt,
+		})
+		await transporter.sendMail({
+			from: config.NODEMAILER_EMAIL_USER,
+			to: email,
+			subject: 'You have been invited to join heyjasmin 🎉',
+			html: newInviteTemplate,
+		})
+	} catch (error) {
+		console.error('Failed to send invitation email:', error)
+		// Optionally delete the invitation if email fails
+		await BusinessUserInvitation.findByIdAndDelete(invitation._id)
+		throw new Error('Failed to send invitation email')
+	}
+	request.log.info('Business user invitation created successfully')
 	return invitation
 }

@@ -8,12 +8,16 @@ export const canEdit = (targetRole: string, userData: UserData | null) => {
 
   // EDITOR → can’t change admins or owner
   if (userData.role === "editor") {
-    return targetRole !== "admin" && targetRole !== "owner";
+    return (
+      targetRole !== "editor" &&
+      targetRole !== "admin" &&
+      targetRole !== "owner"
+    );
   }
 
   // ADMIN → can change anyone except owner
   if (userData.role === "admin") {
-    return targetRole !== "owner";
+    return targetRole !== "admin" && targetRole !== "owner";
   }
 
   // OWNER → can change anyone
@@ -21,5 +25,5 @@ export const canEdit = (targetRole: string, userData: UserData | null) => {
     return true;
   }
 
-  return false;
+  return true;
 };

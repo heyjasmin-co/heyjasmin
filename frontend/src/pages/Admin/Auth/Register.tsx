@@ -1,8 +1,15 @@
 import { SignUp } from "@clerk/clerk-react";
+import { useSearchParams } from "react-router-dom";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
 
 export default function Register() {
+  const [searchParams] = useSearchParams();
+  const invitationToken = searchParams.get("invitationToken");
+  const emailParam = searchParams.get("email");
+
+  const email = emailParam ? decodeURIComponent(emailParam) : null;
+
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
       {/* Left branding section (hidden on small screens) */}
@@ -88,9 +95,25 @@ export default function Register() {
           {/* Clerk Sign Up */}
           <SignUp
             afterSignInUrl="/admin/dashboard"
+            unsafeMetadata={{
+              invitationToken,
+            }}
+            initialValues={{
+              emailAddress: email || "",
+            }}
             appearance={{
               elements: {
                 card: "shadow-none border-none bg-transparent w-full",
+                ...(email && {
+                  formFieldInput__emailAddress: `
+                    cursor-not-allowed 
+                    bg-gray-100 
+                    opacity-75 
+                    pointer-events-none 
+                    select-none
+                  `,
+                }),
+
                 formFieldInput:
                   "w-full text-lg px-4 py-3 rounded-lg border-gray-300 focus:ring-2 focus:ring-[var(--color-primary)]",
                 formFieldLabel: "text-base font-medium text-gray-700 mb-2",

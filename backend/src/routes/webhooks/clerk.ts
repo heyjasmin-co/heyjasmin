@@ -27,13 +27,13 @@ export default async function clerkWebhook(fastify: FastifyInstance) {
 		},
 		async (request, reply) => {
 			const { data, type } = request.body as ClerkWebhookBody
-		
+
 			try {
 				switch (type) {
 					case 'user.created':
-						await asyncHandler(async (_req, _reply) => {
+						await asyncHandler(async (request, _reply) => {
 							await runTransaction(async (session) => {
-								const user = await clerkService.handleUserCreated(data, session)
+								const user = await clerkService.handleUserCreated(request, data, session)
 
 								if (data.public_metadata?.eventType === 'business-invitation') {
 									await clerkService.handleBusinessUserCreated({ user, data }, session)

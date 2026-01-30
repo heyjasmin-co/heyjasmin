@@ -18,20 +18,16 @@ export type CreateBusinessUserInvitationByIdSchemaInput = z.infer<typeof createB
 	z.infer<typeof createBusinessUserInvitationByIdBodySchema>
 
 //
-export const revokeBusinessUserInvitationByIdParamsSchema = z.object({
-	invitationId: z.string(),
+export const revokeBusinessUserInvitationByTokenParamsSchema = z.object({
+	invitationToken: z.string(),
 })
 
-export type RevokeBusinessUserInvitationByIdSchemaInput = z.infer<typeof revokeBusinessUserInvitationByIdParamsSchema>
+export type RevokeBusinessUserInvitationByTokenSchemaInput = z.infer<typeof revokeBusinessUserInvitationByTokenParamsSchema>
 
 //
 export const acceptBusinessUserInvitationByIdBodySchema = z.object({
 	userId: z.string(),
-	businessId: z.string(),
-	role: z.string(),
-	clerkOrganizationId: z.string(),
-	clerkUserId: z.string(),
-	email: z.string(),
+	invitationToken: z.string(),
 })
 
 export type AcceptBusinessUserInvitationByIdSchemaInput = z.infer<typeof acceptBusinessUserInvitationByIdBodySchema>
