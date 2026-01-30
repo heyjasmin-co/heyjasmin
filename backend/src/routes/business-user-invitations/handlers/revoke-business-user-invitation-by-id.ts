@@ -1,15 +1,11 @@
 import { asyncHandler } from '../../../utils/asyncHandler'
 import { BusinessUsersInvitationService } from '../services'
-import {
-	createBusinessUserInvitationByIdBodySchema,
-	createBusinessUserInvitationByIdParamsSchema,
-	revokeBusinessUserInvitationByIdParamsSchema,
-} from './types'
+import { revokeBusinessUserInvitationByTokenParamsSchema } from './types'
 
-export const revokeBusinessUserInvitationByIdHandler = asyncHandler(async (request, reply) => {
-	const params = revokeBusinessUserInvitationByIdParamsSchema.parse(request.params)
+export const revokeBusinessUserInvitationByTokenHandler = asyncHandler(async (request, reply) => {
+	const params = revokeBusinessUserInvitationByTokenParamsSchema.parse(request.params)
 	const businessUsersInvitationService = new BusinessUsersInvitationService()
-	const businessUsersInvitations = await businessUsersInvitationService.revokeBusinessUserInvitationById(request, params)
+	const businessUsersInvitations = await businessUsersInvitationService.revokeBusinessUserInvitationByToken(request, params)
 
 	return reply.status(200).send({
 		success: true,

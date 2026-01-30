@@ -1,9 +1,11 @@
+import { FastifyRequest } from 'fastify'
 import { ClientSession } from 'mongoose'
 import config from '../config'
 import clerkClient from '../config/clerk'
 import transporter from '../config/nodemailer'
 import { Business, BusinessUser, User } from '../models'
 import { BusinessUserInvitation } from '../models/BusinessUserInvitation'
+import { validateAndCreateBusinessMemberUser } from '../routes/business-user-invitations/services/accept-business-user-invitation-id'
 import { newUserNotificationTemplate } from '../template/newUserTemplate'
 import { welcomeAfterVerificationTemplate } from '../template/registerTemplate'
 type ClerkOrganizationInvitationAccepted = {
@@ -28,9 +30,10 @@ type ClerkOrganizationInvitationAccepted = {
 	user_id: string
 }
 
-export const handleUserCreated = async (clerkUser: any, session: ClientSession) => {
+export const handleUserCreated = async (request: FastifyRequest, clerkUser: any, session: ClientSession) => {
 	// const clerkUserId: string | null = null
 	// let clerkOrgId: string | null = null
+
 	try {
 		const userData = {
 			clerkId: clerkUser.id,
@@ -39,13 +42,17 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 			lastName: clerkUser.last_name,
 			profileImage: clerkUser.has_image ? clerkUser.image_url : '',
 		}
+		const unsafeMetadata = clerkUser.unsafe_metadata
 		// Create local user
 		const user = new User(userData)
 		const savedUser = await user.save({ session })
 
 		//Store User in Business
-		const businessId = clerkUser.unsafe_metadata.businessId
-		if (businessId) {
+		const businessId = unsafeMetadata?.businessId
+		const invitationToken = unsafeMetadata?.invitationToken
+		console.log('businessId', businessId)
+		console.log('invitationToken', invitationToken)
+		if (businessId && !invitationToken) {
 			const business = await Business.findById(businessId).session(session)
 			if (!business) {
 				throw new Error(`Business not found with id: ${businessId}`)
@@ -57,56 +64,42 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 				role: 'owner',
 				status: 'active',
 			})
-
-			// Create Clerk organization + update metadata
-			const [org] = await Promise.all([
-				clerkClient.organizations.createOrganization({
-					name: business.name,
-					createdBy: savedUser.clerkId,
-				}),
-				clerkClient.users.updateUserMetadata(savedUser.clerkId, {
-					publicMetadata: {
-						dbUserId: savedUser._id,
-						clerkId: savedUser.clerkId,
-						businessId: businessId,
-						role: 'owner',
-						selectedClientId: null,
-					},
-				}),
-			])
-			// clerkOrgId = org.id
-			// Update Business with Clerk Organization ID
-			business.clerkOrganizationId = org.id
-			await business.save({ session })
-
-			// Save business membership
 			await businessMember.save({ session })
-
-			// Final metadata update (optional but clean)
-
-			await clerkClient.users.updateUser(savedUser.clerkId, {
+			// update user metadata
+			await clerkClient.users.updateUserMetadata(savedUser.clerkId, {
 				publicMetadata: {
+					dbUserId: savedUser._id,
+					clerkId: savedUser.clerkId,
 					businessId: businessId,
 					role: 'owner',
+					selectedClientId: null,
 				},
 			})
+			request.log.info('Business member created for user ' + savedUser.email)
 		}
-		const registerTemplate = welcomeAfterVerificationTemplate(userData.firstName + ' ' + userData.lastName, userData.email)
-		const newUserTemplate = newUserNotificationTemplate(userData.firstName + ' ' + userData.lastName, userData.email)
-		await Promise.all([
-			transporter.sendMail({
-				from: config.NODEMAILER_EMAIL_USER,
-				to: userData.email,
-				subject: 'Welcome to heyjasmin 🎉',
-				html: registerTemplate,
-			}),
-			transporter.sendMail({
-				from: config.NODEMAILER_EMAIL_USER,
-				to: config.NODEMAILER_EMAIL_USER,
-				subject: 'New User Onboard to heyjasmin 🎉',
-				html: newUserTemplate,
-			}),
-		])
+
+		if (invitationToken) {
+			await validateAndCreateBusinessMemberUser({ invitationToken, userId: (savedUser._id as any).toString(), session })
+			request.log.info('Business member accepted invitation for user ' + savedUser.email)
+		} else {
+			const registerTemplate = welcomeAfterVerificationTemplate(userData.firstName + ' ' + userData.lastName, userData.email)
+			const newUserTemplate = newUserNotificationTemplate(userData.firstName + ' ' + userData.lastName, userData.email)
+			await Promise.all([
+				transporter.sendMail({
+					from: config.NODEMAILER_EMAIL_USER,
+					to: userData.email,
+					subject: 'Welcome to heyjasmin 🎉',
+					html: registerTemplate,
+				}),
+				transporter.sendMail({
+					from: config.NODEMAILER_EMAIL_USER,
+					to: config.NODEMAILER_EMAIL_USER,
+					subject: 'New User Onboard to heyjasmin 🎉',
+					html: newUserTemplate,
+				}),
+			])
+			request.log.info('Welcome email and new user email sent to user ' + savedUser.email)
+		}
 
 		return {
 			success: true,
@@ -114,21 +107,6 @@ export const handleUserCreated = async (clerkUser: any, session: ClientSession) 
 		}
 	} catch (error) {
 		console.error('Error creating user from webhook:', error)
-
-		// // Prepare cleanup promises
-		// const cleanupPromises: Promise<any>[] = []
-
-		// if (clerkUserId) {
-		// 	cleanupPromises.push(clerkClient.users.deleteUser(clerkUserId))
-		// }
-
-		// if (clerkOrgId) {
-		// 	cleanupPromises.push(clerkClient.organizations.deleteOrganization(clerkOrgId))
-		// }
-
-		// // Run all cleanup operations concurrently
-		// await Promise.all(cleanupPromises)
-
 		throw new Error('Failed to create user from webhook')
 	}
 }

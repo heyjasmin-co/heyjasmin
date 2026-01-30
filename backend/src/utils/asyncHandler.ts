@@ -14,7 +14,7 @@ export const asyncHandler = (fn: HandlerFunction) => {
 
 			// Default error response
 			let statusCode = 500
-			let errorMessage = 'Internal server error'
+			let errorMessage = error.message || 'Internal server error'
 
 			// Custom error mapping (you can expand this as needed)
 			if (error.message?.includes('Invalid URL')) {

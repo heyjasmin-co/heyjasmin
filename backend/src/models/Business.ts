@@ -34,7 +34,6 @@ interface IBusiness extends Document {
 		appointmentMessage: string | null
 		schedulingLink: string | null
 	}
-	clerkOrganizationId?: string
 	isSetupComplete: boolean
 	createdAt: Date
 	updatedAt: Date
@@ -100,9 +99,6 @@ const businessSchema = new Schema<IBusiness>(
 
 		// Setup Status
 		isSetupComplete: { type: Boolean, default: false },
-
-		// Clerk Organization Id
-		clerkOrganizationId: { type: String },
 	},
 	{ timestamps: true }
 )

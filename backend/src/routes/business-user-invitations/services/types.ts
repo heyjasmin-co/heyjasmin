@@ -4,7 +4,7 @@ import {
 	AcceptBusinessUserInvitationByIdSchemaInput,
 	CreateBusinessUserInvitationByIdSchemaInput,
 	GetBusinessUserInvitationsByIdParamsSchemaInput,
-	RevokeBusinessUserInvitationByIdSchemaInput,
+	RevokeBusinessUserInvitationByTokenSchemaInput,
 } from '../handlers/types'
 
 //
@@ -16,7 +16,7 @@ export type CreateBusinessUserInvitationInput = CreateBusinessUserInvitationById
 export type CreateBusinessUserInvitationOutput = IBusinessUserInvitation | null
 
 //
-export type RevokeBusinessUserInvitationInput = RevokeBusinessUserInvitationByIdSchemaInput
+export type RevokeBusinessUserInvitationInput = RevokeBusinessUserInvitationByTokenSchemaInput
 export type RevokeBusinessUserInvitationOutput = IBusinessUserInvitation | null
 
 //
