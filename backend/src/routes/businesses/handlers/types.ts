@@ -134,9 +134,7 @@ export const createBusinessGoogleProfileBodySchema = z.object({
 
 	service: z.array(z.string().min(1, 'Each service must have a name')).min(1, 'Please specify at least one service you offer'),
 
-	business_hours: z
-		.array(z.string().min(1, 'Business hours entry cannot be empty'))
-		.min(1, 'Please include at least one business hours entry'),
+	business_hours: z.array(z.string().min(1, 'Business hours entry cannot be empty')).optional(),
 })
 export type CreateBusinessGoogleProfileSchemaInput = z.infer<typeof createBusinessGoogleProfileBodySchema>
 

@@ -14,7 +14,7 @@ export interface BusinessData {
 	address: string | null
 	email: string | null
 	services: string[] | null
-	business_hours: BusinessHours[] | null
+	business_hours?: BusinessHours[] | null
 	website: string
 }
 
