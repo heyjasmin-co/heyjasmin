@@ -1,17 +1,9 @@
-import { useAuth, useOrganizationList } from "@clerk/clerk-react";
+import { useAuth } from "@clerk/clerk-react";
 import axios, { AxiosInstance } from "axios";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 
 export const useApiClient = (timeout: number = 10000): AxiosInstance => {
   const { getToken, isLoaded } = useAuth();
-  const { setActive } = useOrganizationList();
-
-  useEffect(() => {
-    if (setActive) {
-      setActive({ organization: null });
-    }
-  }, [setActive]);
-
   const apiClient = useMemo(() => {
     const client = axios.create({
       baseURL:
@@ -25,7 +17,7 @@ export const useApiClient = (timeout: number = 10000): AxiosInstance => {
     client.interceptors.request.use(
       async (config) => {
         const token = await getToken({
-          skipCache:true,
+          skipCache: true,
         });
 
         if (token) {

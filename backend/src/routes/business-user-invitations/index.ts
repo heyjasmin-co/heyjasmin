@@ -49,7 +49,6 @@ export default async function businessUserInvitationsRoute(fastify: FastifyInsta
 
 	// Accept Business User Invitation
 	fastify.post('/accept', {
-		preHandler: [createContext, authenticate],
 		schema: {
 			tags: ['business-user-invitations'],
 			description: 'Accept Business User Invitation',

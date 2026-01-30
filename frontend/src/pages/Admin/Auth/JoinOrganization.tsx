@@ -14,13 +14,10 @@ export default function JoinOrganization() {
 
   // Get URL parameters
   const userId = searchParams.get("userId");
-  const businessId = searchParams.get("businessId");
-  const clerkUserId = searchParams.get("clerkUserId");
-  const clerkOrganizationId = searchParams.get("clerkOrganizationId");
   const role = searchParams.get("role");
   const businessName = searchParams.get("businessName");
   const email = searchParams.get("email");
-
+  const invitationToken = searchParams.get("invitationToken");
   const handleJoinOrganization = async () => {
     setIsLoading(true);
     setError("");
@@ -29,15 +26,11 @@ export default function JoinOrganization() {
       // Call your API to join the organization
       await apiClient.post(`/business-user-invitations/accept`, {
         userId,
-        businessId,
-        clerkOrganizationId,
-        role,
-        clerkUserId,
-        email,
+        invitationToken,
       });
 
       // Redirect to dashboard on success
-      navigate("/admin/sign-in");
+      navigate("/admin/dashboard");
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
     } finally {
@@ -46,7 +39,7 @@ export default function JoinOrganization() {
   };
 
   const handleDecline = () => {
-    navigate("/admin/sign-in");
+    navigate("/admin/dashboard");
   };
 
   return (
