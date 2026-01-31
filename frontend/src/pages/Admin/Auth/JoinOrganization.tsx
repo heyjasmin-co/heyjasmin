@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useApiClient } from "../../../lib/axios";
+import { useAcceptInvitation } from "../../../hooks/useUser";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
 
 export default function JoinOrganization() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const apiClient = useApiClient();
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const acceptInvitationMutation = useAcceptInvitation();
 
   // Get URL parameters
   const userId = searchParams.get("userId");
@@ -18,24 +17,26 @@ export default function JoinOrganization() {
   const businessName = searchParams.get("businessName");
   const email = searchParams.get("email");
   const invitationToken = searchParams.get("invitationToken");
+
   const handleJoinOrganization = async () => {
-    setIsLoading(true);
     setError("");
 
-    try {
-      // Call your API to join the organization
-      await apiClient.post(`/business-user-invitations/accept`, {
-        userId,
-        invitationToken,
-      });
-
-      // Redirect to dashboard on success
-      navigate("/admin/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (!userId || !invitationToken) {
+      setError("Missing invitation details");
+      return;
     }
+
+    acceptInvitationMutation.mutate(
+      { token: invitationToken, email: email || "" },
+      {
+        onSuccess: () => {
+          navigate("/admin/dashboard");
+        },
+        onError: (err: any) => {
+          setError(err.response?.data?.error || "Failed to join organization");
+        },
+      },
+    );
   };
 
   const handleDecline = () => {
@@ -122,16 +123,18 @@ export default function JoinOrganization() {
             <div className="space-y-3">
               <button
                 onClick={handleJoinOrganization}
-                disabled={isLoading}
+                disabled={acceptInvitationMutation.isPending}
                 className="w-full rounded-lg px-4 py-3 text-lg font-semibold text-white shadow transition hover:opacity-90 disabled:opacity-50"
                 style={{ backgroundColor: colorTheme.primary(1) }}
               >
-                {isLoading ? "Joining..." : "Accept Invitation"}
+                {acceptInvitationMutation.isPending
+                  ? "Joining..."
+                  : "Accept Invitation"}
               </button>
 
               <button
                 onClick={handleDecline}
-                disabled={isLoading}
+                disabled={acceptInvitationMutation.isPending}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-lg font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
               >
                 Decline

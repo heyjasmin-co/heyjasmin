@@ -1,39 +1,14 @@
 import { useUser } from "@clerk/clerk-react";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { useApiClient } from "../lib/axios";
-
-export interface UserData {
-  dbUserId: string | null;
-  clerkId: string | null;
-  businessId: string | null;
-  isSetupComplete: boolean;
-  role: string | null;
-  assistantNumber: string | null;
-  businessName: string | null;
-  subscription: SubscriptionDetails | null;
-}
-
-export interface SubscriptionDetails {
-  plan: "essential" | "pro" | "plus" | "trial";
-  remainingMinutes: number | "unlimited";
-  remainingMinutesFormatted: string;
-  usedMinutes: number;
-  stripePriceId: string | null;
-  status:
-    | "trial_active"
-    | "trial_ended"
-    | "canceled"
-    | "active"
-    | "inactive"
-    | "unpaid";
-}
+import { useQueryClient } from "@tanstack/react-query";
+import { createContext, useCallback, useContext, useMemo } from "react";
+import { UserData, useUserDataQuery } from "../hooks/useUser";
 
 interface UserDataContextType {
   userData: UserData | null;
   loading: boolean;
   updateUserData: (data: Partial<UserData>) => void;
   refreshUserData: () => Promise<void>;
-  setUserData: React.Dispatch<React.SetStateAction<UserData | null>>;
+  setUserData: (data: UserData | null) => void;
 }
 
 const UserDataContext = createContext<UserDataContextType | undefined>(
@@ -41,62 +16,42 @@ const UserDataContext = createContext<UserDataContextType | undefined>(
 );
 
 export function UserDataProvider({ children }: { children: React.ReactNode }) {
-  const { user, isSignedIn } = useUser();
-  const apiClient = useApiClient();
+  const { isSignedIn } = useUser();
+  const queryClient = useQueryClient();
 
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: userData, isLoading: loading } = useUserDataQuery(
+    isSignedIn === true,
+  );
 
-  const fetchUserData = async () => {
-    if (!user || !isSignedIn) {
-      setUserData(null);
-      setLoading(false);
-      return;
-    }
+  const updateUserData = useCallback(
+    (data: Partial<UserData>) => {
+      queryClient.setQueryData(["user-data"], (prev: UserData | undefined) =>
+        prev ? { ...prev, ...data } : undefined,
+      );
+    },
+    [queryClient],
+  );
 
-    try {
-      setLoading(true);
-      const response = await apiClient.get<{
-        message: string;
-        success: boolean;
-        data: UserData;
-      }>("/users/me");
+  const setUserData = useCallback(
+    (data: UserData | null) => {
+      queryClient.setQueryData(["user-data"], data);
+    },
+    [queryClient],
+  );
 
-      setUserData(response.data.data);
-    } catch (error) {
-      console.error("Failed to fetch user data:", error);
-
-      // Fallback user data
-      setUserData({
-        dbUserId: null,
-        clerkId: null,
-        businessId: null,
-        isSetupComplete: false,
-        role: null,
-        assistantNumber: null,
-        businessName: null,
-        subscription: null,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateUserData = (data: Partial<UserData>) => {
-    setUserData((prev) => (prev ? { ...prev, ...data } : null));
-  };
-
-  const refreshUserData = async () => {
-    await fetchUserData();
-  };
-
-  useEffect(() => {
-    fetchUserData();
-  }, [isSignedIn]);
+  const refreshUserData = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ["user-data"] });
+  }, [queryClient]);
 
   const contextValue = useMemo(
-    () => ({ userData, loading, updateUserData, refreshUserData, setUserData }),
-    [userData, loading],
+    () => ({
+      userData: userData || null,
+      loading,
+      updateUserData,
+      refreshUserData,
+      setUserData,
+    }),
+    [userData, loading, refreshUserData, setUserData, updateUserData],
   );
 
   return (

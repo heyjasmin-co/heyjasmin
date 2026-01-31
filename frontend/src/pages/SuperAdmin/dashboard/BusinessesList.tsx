@@ -1,49 +1,33 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { HiTrash } from "react-icons/hi";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import Loading from "../../../components/Loading";
-import { superAdminService } from "../../../lib/superAdminService";
+import {
+  useDeleteBusiness,
+  useSuperAdminBusinesses,
+} from "../../../hooks/useSuperAdmin";
 import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast, successToast } from "../../../utils/react-toast";
 
 const BusinessesList = () => {
-  const [businesses, setBusinesses] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(
     null,
   );
-  const [isDeleting, setIsDeleting] = useState(false);
   // Pagination state
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
 
-  const fetchBusinesses = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { data } = await superAdminService.getBusinesses({
-        page,
-        limit,
-      });
-      if (data.success) {
-        setBusinesses(data.businesses);
-        setTotal(data.total);
-        setTotalPages(data.pages);
-      }
-    } catch (error) {
-      console.error("Failed to fetch businesses", error);
-      errorToast("Failed to fetch businesses");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, limit]);
+  const {
+    data: response,
+    isLoading,
+    isError,
+  } = useSuperAdminBusinesses(page, limit);
+  const deleteMutation = useDeleteBusiness();
 
-  useEffect(() => {
-    fetchBusinesses();
-  }, [fetchBusinesses]);
+  const businesses = response?.data?.businesses || [];
+  const total = response?.data?.total || 0;
+  const totalPages = response?.data?.pages || 0;
 
   const handleDeleteClick = (id: string) => {
     setSelectedBusinessId(id);
@@ -52,26 +36,33 @@ const BusinessesList = () => {
 
   const handleConfirmDelete = async () => {
     if (!selectedBusinessId) return;
-    setIsDeleting(true);
-    try {
-      await superAdminService.deleteBusiness(selectedBusinessId);
-      setBusinesses(businesses.filter((b) => b._id !== selectedBusinessId));
-      setShowDeleteModal(false);
-      setSelectedBusinessId(null);
-      successToast("Business deleted successfully");
-      fetchBusinesses(); // Refresh to update total and pagination
-    } catch (error) {
-      console.error("Failed to delete business", error);
-      errorToast("Failed to delete business");
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteMutation.mutate(selectedBusinessId, {
+      onSuccess: () => {
+        setShowDeleteModal(false);
+        setSelectedBusinessId(null);
+        successToast("Business deleted successfully");
+      },
+      onError: (error: any) => {
+        console.error("Failed to delete business", error);
+        errorToast("Failed to delete business");
+      },
+    });
   };
 
-  if (loading && businesses.length === 0) {
+  if (isLoading && businesses.length === 0) {
     return (
       <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
         <Loading />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
+        <div className="text-center text-red-500">
+          Failed to load businesses
+        </div>
       </div>
     );
   }
@@ -131,7 +122,7 @@ const BusinessesList = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {businesses.length === 0 && !loading ? (
+                  {businesses.length === 0 && !isLoading ? (
                     <tr>
                       <td
                         colSpan={6}
@@ -141,7 +132,7 @@ const BusinessesList = () => {
                       </td>
                     </tr>
                   ) : (
-                    businesses.map((business) => (
+                    businesses.map((business: any) => (
                       <tr key={business._id}>
                         <td className="px-4 py-3">
                           <div className="flex flex-col">
@@ -312,7 +303,7 @@ const BusinessesList = () => {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleConfirmDelete}
-        isLoading={isDeleting}
+        isLoading={deleteMutation.isPending}
         title="Delete Business?"
         message="Are you sure you want to delete this business? This will also cancel any active subscriptions and release the associated phone numbers. This action cannot be undone."
       />

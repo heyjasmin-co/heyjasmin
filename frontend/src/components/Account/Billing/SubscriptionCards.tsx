@@ -1,13 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import infoIcon from "../../../assets/image/infoIcon.png";
 import { useUserData } from "../../../context/UserDataContext";
-import { useApiClient } from "../../../lib/axios";
+import { useCreateSubscription } from "../../../hooks/useStripe";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast } from "../../../utils/react-toast";
 import type { SubscriptionCard } from "../../../utils/subscriptionCards";
 import { subscriptionCards } from "../../../utils/subscriptionCards";
+
 interface SubscriptionCardsProps {
   handleCreatePaymentIntent: ({
     clientSecret,
@@ -17,37 +17,36 @@ interface SubscriptionCardsProps {
     priceId: string;
   }) => void;
 }
+
 function SubscriptionCards({
   handleCreatePaymentIntent,
 }: SubscriptionCardsProps) {
   const [subscriptions] = useState<SubscriptionCard[]>(subscriptionCards);
   const [loadingId, setLoadingId] = useState<number | null>(null);
-  const apiClient = useApiClient();
   const { userData } = useUserData();
   const currentSusbcription = userData?.subscription?.stripePriceId;
-  const handleSubscribe = async (sub: SubscriptionCard) => {
-    try {
-      setLoadingId(sub.id);
 
-      const response = await apiClient.post<{
-        success: boolean;
-        message: string;
-        data: { clientSecret: string };
-      }>("/stripe/create", {
-        businessId: userData?.businessId,
-        priceId: sub.priceId,
+  const { mutateAsync: createSubscriptionMutation } = useCreateSubscription();
+
+  const handleSubscribe = async (sub: SubscriptionCard) => {
+    setLoadingId(sub.id);
+    try {
+      const response = await createSubscriptionMutation({
+        businessId: userData?.businessId ?? undefined,
+        priceId: sub.priceId!,
       });
 
-      if (response.data.success) {
-        const clientSecret = response.data.data.clientSecret;
+      if (response.success) {
         handleCreatePaymentIntent({
           priceId: sub.priceId!,
-          clientSecret,
+          clientSecret: response.data.clientSecret,
         });
       }
     } catch (error: any) {
       console.error("Payment Intent Error:", error);
-      errorToast("");
+      errorToast(
+        error.response?.data?.error || "Failed to create subscription",
+      );
     } finally {
       setLoadingId(null);
     }

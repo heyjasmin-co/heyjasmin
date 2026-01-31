@@ -1,37 +1,35 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SuperAdminSignupData } from "@/lib/superAdminService";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSuperAdminClient } from "../../../lib/superAdminClient";
+import { useSuperAdminSignup } from "../../../hooks/useSuperAdmin";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast, successToast } from "../../../utils/react-toast";
 
 const Signup = () => {
   const navigate = useNavigate();
-  const apiClient = useSuperAdminClient();
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<SuperAdminSignupData>({
     email: "",
     password: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const { mutate: signup, isPending: loading } = useSuperAdminSignup();
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      const { data } = await apiClient.post("/super-admin/signup", formData);
-      if (data.success) {
-        successToast("Account created successfully!");
-        navigate("/super-admin/auth/login");
-      }
-    } catch (error: any) {
-      const msg = error.response?.data?.error || "Signup failed";
-      errorToast(msg);
-    } finally {
-      setLoading(false);
-    }
+    signup(formData, {
+      onSuccess: (data: any) => {
+        if (data.success) {
+          successToast("Account created successfully!");
+          navigate("/super-admin/auth/login");
+        }
+      },
+      onError: (error: any) => {
+        const msg = error.response?.data?.error || "Signup failed";
+        errorToast(msg);
+      },
+    });
   };
 
   return (

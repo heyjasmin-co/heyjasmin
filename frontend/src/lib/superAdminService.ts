@@ -31,6 +31,7 @@ export interface SuperAdminForgotPasswordData {
 export interface SuperAdminResetPasswordData {
   token: string;
   newPassword: string;
+  id: string;
 }
 
 export interface SuperAdminChangePasswordData {

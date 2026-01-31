@@ -1,50 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useLayoutEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
+import { useCalls } from "../../hooks/useCalls";
 import { colorTheme } from "../../theme/colorTheme";
-import { CallsType } from "../../types/CallsType";
-import { errorToast, successToast } from "../../utils/react-toast";
 import { formatPhoneNumber } from "../../utils/string-utils";
 import Loading from "../Loading";
 
 export default function CallsList() {
-  const apiClient = useApiClient();
-  const [calls, setCalls] = useState<CallsType>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { userData } = useUserData();
-
-  const fetchCalls = async () => {
-    if (!userData?.businessId) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const res = await apiClient.get<{
-        success: boolean;
-        message: string;
-        data: CallsType;
-      }>(`/calls/${userData.businessId}`);
-
-      setCalls(res.data.data);
-      successToast(res.data.message);
-    } catch (err: any) {
-      console.error(err);
-      setError("Failed to fetch calls");
-      errorToast("Failed to fetch calls");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useLayoutEffect(() => {
-    if (userData?.businessId) {
-      fetchCalls();
-    }
-  }, [userData?.businessId]);
+  const {
+    data: calls = [],
+    isLoading,
+    isError, // Keep isError for proper error handling
+    refetch: fetchCalls,
+  } = useCalls(userData?.businessId ?? undefined);
 
   return (
     <div
@@ -52,13 +20,13 @@ export default function CallsList() {
       style={{ fontFamily: "'Outfit', sans-serif" }}
     >
       {/* Loading */}
-      {loading ? (
+      {isLoading ? (
         <Loading />
-      ) : error ? (
+      ) : isError ? ( // Use isError for error state
         <div className="flex h-full flex-col items-center justify-center">
-          <p className="text-sm text-red-500">{error}</p>
+          <p className="text-sm text-red-500">Failed to fetch calls</p>
           <button
-            onClick={fetchCalls}
+            onClick={() => fetchCalls()}
             className="mt-3 rounded-md bg-purple-500 px-4 py-1.5 text-sm text-white shadow-sm hover:bg-purple-600"
           >
             Retry
@@ -77,7 +45,7 @@ export default function CallsList() {
               </span>
               <i
                 className="fa-solid fa-rotate-right ml-3 cursor-pointer text-sm text-gray-400 hover:text-gray-600"
-                onClick={fetchCalls}
+                onClick={() => fetchCalls()}
               />
             </div>
           </div>

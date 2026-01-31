@@ -2,7 +2,10 @@
 import { useState } from "react";
 import infoIcon from "../../../../assets/image/infoIcon.png";
 import { useUserData } from "../../../../context/UserDataContext";
-import { useApiClient } from "../../../../lib/axios";
+import {
+  useRemoveTeammate,
+  useUpdateTeammate,
+} from "../../../../hooks/useUser";
 import { appName } from "../../../../theme/appName";
 import { colorTheme } from "../../../../theme/colorTheme";
 import {
@@ -28,15 +31,15 @@ type BusinessUsersProps = {
 };
 
 function TeamMembers({ businessUsers }: BusinessUsersProps) {
-  const [members, setMembers] = useState(businessUsers);
   const [openModal, setOpenModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [removeMode, setRemoveMode] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const { userData } = useUserData();
-  const apiClient = useApiClient();
 
-  // Handlers
+  const updateTeammate = useUpdateTeammate();
+  const removeTeammate = useRemoveTeammate();
+
   const handleModal = () => {
     setOpenModal((prev) => !prev);
     if (!openModal) {
@@ -73,40 +76,21 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
     role: string;
   }) => {
     try {
-      const { businessUserId, role } = member;
-      const response = await apiClient.patch<{
-        message: string;
-        success: boolean;
-        data: BusinessUserType;
-      }>(`/business-users/${businessUserId}`, { role });
-
-      const updatedUser = response.data.data;
-      setMembers((prevMembers) =>
-        prevMembers.map((m) =>
-          m._id === updatedUser._id ? { ...m, ...updatedUser } : m,
-        ),
-      );
-      successToast(response.data.message);
+      const response = await updateTeammate.mutateAsync(member);
+      successToast(response.message);
+      handleModal();
     } catch (error: any) {
-      const message = error.response?.data?.error || "Something went wrong.";
-      errorToast(message);
+      errorToast(error.response?.data?.error || "Something went wrong.");
     }
   };
 
   const handleRemoveMember = async (businessUserId: string) => {
     try {
-      const response = await apiClient.delete<{
-        message: string;
-        success: boolean;
-        data: BusinessUserType;
-      }>("/business-users/" + businessUserId);
-      const user = response.data.data;
-
-      setMembers(members.filter((member) => member._id !== user._id));
-      successToast(response.data.message);
+      const response = await removeTeammate.mutateAsync(businessUserId);
+      successToast(response.message);
+      setRemoveMode(false);
     } catch (error: any) {
-      const message = error.response?.data?.error || "Something went wrong.";
-      errorToast(message);
+      errorToast(error.response?.data?.error || "Something went wrong.");
     }
   };
 
@@ -164,7 +148,7 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {members.map((member) => (
+                  {businessUsers.map((member: BusinessUserType) => (
                     <tr key={member._id}>
                       <td className="px-4 py-3 font-medium text-gray-900">
                         {member.name}

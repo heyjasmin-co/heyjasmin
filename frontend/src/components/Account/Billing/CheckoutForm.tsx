@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import Loading from "@/components/Loading";
 import {
   PaymentElement,
   useElements,
@@ -6,7 +6,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { useMemo, useState } from "react";
 import { useUserData } from "../../../context/UserDataContext";
-import { useApiClient } from "../../../lib/axios";
+import { useConfirmSubscription } from "../../../hooks/useStripe";
 import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast } from "../../../utils/react-toast";
 import {
@@ -26,27 +26,25 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 }) => {
   const stripe = useStripe();
   const elements = useElements();
-  const apiClient = useApiClient();
   const [successModal, setSuccessModal] = useState(false);
-  const [loading, setLoading] = useState(false);
   const { userData } = useUserData();
   const selectedPlan: SubscriptionCard | undefined = useMemo(
     () => subscriptionCards.find((plan) => plan.priceId === priceId),
     [priceId],
   );
+  if (!userData?.businessId) {
+    return <Loading />;
+  }
+  const { mutate: confirmSubscription, isPending: loading } =
+    useConfirmSubscription();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!stripe || !elements) return;
 
-    setLoading(true);
-
     try {
       const { error, setupIntent } = await stripe.confirmSetup({
         elements,
-        // confirmParams: {
-        //   return_url: `${window.location.origin}/billing/success`,
-        // },
         redirect: "if_required",
       });
 
@@ -54,22 +52,32 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         errorToast(error.message || "Payment failed");
         return;
       }
-      await apiClient.post<{
-        success: boolean;
-        message: string;
-        data: { clientSecret: string };
-      }>("/stripe/confirm", {
-        businessId: userData?.businessId,
-        setupIntentId: setupIntent.id,
-        priceId,
-      });
-      setSuccessModal(true);
+
+      if (setupIntent) {
+        confirmSubscription(
+          {
+            businessId: userData.businessId!,
+            setupIntentId: setupIntent.id,
+            priceId,
+          },
+          {
+            onSuccess: (data) => {
+              if (data.success) {
+                setSuccessModal(true);
+              }
+            },
+            onError: (err: any) => {
+              errorToast(
+                err.response?.data?.error ||
+                  err.message ||
+                  "Something went wrong",
+              );
+            },
+          },
+        );
+      }
     } catch (err: any) {
-      errorToast(
-        err.response?.data?.error || err.message || "Something went wrong",
-      );
-    } finally {
-      setLoading(false);
+      errorToast(err.message || "Something went wrong");
     }
   };
 

@@ -1,47 +1,31 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { HiTrash } from "react-icons/hi";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import Loading from "../../../components/Loading";
-import { superAdminService } from "../../../lib/superAdminService";
+import {
+  useDeleteUser,
+  useSuperAdminUsers,
+} from "../../../hooks/useSuperAdmin";
 import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast, successToast } from "../../../utils/react-toast";
 
 const UsersList = () => {
-  const [users, setUsers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
   // Pagination state
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { data } = await superAdminService.getUsers({
-        page,
-        limit,
-      });
-      if (data.success) {
-        setUsers(data.users);
-        setTotal(data.total);
-        setTotalPages(data.pages);
-      }
-    } catch (error) {
-      console.error("Failed to fetch users", error);
-      errorToast("Failed to fetch users");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, limit]);
+  const {
+    data: response,
+    isLoading,
+    isError,
+  } = useSuperAdminUsers(page, limit);
+  const deleteMutation = useDeleteUser();
 
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+  const users = response?.data?.users || [];
+  const total = response?.data?.total || 0;
+  const totalPages = response?.data?.pages || 0;
 
   const handleDeleteClick = (id: string) => {
     setSelectedUserId(id);
@@ -50,25 +34,31 @@ const UsersList = () => {
 
   const handleConfirmDelete = async () => {
     if (!selectedUserId) return;
-    setIsDeleting(true);
-    try {
-      await superAdminService.deleteUser(selectedUserId);
-      successToast("User and all associated data deleted successfully");
-      setShowDeleteModal(false);
-      setSelectedUserId(null);
-      fetchUsers();
-    } catch (error) {
-      console.error("Failed to delete user", error);
-      errorToast("Failed to delete user");
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteMutation.mutate(selectedUserId, {
+      onSuccess: () => {
+        setShowDeleteModal(false);
+        setSelectedUserId(null);
+        successToast("User and all associated data deleted successfully");
+      },
+      onError: (error: any) => {
+        console.error("Failed to delete user", error);
+        errorToast("Failed to delete user");
+      },
+    });
   };
 
-  if (loading && users.length === 0) {
+  if (isLoading && users.length === 0) {
     return (
       <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
         <Loading />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
+        <div className="text-center text-red-500">Failed to load users</div>
       </div>
     );
   }
@@ -119,7 +109,7 @@ const UsersList = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {users.length === 0 && !loading ? (
+                  {users.length === 0 && !isLoading ? (
                     <tr>
                       <td
                         colSpan={5}
@@ -129,7 +119,7 @@ const UsersList = () => {
                       </td>
                     </tr>
                   ) : (
-                    users.map((user) => (
+                    users.map((user: any) => (
                       <tr key={user._id}>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
@@ -255,7 +245,7 @@ const UsersList = () => {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleConfirmDelete}
-        isLoading={isDeleting}
+        isLoading={deleteMutation.isPending}
         title="Delete User Account?"
         message="Are you sure you want to delete this user? This will also delete all businesses owned by this user, cancel their subscriptions, and release all associated phone numbers. This action cannot be undone."
       />
