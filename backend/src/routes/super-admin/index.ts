@@ -10,6 +10,7 @@ import {
 	loginHandler,
 	resetPasswordHandler,
 	signupHandler,
+	verifyEmailChangeHandler,
 } from './handlers'
 import {
 	changeEmailBodySchema,
@@ -19,6 +20,7 @@ import {
 	loginBodySchema,
 	resetPasswordBodySchema,
 	signupBodySchema,
+	verifyEmailChangeBodySchema,
 } from './handlers/types'
 
 export default async function superAdminRoutes(fastify: FastifyInstance) {
@@ -82,6 +84,16 @@ export default async function superAdminRoutes(fastify: FastifyInstance) {
 			body: changeEmailBodySchema,
 		},
 		handler: changeEmailHandler,
+	})
+
+	// Verify Email Change
+	fastify.post('/verify-email-change', {
+		schema: {
+			tags: ['super-admin'],
+			description: 'Verify and apply super admin email change',
+			body: verifyEmailChangeBodySchema,
+		},
+		handler: verifyEmailChangeHandler,
 	})
 
 	// Get Businesses

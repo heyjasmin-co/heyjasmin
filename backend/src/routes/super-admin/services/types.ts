@@ -22,6 +22,15 @@ export type ResetPasswordServiceOutput = { message: string }
 
 export type ChangePasswordServiceInput = ChangePasswordBodyInput
 export type ChangePasswordServiceOutput = { message: string }
+export interface VerifyEmailChangeServiceInput {
+	token: string
+	id: string
+}
+
+export interface VerifyEmailChangeServiceOutput {
+	message: string
+	token?: string
+}
 
 export type ChangeEmailServiceInput = ChangeEmailBodyInput
 export type ChangeEmailServiceOutput = { message: string; token: string }

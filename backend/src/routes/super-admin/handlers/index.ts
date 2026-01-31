@@ -6,3 +6,5 @@ export * from './get-businesses'
 export * from './login'
 export * from './reset-password'
 export * from './signup'
+export * from './verify-email-change'
+

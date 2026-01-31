@@ -5,11 +5,13 @@ import {
 } from "@/lib/superAdminService";
 import { errorToast, successToast } from "@/utils/react-toast";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import TitleCard from "../../../components/TitleCard";
 import { useSuperAdminClient } from "../../../lib/superAdminClient";
 import { colorTheme } from "../../../theme/colorTheme";
 
 const Settings = () => {
+  const navigate = useNavigate();
   const apiClient = useSuperAdminClient();
   const [loading, setLoading] = useState({ password: false, email: false });
   const [showPasswords, setShowPasswords] = useState({
@@ -59,9 +61,14 @@ const Settings = () => {
         emailData,
       );
       if (data.success) {
-        successToast("Email updated successfully. Token refreshed.");
-        localStorage.setItem("superAdminToken", data.token);
+        successToast(
+          "Verification email sent! Please check your current email to confirm the change. You have been logged out for security.",
+        );
         setEmailData({ newEmail: "", password: "" });
+        localStorage.removeItem("superAdminToken");
+        setTimeout(() => {
+          navigate("/super-admin/auth/login");
+        }, 3000);
       }
     } catch (err: any) {
       const msg = err.response?.data?.error || "Failed to update email";

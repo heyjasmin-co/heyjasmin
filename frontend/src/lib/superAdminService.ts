@@ -3,7 +3,7 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"; // Adjust fallback as needed
 
 const api = axios.create({
-  baseURL: `${API_URL}/api`,
+  baseURL: `${API_URL}/api/v1`,
 });
 
 api.interceptors.request.use((config) => {
@@ -57,6 +57,8 @@ export const superAdminService = {
     api.post("/super-admin/change-password", data),
   changeEmail: (data: SuperAdminChangeEmailData) =>
     api.post("/super-admin/change-email", data),
+  verifyEmailChange: (data: { token: string; id: string }) =>
+    api.post("/super-admin/verify-email-change", data),
   getBusinesses: () => api.get("/super-admin/businesses"),
   deleteBusiness: (id: string) => api.delete(`/super-admin/businesses/${id}`),
 };

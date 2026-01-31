@@ -27,6 +27,11 @@ export const resetPasswordBodySchema = z.object({
 	id: z.string(),
 })
 export type ResetPasswordBodyInput = z.infer<typeof resetPasswordBodySchema>
+export const verifyEmailChangeBodySchema = z.object({
+	token: z.string(),
+	id: z.string(),
+})
+export type VerifyEmailChangeBodyInput = z.infer<typeof verifyEmailChangeBodySchema>
 
 // Change Password
 export const changePasswordBodySchema = z.object({

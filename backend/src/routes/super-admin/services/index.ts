@@ -6,6 +6,7 @@ import { getBusinesses } from './get-businesses'
 import { login } from './login'
 import { resetPassword } from './reset-password'
 import { signup } from './signup'
+import { verifyEmailChange } from './verify-email-change'
 
 export class SuperAdminService {
 	signup = signup
@@ -14,6 +15,7 @@ export class SuperAdminService {
 	resetPassword = resetPassword
 	changePassword = changePassword
 	changeEmail = changeEmail
+	verifyEmailChange = verifyEmailChange
 	getBusinesses = getBusinesses
 	deleteBusinessAndUser = deleteBusinessAndUser
 }

@@ -6,6 +6,9 @@ export interface ISuperAdmin extends Document {
 	password?: string
 	resetPasswordToken?: string
 	resetPasswordExpires?: Date
+	pendingEmail?: string
+	emailChangeToken?: string
+	emailChangeExpires?: Date
 	comparePassword(candidatePassword: string): Promise<boolean>
 }
 
@@ -15,6 +18,9 @@ const SuperAdminSchema: Schema = new Schema(
 		password: { type: String, required: true },
 		resetPasswordToken: { type: String },
 		resetPasswordExpires: { type: Date },
+		pendingEmail: { type: String },
+		emailChangeToken: { type: String },
+		emailChangeExpires: { type: Date },
 	},
 	{ timestamps: true }
 )
