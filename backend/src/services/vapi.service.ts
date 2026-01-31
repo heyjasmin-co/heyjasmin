@@ -480,3 +480,14 @@ export async function deleteSendSMSTool(toolId: string) {
 		throw error
 	}
 }
+/**
+ * Deletes a phone number from VAPI
+ */
+export async function deleteVapiPhoneNumber(phoneNumberId: string) {
+	try {
+		await vapiClient.phoneNumbers.delete(phoneNumberId)
+	} catch (error: any) {
+		console.error('Failed to delete VAPI phone number:', error.response?.data || error.message)
+		throw error
+	}
+}

@@ -9,13 +9,13 @@ import TalkToAgent from "../../../../components/dashboard/TalkToAgent";
 import TrainingSources from "../../../../components/dashboard/TrainingSources";
 import Loading from "../../../../components/Loading";
 import { useUserData } from "../../../../context/UserDataContext";
-import { useApiClient } from "../../../../lib/axios";
+import { useScrapeApiClient } from "../../../../lib/axios";
 import { appName } from "../../../../theme/appName";
 import { BusinessDetailsType } from "../../../../types/BusinessTypes";
 import { errorToast, successToast } from "../../../../utils/react-toast";
 export default function Dashboard() {
   const [guideStep, setGuideStep] = useState(0);
-  const apiClient = useApiClient();
+  const apiClient = useScrapeApiClient();
   const { userData } = useUserData();
   const [loading, setLoading] = useState(false);
   const [businessDetails, setBusinessDetails] =
@@ -128,8 +128,6 @@ export default function Dashboard() {
               subtitle={` Well done! Forward your business number to ${appName} so she can start answering your calls.`}
             />
           )}
-
-      
         </div>
       )}
     </div>

@@ -83,6 +83,7 @@ export const updateBusinessDetailsById = async (
 							assistantName: aIAssistant.name,
 							assistantSetup: 'testing',
 							assistantPhoneNumberId: linkedPhoneNumber.id,
+							assistantToolId: sendSMSTool.id,
 							twilioNumber: twilioNumber.phoneNumber,
 							twilioId: twilioNumber.sid,
 						},
