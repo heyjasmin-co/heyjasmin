@@ -198,10 +198,14 @@ export async function createAIAssistant(businessData: BusinessData): Promise<Ass
  */
 export async function updateAIAssistant(businessData: BusinessData, assistantId: string): Promise<Assistant> {
 	try {
+		const currentAssistant = await vapiClient.assistants.get(assistantId)
+		if (!currentAssistant.model) {
+			throw new Error('Assistant has no model configuration')
+		}
+
 		const updatedAssistant = await vapiClient.assistants.update(assistantId, {
 			model: {
-				provider: 'openai',
-				model: 'gpt-4o-mini',
+				...currentAssistant.model,
 				messages: [
 					{
 						role: 'system',
@@ -470,58 +474,16 @@ export async function updateAIAssistantWithSendSMSTool({
 	assistantId: string
 }) {
 	try {
-		const update = await vapiClient.assistants.update(assistantId, {
-			name: businessData.businessName,
-			transcriber: {
-				provider: 'deepgram',
-				model: 'nova-2',
-				language: 'en',
-			},
-			model: {
-				provider: 'openai',
-				model: 'gpt-4o-mini',
-				messages: [
-					{
-						role: 'system',
-						content: createContentForAssistant(businessData),
-					},
-				],
-				toolIds: [toolId],
-				temperature: 0.2,
-			},
-			voice: {
-				model: 'eleven_turbo_v2_5',
-				voiceId: 'jBzLvP03992lMFEkj2kJ',
-				provider: '11labs',
-				stability: 0.5,
-				similarityBoost: 0.75,
-			},
-			firstMessageMode: 'assistant-speaks-first-with-model-generated-message',
-			voicemailMessage: "Please call back when you're available.",
-			backgroundSound: 'off',
-			endCallMessage: 'Goodbye.',
-			artifactPlan: {
-				recordingFormat: 'mp3',
-			},
-			server: {
-				url: `${config.BACKEND_URL}/api/v1/webhooks-vapi`,
-			},
+		const currentAssistant = await vapiClient.assistants.get(assistantId)
+		if (!currentAssistant.model) {
+			throw new Error('Assistant has no model configuration')
+		}
 
-			clientMessages: [
-				'function-call',
-				'model-output',
-				'transcript',
-				'tool-calls',
-				'conversation-update',
-				'function-call-result',
-				'hang',
-				'speech-update',
-				'status-update',
-				'voice-input',
-				'user-interrupted',
-				'transfer-update',
-			],
-			serverMessages: ['end-of-call-report'],
+		const update = await vapiClient.assistants.update(assistantId, {
+			model: {
+				...currentAssistant.model,
+				toolIds: [toolId],
+			},
 		})
 
 		return update
