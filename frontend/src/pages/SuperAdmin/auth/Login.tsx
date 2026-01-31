@@ -177,7 +177,7 @@ const Login = () => {
                   Forgot Password?
                 </Link>
               </div>
-              <div className="text-gray-500">
+              {/* <div className="text-gray-500">
                 Don't have an account?{" "}
                 <Link
                   to="/super-admin/auth/signup"
@@ -186,7 +186,7 @@ const Login = () => {
                 >
                   Sign Up
                 </Link>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

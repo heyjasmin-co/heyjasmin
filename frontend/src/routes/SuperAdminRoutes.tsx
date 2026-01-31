@@ -3,7 +3,7 @@ import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import SuperAdminLayout from "../components/SuperAdmin/SuperAdminLayout";
 
 const Login = lazy(() => import("../pages/SuperAdmin/auth/Login"));
-const Signup = lazy(() => import("../pages/SuperAdmin/auth/Signup"));
+// const Signup = lazy(() => import("../pages/SuperAdmin/auth/Signup"));
 const ResetPassword = lazy(
   () => import("../pages/SuperAdmin/auth/ResetPassword"),
 );
@@ -41,7 +41,8 @@ const SuperAdminRoutes = () => {
       <Routes>
         {/* Auth Routes */}
         <Route path="/auth/login" element={<Login />} />
-        <Route path="/auth/signup" element={<Signup />} />
+        {/* <Route path="/auth/signup" element={<Signup />} /> */}
+        <Route path="/auth/forgot-password" element={<ResetPassword />} />
         <Route path="/auth/reset-password" element={<ResetPassword />} />
         <Route
           path="/auth/verify-email-change"
