@@ -198,7 +198,18 @@ export async function createAIAssistant(businessData: BusinessData): Promise<Ass
  */
 export async function updateAIAssistant(businessData: BusinessData, assistantId: string): Promise<Assistant> {
 	try {
-		const updatedAssistant = await vapiClient.assistants.update(assistantId, createAssistantData(businessData))
+		const updatedAssistant = await vapiClient.assistants.update(assistantId, {
+			model: {
+				provider: 'openai',
+				model: 'gpt-4o-mini',
+				messages: [
+					{
+						role: 'system',
+						content: createContentForAssistant(businessData),
+					},
+				],
+			},
+		})
 
 		return updatedAssistant
 	} catch (error: any) {
