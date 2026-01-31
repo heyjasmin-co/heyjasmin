@@ -19,15 +19,14 @@ export default function BusinessDetailsPage() {
   const { userData } = useUserData();
   const [businessDetailsState, setBusinessDetailsState] =
     useState<BusinessDetailsType | null>(null);
-
+  if (!userData?.businessId) {
+    return <Loading />;
+  }
   const { data: businessDetails, isLoading } = useBusinessDetails(
-    userData?.businessId || undefined,
+    userData?.businessId!,
   );
-  const { data: businessUsers } = useTeammates(
-    userData?.businessId || undefined,
-  );
-  console.log(businessDetailsState, businessUsers); // avoid unused warnings
-  const updateAssistantMutation = useUpdateAssistant(userData?.businessId);
+  const { data: businessUsers } = useTeammates(userData?.businessId!);
+  const updateAssistantMutation = useUpdateAssistant(userData?.businessId!);
 
   useEffect(() => {
     if (businessDetails) {

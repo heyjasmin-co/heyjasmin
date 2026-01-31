@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/pages/Admin/SubscriptionPage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -74,7 +75,7 @@ export default function SubscriptionPage() {
 
   const handleSelectPlan = (id: number) => {
     setSelectedPlan(id);
-    user.setUserData((prev) => {
+    user.setUserData((prev: any) => {
       if (prev) {
         return { ...prev, hasSubscription: true };
       }
