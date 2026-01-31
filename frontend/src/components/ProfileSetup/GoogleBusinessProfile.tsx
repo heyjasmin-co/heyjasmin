@@ -36,7 +36,6 @@ export default function GoogleBusinessProfileSetup({
 }) {
   const [googleBusinessData, setGoogleBusinessData] =
     useState<GooglePlaceDetails | null>(null);
-  console.log("googleBusinessData", googleBusinessData);
   const scrapeApiClient = useScrapeApiClient();
   const handleGoogleProfileData = async () => {
     setLoading(true);

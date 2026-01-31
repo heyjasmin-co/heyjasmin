@@ -2,7 +2,7 @@ import { useAuth } from "@clerk/clerk-react";
 import axios, { AxiosInstance } from "axios";
 import { useMemo } from "react";
 
-export const useApiClient = (timeout: number = 10000): AxiosInstance => {
+export const useApiClient = (timeout?: number): AxiosInstance => {
   const { getToken, isLoaded } = useAuth();
   const apiClient = useMemo(() => {
     const client = axios.create({
