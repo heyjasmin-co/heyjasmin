@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import CallDetails from "./components/calls/CallDetails";
+import SuperAdminRoutes from "./routes/SuperAdminRoutes";
 
 import { RouteGuard } from "./components/Auth/RouteGuard";
 import ScrollToTop from "./components/common/ScrollToTop";
@@ -56,6 +57,7 @@ export default function App() {
           </Route>
 
           {/* Admin routes */}
+          <Route path="/super-admin/*" element={<SuperAdminRoutes />} />
           <Route path="/admin" element={<Login />} />
           <Route path="/admin/sign-in" element={<Login />} />
           <Route path="/admin/sign-up" element={<Register />} />

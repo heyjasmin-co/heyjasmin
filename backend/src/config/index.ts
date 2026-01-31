@@ -24,6 +24,7 @@ interface Config {
 	NODEMAILER_EMAIL_PASS: string
 	TRIAL_MINUTES: number
 	GOOGLE_MAP_API: string
+	JWT_SECRET: string
 }
 
 const config: Config = {
@@ -72,6 +73,9 @@ const config: Config = {
 
 	//Google Maps API
 	GOOGLE_MAP_API: process.env.GOOGLE_MAP_API!,
+
+	// JWT
+	JWT_SECRET: process.env.JWT_SECRET || 'super-secret-key-change-this',
 }
 
 export default config
