@@ -160,6 +160,7 @@ function createAssistantData(businessData: BusinessData): any {
 		},
 		server: {
 			url: `${config.BACKEND_URL}/api/v1/webhooks-vapi`,
+			timeoutSeconds: 20,
 		},
 
 		clientMessages: [
