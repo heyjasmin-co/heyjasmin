@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useSuperAdminClient } from "@/lib/superAdminClient";
+import { useSuperAdminClient } from "@/lib/axios";
 import { SuperAdminForgotPasswordData } from "@/lib/superAdminService";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";

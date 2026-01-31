@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useSuperAdminClient } from "@/lib/axios";
 import { SuperAdminLoginData } from "@/lib/superAdminService";
+import { appName } from "@/theme/appName";
+import { colorTheme } from "@/theme/colorTheme";
+import { errorToast } from "@/utils/react-toast";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSuperAdminClient } from "../../../lib/superAdminClient";
-import { appName } from "../../../theme/appName";
-import { colorTheme } from "../../../theme/colorTheme";
-import { errorToast } from "../../../utils/react-toast";
 
 const Login = () => {
   const navigate = useNavigate();

@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import TitleCard from "@/components/TitleCard";
+import { useSuperAdminClient } from "@/lib/axios";
 import {
   SuperAdminChangeEmailData,
   SuperAdminChangePasswordData,
 } from "@/lib/superAdminService";
+import { colorTheme } from "@/theme/colorTheme";
 import { errorToast, successToast } from "@/utils/react-toast";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import TitleCard from "../../../components/TitleCard";
-import { useSuperAdminClient } from "../../../lib/superAdminClient";
-import { colorTheme } from "../../../theme/colorTheme";
 
 const Settings = () => {
   const navigate = useNavigate();
