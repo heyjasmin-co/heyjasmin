@@ -161,6 +161,7 @@ function createAssistantData(businessData: BusinessData): any {
 		},
 		server: {
 			url: `${config.BACKEND_URL}/api/v1/webhooks-vapi`,
+			timeoutSeconds: 20,
 		},
 
 		clientMessages: [
@@ -199,7 +200,22 @@ export async function createAIAssistant(businessData: BusinessData): Promise<Ass
  */
 export async function updateAIAssistant(businessData: BusinessData, assistantId: string): Promise<Assistant> {
 	try {
-		const updatedAssistant = await vapiClient.assistants.update(assistantId, createAssistantData(businessData))
+		const currentAssistant = await vapiClient.assistants.get(assistantId)
+		if (!currentAssistant.model) {
+			throw new Error('Assistant has no model configuration')
+		}
+
+		const updatedAssistant = await vapiClient.assistants.update(assistantId, {
+			model: {
+				...currentAssistant.model,
+				messages: [
+					{
+						role: 'system',
+						content: createContentForAssistant(businessData),
+					},
+				],
+			},
+		})
 
 		return updatedAssistant
 	} catch (error: any) {
@@ -460,7 +476,17 @@ export async function updateAIAssistantWithSendSMSTool({
 	assistantId: string
 }) {
 	try {
-		const update = await vapiClient.assistants.update(assistantId, createAssistantData(businessData))
+		const currentAssistant = await vapiClient.assistants.get(assistantId)
+		if (!currentAssistant.model) {
+			throw new Error('Assistant has no model configuration')
+		}
+
+		const update = await vapiClient.assistants.update(assistantId, {
+			model: {
+				...currentAssistant.model,
+				toolIds: [toolId],
+			},
+		})
 
 		return update
 	} catch (error: any) {
