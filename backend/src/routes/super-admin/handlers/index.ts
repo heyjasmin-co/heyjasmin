@@ -1,10 +1,11 @@
 export * from './change-email'
 export * from './change-password'
 export * from './delete-business-and-user'
+export * from './delete-user'
 export * from './forgot-password'
 export * from './get-businesses'
+export * from './get-users'
 export * from './login'
 export * from './reset-password'
 export * from './signup'
 export * from './verify-email-change'
-

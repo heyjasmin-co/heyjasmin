@@ -13,6 +13,7 @@ const VerifyEmailChange = lazy(
 const BusinessesList = lazy(
   () => import("../pages/SuperAdmin/dashboard/BusinessesList"),
 );
+const UsersList = lazy(() => import("../pages/SuperAdmin/dashboard/UsersList"));
 const Settings = lazy(() => import("../pages/SuperAdmin/dashboard/Settings"));
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -57,6 +58,7 @@ const SuperAdminRoutes = () => {
           }
         >
           <Route path="businesses" element={<BusinessesList />} />
+          <Route path="users" element={<UsersList />} />
           <Route path="settings" element={<Settings />} />
           <Route index element={<Navigate to="businesses" replace />} />
         </Route>

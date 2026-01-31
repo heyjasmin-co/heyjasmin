@@ -92,6 +92,29 @@ const SuperAdminLayout = () => {
                 </NavLink>
               </li>
 
+              {/* Users */}
+              <li>
+                <NavLink
+                  to="/super-admin/dashboard/users"
+                  className="group flex items-center rounded-lg px-3 py-2 text-sm transition-all duration-200 sm:text-base"
+                  style={{
+                    backgroundColor: isPathActive(
+                      "/super-admin/dashboard/users",
+                    )
+                      ? colorTheme.secondaryColor(0.9)
+                      : "transparent",
+                    color: isPathActive("/super-admin/dashboard/users")
+                      ? "white"
+                      : "#374151",
+                    fontWeight: 500,
+                  }}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <i className="fa-solid fa-users text-base sm:text-lg"></i>
+                  <span className="ml-2 sm:ml-3">Users</span>
+                </NavLink>
+              </li>
+
               {/* Settings */}
               <li>
                 <NavLink

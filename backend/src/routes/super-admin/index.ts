@@ -5,8 +5,10 @@ import {
 	changeEmailHandler,
 	changePasswordHandler,
 	deleteBusinessAndUserHandler,
+	deleteUserHandler,
 	forgotPasswordHandler,
 	getBusinessesHandler,
+	getUsersHandler,
 	loginHandler,
 	resetPasswordHandler,
 	signupHandler,
@@ -16,8 +18,11 @@ import {
 	changeEmailBodySchema,
 	changePasswordBodySchema,
 	deleteBusinessParamsSchema,
+	deleteUserParamsSchema,
 	forgotPasswordBodySchema,
+	getUsersQuerySchema,
 	loginBodySchema,
+	paginationQuerySchema,
 	resetPasswordBodySchema,
 	signupBodySchema,
 	verifyEmailChangeBodySchema,
@@ -102,11 +107,23 @@ export default async function superAdminRoutes(fastify: FastifyInstance) {
 		schema: {
 			tags: ['super-admin'],
 			description: 'Get all businesses',
+			query: paginationQuerySchema,
 		},
 		handler: getBusinessesHandler,
 	})
 
-	// Delete Business and User
+	// Get Users
+	fastify.get('/users', {
+		preHandler: [authenticateSuperAdmin],
+		schema: {
+			tags: ['super-admin'],
+			description: 'Get all users',
+			query: getUsersQuerySchema,
+		},
+		handler: getUsersHandler,
+	})
+
+	// Delete Business
 	fastify.delete('/businesses/:id', {
 		preHandler: [authenticateSuperAdmin],
 		schema: {
@@ -115,5 +132,16 @@ export default async function superAdminRoutes(fastify: FastifyInstance) {
 			params: deleteBusinessParamsSchema,
 		},
 		handler: deleteBusinessAndUserHandler,
+	})
+
+	// Delete User
+	fastify.delete('/users/:id', {
+		preHandler: [authenticateSuperAdmin],
+		schema: {
+			tags: ['super-admin'],
+			description: 'Delete user and all their businesses',
+			params: deleteUserParamsSchema,
+		},
+		handler: deleteUserHandler,
 	})
 }

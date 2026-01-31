@@ -37,3 +37,33 @@ export type ChangeEmailServiceOutput = { message: string; token: string }
 
 export type DeleteBusinessServiceInput = DeleteBusinessParamsInput
 export type DeleteBusinessServiceOutput = { message: string }
+
+export interface PaginationParams {
+	page: number
+	limit: number
+}
+
+export interface GetUsersServiceInput extends PaginationParams {}
+
+export interface GetUsersServiceOutput {
+	users: Array<{
+		_id: string
+		firstName: string
+		lastName: string
+		email: string
+		createdAt: Date
+		businessCount: number
+	}>
+	total: number
+	pages: number
+	currentPage: number
+}
+
+export interface GetBusinessesServiceInput extends PaginationParams {}
+
+export interface GetBusinessesServiceOutput {
+	businesses: Array<any>
+	total: number
+	pages: number
+	currentPage: number
+}

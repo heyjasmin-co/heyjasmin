@@ -47,6 +47,22 @@ export const changeEmailBodySchema = z.object({
 })
 export type ChangeEmailBodyInput = z.infer<typeof changeEmailBodySchema>
 
+// Pagination
+export const paginationQuerySchema = z.object({
+	page: z.coerce.number().optional().default(1),
+	limit: z.coerce.number().optional().default(10),
+})
+
+// Users
+export const getUsersQuerySchema = paginationQuerySchema
+
+// Businesses
+export const getBusinessesQuerySchema = paginationQuerySchema
+
+export const deleteUserParamsSchema = z.object({
+	id: z.string(),
+})
+
 // Delete Business
 export const deleteBusinessParamsSchema = z.object({
 	id: z.string(),

@@ -7,13 +7,11 @@ import { superAdminService } from "../../../lib/superAdminService";
 import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast, successToast } from "../../../utils/react-toast";
 
-const BusinessesList = () => {
-  const [businesses, setBusinesses] = useState<any[]>([]);
+const UsersList = () => {
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedBusinessId, setSelectedBusinessId] = useState<string | null>(
-    null,
-  );
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   // Pagination state
   const [page, setPage] = useState(1);
@@ -21,54 +19,53 @@ const BusinessesList = () => {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  const fetchBusinesses = useCallback(async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await superAdminService.getBusinesses({
+      const { data } = await superAdminService.getUsers({
         page,
         limit,
       });
       if (data.success) {
-        setBusinesses(data.businesses);
+        setUsers(data.users);
         setTotal(data.total);
         setTotalPages(data.pages);
       }
     } catch (error) {
-      console.error("Failed to fetch businesses", error);
-      errorToast("Failed to fetch businesses");
+      console.error("Failed to fetch users", error);
+      errorToast("Failed to fetch users");
     } finally {
       setLoading(false);
     }
   }, [page, limit]);
 
   useEffect(() => {
-    fetchBusinesses();
-  }, [fetchBusinesses]);
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleDeleteClick = (id: string) => {
-    setSelectedBusinessId(id);
+    setSelectedUserId(id);
     setShowDeleteModal(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedBusinessId) return;
+    if (!selectedUserId) return;
     setIsDeleting(true);
     try {
-      await superAdminService.deleteBusiness(selectedBusinessId);
-      setBusinesses(businesses.filter((b) => b._id !== selectedBusinessId));
+      await superAdminService.deleteUser(selectedUserId);
+      successToast("User and all associated data deleted successfully");
       setShowDeleteModal(false);
-      setSelectedBusinessId(null);
-      successToast("Business deleted successfully");
-      fetchBusinesses(); // Refresh to update total and pagination
+      setSelectedUserId(null);
+      fetchUsers();
     } catch (error) {
-      console.error("Failed to delete business", error);
-      errorToast("Failed to delete business");
+      console.error("Failed to delete user", error);
+      errorToast("Failed to delete user");
     } finally {
       setIsDeleting(false);
     }
   };
 
-  if (loading && businesses.length === 0) {
+  if (loading && users.length === 0) {
     return (
       <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
         <Loading />
@@ -90,40 +87,31 @@ const BusinessesList = () => {
                 className="flex h-8 w-8 items-center justify-center rounded-full"
                 style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
               >
-                <i className="fa-solid fa-building text-white"></i>
+                <i className="fa-solid fa-users text-white"></i>
               </div>
               <h5 className="text-lg font-bold text-gray-900">
-                Registered Businesses
+                User Management
               </h5>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="text-sm font-medium whitespace-nowrap text-gray-500">
-                Total: <span className="text-gray-900">{total}</span>
-              </div>
             </div>
           </div>
 
-          {/* Businesses Table */}
+          {/* Users Table */}
           <div className="flex flex-col gap-6 px-4 py-4">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 text-sm">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-4 py-3 text-left font-semibold text-gray-600">
-                      Business Info
+                      User
                     </th>
                     <th className="px-4 py-3 text-left font-semibold text-gray-600">
-                      Owner Info
+                      Email
+                    </th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-600">
+                      Businesses
                     </th>
                     <th className="px-4 py-3 text-left font-semibold text-gray-600">
-                      Subscription
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-600">
-                      Members
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-600">
-                      Created At
+                      Joined
                     </th>
                     <th className="px-4 py-3 text-left font-semibold text-gray-600">
                       Actions
@@ -131,87 +119,42 @@ const BusinessesList = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {businesses.length === 0 && !loading ? (
+                  {users.length === 0 && !loading ? (
                     <tr>
                       <td
-                        colSpan={6}
+                        colSpan={5}
                         className="px-4 py-8 text-center text-gray-500"
                       >
-                        No businesses found
+                        No users found
                       </td>
                     </tr>
                   ) : (
-                    businesses.map((business) => (
-                      <tr key={business._id}>
+                    users.map((user) => (
+                      <tr key={user._id}>
                         <td className="px-4 py-3">
-                          <div className="flex flex-col">
-                            <span className="font-medium text-gray-900">
-                              {business.name}
-                            </span>
-                            {business.twilioNumber ? (
-                              <span className="text-xs text-gray-500">
-                                <i className="fa-solid fa-phone mr-1 text-[10px]"></i>
-                                {business.twilioNumber}
-                              </span>
-                            ) : (
-                              <span className="text-[10px] font-medium text-gray-400 italic">
-                                No Number
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-gray-700">
-                          {business.ownerUserId ? (
-                            <div className="flex flex-col">
-                              <span className="font-medium text-gray-900">
-                                {business.ownerUserId.firstName}{" "}
-                                {business.ownerUserId.lastName}
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                {business.ownerUserId.email}
-                              </span>
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 font-bold text-gray-400 uppercase">
+                              {user.firstName?.charAt(0) || "U"}
                             </div>
-                          ) : (
-                            <span className="text-xs font-medium text-gray-400 italic">
-                              No Owner
+                            <span className="font-medium text-gray-900">
+                              {user.firstName} {user.lastName}
                             </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-gray-700">
-                          <div className="flex flex-col gap-1">
-                            {business.subscription?.plan ? (
-                              <span className="inline-flex w-fit items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 capitalize">
-                                {business.subscription.plan}
-                              </span>
-                            ) : business.subscription?.status ===
-                              "trial_active" ? (
-                              <span className="inline-flex w-fit items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                                Trial
-                              </span>
-                            ) : business.subscription?.status ===
-                              "trial_ended" ? (
-                              <span className="inline-flex w-fit items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800">
-                                Trial Expired
-                              </span>
-                            ) : (
-                              <span className="inline-flex w-fit items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
-                                No Plan
-                              </span>
-                            )}
                           </div>
                         </td>
                         <td className="px-4 py-3 text-gray-700">
-                          <span className="flex items-center gap-1.5">
-                            <i className="fa-solid fa-users text-gray-400"></i>
-                            {business.memberCount || 0}
+                          {user.email}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">
+                            {user.businessCount || 0}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-gray-700">
-                          {new Date(business.createdAt).toLocaleDateString()}
+                          {new Date(user.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-4 py-3">
                           <button
-                            onClick={() => handleDeleteClick(business._id)}
+                            onClick={() => handleDeleteClick(user._id)}
                             className="inline-flex items-center justify-center gap-2 rounded-md bg-red-50 px-3 py-2 text-red-600 transition-colors duration-200 hover:bg-red-100"
                             title="Delete"
                           >
@@ -313,11 +256,11 @@ const BusinessesList = () => {
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
-        title="Delete Business?"
-        message="Are you sure you want to delete this business? This will also cancel any active subscriptions and release the associated phone numbers. This action cannot be undone."
+        title="Delete User Account?"
+        message="Are you sure you want to delete this user? This will also delete all businesses owned by this user, cancel their subscriptions, and release all associated phone numbers. This action cannot be undone."
       />
     </div>
   );
 };
 
-export default BusinessesList;
+export default UsersList;

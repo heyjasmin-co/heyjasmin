@@ -56,6 +56,7 @@ interface SendSMSToolData {
 }
 
 function createContentForAssistant(businessData: BusinessData): string {
+	const toolName = `send_sms_${businessData.businessName.toLowerCase().replace(/[^a-z0-9_-]/g, '_')}`
 	const systemPrompt = `You are a friendly and professional AI voice assistant named Jasmin representing ${businessData.businessName}. 
 You handle both inbound and outbound calls for ${
 		businessData.businessName
@@ -68,7 +69,7 @@ Your main goals:
    - Available services: ${businessData.services.map((s) => `\n      ${s}`).join('')}
 3. If the caller wants to book or reschedule an appointment:
    - Inform the caller that you will send them a quick text message (SMS) with a secure booking link.
-   - Use the "send_sms_${businessData.businessName.toLowerCase().replace(/\s+/g, '_')}" tool to send a message like:
+   - Use the "${toolName}" tool to send a message like:
      "Hi ${businessData.customerName || '{customer-name}'}, here's your booking link for ${businessData.businessName}: ${
 			businessData.bookingLink
 		}. Please confirm your appointment through this link."
@@ -113,7 +114,7 @@ You can choose a time that works best for you. Thank you!
 ---
 
 ### Tools Used
-- **send_sms_${businessData.businessName.toLowerCase().replace(/\s+/g, '_')}** → sends booking link to customer in real time.
+- **send_sms_${businessData.businessName.toLowerCase().replace(/[^a-z0-9_-]/g, '_')}** → sends booking link to customer in real time.
 
 ---
 
@@ -413,7 +414,7 @@ export async function createSendSMSTool(businessData: SendSMSToolData): Promise<
 		const payload = {
 			type: 'sms',
 			function: {
-				name: `send_sms_${businessData.businessName.toLowerCase().replace(/\s+/g, '_')}`,
+				name: `send_sms_${businessData.businessName.toLowerCase().replace(/[^a-z0-9_-]/g, '_')}`,
 				description: 'Send an SMS message to the customer with booking information, confirmations, or general details.',
 				parameters: {
 					type: 'object',

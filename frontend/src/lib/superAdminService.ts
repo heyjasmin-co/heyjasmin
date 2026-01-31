@@ -59,6 +59,12 @@ export const superAdminService = {
     api.post("/super-admin/change-email", data),
   verifyEmailChange: (data: { token: string; id: string }) =>
     api.post("/super-admin/verify-email-change", data),
-  getBusinesses: () => api.get("/super-admin/businesses"),
+
+  getBusinesses: (params?: { page: number; limit: number }) =>
+    api.get("/super-admin/businesses", { params }),
   deleteBusiness: (id: string) => api.delete(`/super-admin/businesses/${id}`),
+
+  getUsers: (params?: { page: number; limit: number }) =>
+    api.get("/super-admin/users", { params }),
+  deleteUser: (id: string) => api.delete(`/super-admin/users/${id}`),
 };
