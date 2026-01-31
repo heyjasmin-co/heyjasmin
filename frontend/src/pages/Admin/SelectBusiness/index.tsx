@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import Loading from "@/components/Loading";
 import { useLayoutEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -98,7 +99,7 @@ export default function SelectBusinessPage() {
   if (loading.apiLoading) {
     return (
       <div className="flex h-screen items-center justify-center text-gray-600">
-        Loading...
+        <Loading />
       </div>
     );
   }

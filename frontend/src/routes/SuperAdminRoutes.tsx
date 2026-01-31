@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import Loading from "../components/Loading";
 import SuperAdminLayout from "../components/SuperAdmin/SuperAdminLayout";
 
 const Login = lazy(() => import("../pages/SuperAdmin/auth/Login"));
@@ -33,8 +34,8 @@ const SuperAdminRoutes = () => {
   return (
     <Suspense
       fallback={
-        <div className="flex h-screen items-center justify-center">
-          <i className="fa-solid fa-spinner fa-spin text-4xl text-purple-600"></i>
+        <div className="flex h-screen w-full items-center justify-center">
+          <Loading />
         </div>
       }
     >

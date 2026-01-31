@@ -1,14 +1,14 @@
 import { useUser } from "@clerk/clerk-react";
 import { Navigate } from "react-router-dom";
 import { useUserData } from "../../context/UserDataContext";
-
+import Loading from "../Loading";
 export function RouteGuard({ children }: { children: React.ReactNode }) {
   const { isSignedIn, isLoaded } = useUser();
   const { userData, loading } = useUserData();
   if (!isLoaded || loading) {
     return (
       <div className="flex h-screen items-center justify-center text-gray-600">
-        Loading...
+        <Loading />
       </div>
     );
   }
@@ -18,7 +18,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   if (!userData) {
     return (
       <div className="flex h-screen items-center justify-center text-gray-600">
-        Loading...
+        <Loading />
       </div>
     );
   }
