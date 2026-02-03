@@ -125,8 +125,14 @@ export const useSelectBusiness = () => {
   const apiClient = useApiClient();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (businessId: string) => {
-      await apiClient.post(`/users/select-business/${businessId}`, {});
+    mutationFn: async ({
+      businessId,
+      role,
+    }: {
+      businessId: string;
+      role: string;
+    }) => {
+      await apiClient.post(`/users/select-business/${businessId}`, { role });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-data"] });
