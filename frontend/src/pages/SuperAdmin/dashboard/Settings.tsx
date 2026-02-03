@@ -9,6 +9,7 @@ import { colorTheme } from "@/theme/colorTheme";
 import { errorToast, successToast } from "@/utils/react-toast";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import infoIcon from "../../../assets/image/infoIcon.png";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -106,7 +107,18 @@ const Settings = () => {
                   Change Password
                 </h5>
               </div>
+              <div
+                className="flex items-center space-x-3 px-4 py-3"
+                style={{ fontFamily: "'Outfit', sans-serif" }}
+              >
+                <img src={infoIcon} alt="Training Icon" className="h-6 w-6" />
 
+                <p className="text-sm text-gray-700">
+                  Super Admins are allowed to update their account password. For
+                  security reasons, the current password is required to make
+                  this change.
+                </p>
+              </div>
               {/* Form */}
               <div className="px-4 py-4">
                 <form
@@ -230,7 +242,19 @@ const Settings = () => {
                   Change Email
                 </h5>
               </div>
+              <div
+                className="flex items-center space-x-3 px-4 py-3"
+                style={{ fontFamily: "'Outfit', sans-serif" }}
+              >
+                <img src={infoIcon} alt="Training Icon" className="h-6 w-6" />
 
+                <p className="text-sm text-gray-700">
+                  Super Admins can update their email address by confirming
+                  their password. A verification link will be sent to the
+                  current email address, and the email will only be updated
+                  after successful verification.
+                </p>
+              </div>
               {/* Form */}
               <div className="px-4 py-4">
                 <form
