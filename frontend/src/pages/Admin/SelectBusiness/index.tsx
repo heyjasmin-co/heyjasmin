@@ -44,19 +44,28 @@ export default function SelectBusinessPage() {
 
   const handleBusinessSelect = async (businessId: string) => {
     if (!businessId) return;
-    selectBusinessMutation.mutate(businessId, {
-      onSuccess: () => {
-        successToast("Business selected successfully.");
-        setTimeout(() => {
-          window.location.href = "/admin/dashboard";
-        }, 1500);
+
+    const selectedBusinessData = userBusinesses.find(
+      (b) => b.businessId === businessId,
+    );
+    const role = selectedBusinessData?.role || "owner"; // Default to owner if not found, though it should be there
+
+    selectBusinessMutation.mutate(
+      { businessId, role },
+      {
+        onSuccess: () => {
+          successToast("Business selected successfully.");
+          setTimeout(() => {
+            window.location.href = "/admin/dashboard";
+          }, 1500);
+        },
+        onError: (error: any) => {
+          console.error(error);
+          const msg = error.response?.data?.error || "Selection failed";
+          errorToast(msg);
+        },
       },
-      onError: (error: any) => {
-        console.error(error);
-        const msg = error.response?.data?.error || "Selection failed";
-        errorToast(msg);
-      },
-    });
+    );
   };
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
