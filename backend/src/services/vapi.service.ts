@@ -56,7 +56,13 @@ interface SendSMSToolData {
 }
 
 function createContentForAssistant(businessData: BusinessData): string {
-	const toolName = `send_sms_${businessData.businessName.toLowerCase().replace(/[^a-z0-9_-]/g, '_')}`
+	const sanitizedName = businessData.businessName
+		.replace(/[^a-zA-Z0-9_-]/g, '_') // Replace invalid chars with underscore
+		.replace(/_{2,}/g, '_') // Replace multiple underscores with single
+		.replace(/^[_-]+|[_-]+$/g, '') // Remove leading/trailing underscores or hyphens
+		.substring(0, 54) // Leave room for "send_sms_" prefix (64 - 9 = 55, but safer with 54)
+
+	const toolName = `send_sms_${sanitizedName}`
 	const systemPrompt = `You are a friendly and professional AI voice assistant named Jasmin representing ${businessData.businessName}. 
 You handle both inbound and outbound calls for ${
 		businessData.businessName
@@ -114,7 +120,7 @@ You can choose a time that works best for you. Thank you!
 ---
 
 ### Tools Used
-- **send_sms_${businessData.businessName.toLowerCase().replace(/[^a-z0-9_-]/g, '_')}** → sends booking link to customer in real time.
+- **${toolName}** → sends booking link to customer in real time.
 
 ---
 
@@ -161,6 +167,7 @@ function createAssistantData(businessData: BusinessData): any {
 		},
 		server: {
 			url: `${config.BACKEND_URL}/api/v1/webhooks-vapi`,
+			timeoutSeconds: 20,
 		},
 
 		clientMessages: [
@@ -199,7 +206,22 @@ export async function createAIAssistant(businessData: BusinessData): Promise<Ass
  */
 export async function updateAIAssistant(businessData: BusinessData, assistantId: string): Promise<Assistant> {
 	try {
-		const updatedAssistant = await vapiClient.assistants.update(assistantId, createAssistantData(businessData))
+		const currentAssistant = await vapiClient.assistants.get(assistantId)
+		if (!currentAssistant.model) {
+			throw new Error('Assistant has no model configuration')
+		}
+
+		const updatedAssistant = await vapiClient.assistants.update(assistantId, {
+			model: {
+				...currentAssistant.model,
+				messages: [
+					{
+						role: 'system',
+						content: createContentForAssistant(businessData),
+					},
+				],
+			},
+		})
 
 		return updatedAssistant
 	} catch (error: any) {
@@ -411,10 +433,17 @@ export async function handleCreateAssistantCall(request: FastifyRequest, vapiMes
  */
 export async function createSendSMSTool(businessData: SendSMSToolData): Promise<SmsFunctionCall> {
 	try {
+		const sanitizedName = businessData.businessName
+			.replace(/[^a-zA-Z0-9_-]/g, '_') // Replace invalid chars with underscore
+			.replace(/_{2,}/g, '_') // Replace multiple underscores with single
+			.replace(/^[_-]+|[_-]+$/g, '') // Remove leading/trailing underscores or hyphens
+			.substring(0, 54) // Leave room for "send_sms_" prefix (64 - 9 = 55, but safer with 54)
+
+		const toolName = `send_sms_${sanitizedName}`
 		const payload = {
 			type: 'sms',
 			function: {
-				name: `send_sms_${businessData.businessName.toLowerCase().replace(/[^a-z0-9_-]/g, '_')}`,
+				name: toolName,
 				description: 'Send an SMS message to the customer with booking information, confirmations, or general details.',
 				parameters: {
 					type: 'object',
@@ -460,7 +489,17 @@ export async function updateAIAssistantWithSendSMSTool({
 	assistantId: string
 }) {
 	try {
-		const update = await vapiClient.assistants.update(assistantId, createAssistantData(businessData))
+		const currentAssistant = await vapiClient.assistants.get(assistantId)
+		if (!currentAssistant.model) {
+			throw new Error('Assistant has no model configuration')
+		}
+
+		const update = await vapiClient.assistants.update(assistantId, {
+			model: {
+				...currentAssistant.model,
+				toolIds: [toolId],
+			},
+		})
 
 		return update
 	} catch (error: any) {

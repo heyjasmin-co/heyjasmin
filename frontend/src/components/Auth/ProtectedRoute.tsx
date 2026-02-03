@@ -1,6 +1,7 @@
 import { useUser } from "@clerk/clerk-react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useUserData } from "../../context/UserDataContext";
+import Loading from "../Loading";
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
@@ -16,7 +17,7 @@ export default function ProtectedRoute({
   if (!isLoaded || loading) {
     return (
       <div className="flex h-screen items-center justify-center text-gray-600">
-        Loading...
+        <Loading />
       </div>
     );
   }
@@ -26,7 +27,7 @@ export default function ProtectedRoute({
   if (!userData) {
     return (
       <div className="flex h-screen items-center justify-center text-gray-600">
-        Loading...
+        <Loading />
       </div>
     );
   }

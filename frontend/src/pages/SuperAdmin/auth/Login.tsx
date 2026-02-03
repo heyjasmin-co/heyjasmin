@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SuperAdminLoginData } from "@/lib/superAdminService";
+import { appName } from "@/theme/appName";
+import { colorTheme } from "@/theme/colorTheme";
+import { errorToast } from "@/utils/react-toast";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSuperAdminLogin } from "../../../hooks/useSuperAdmin";
-import { appName } from "../../../theme/appName";
-import { colorTheme } from "../../../theme/colorTheme";
-import { errorToast } from "../../../utils/react-toast";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -175,7 +176,7 @@ const Login = () => {
                   Forgot Password?
                 </Link>
               </div>
-              <div className="text-gray-500">
+              {/* <div className="text-gray-500">
                 Don't have an account?{" "}
                 <Link
                   to="/super-admin/auth/signup"
@@ -184,7 +185,7 @@ const Login = () => {
                 >
                   Sign Up
                 </Link>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

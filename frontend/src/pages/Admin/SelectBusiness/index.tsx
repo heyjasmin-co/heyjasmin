@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import Loading from "@/components/Loading";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import completeIcon from "../../../assets/image/completeIcon.png";
@@ -64,7 +66,7 @@ export default function SelectBusinessPage() {
   if (apiLoading) {
     return (
       <div className="flex h-screen items-center justify-center text-gray-600">
-        Loading...
+        <Loading />
       </div>
     );
   }

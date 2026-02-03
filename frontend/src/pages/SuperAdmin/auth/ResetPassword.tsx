@@ -2,6 +2,7 @@ import {
   SuperAdminForgotPasswordData,
   SuperAdminResetPasswordData,
 } from "@/lib/superAdminService";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
 import { errorToast, successToast } from "@/utils/react-toast";
