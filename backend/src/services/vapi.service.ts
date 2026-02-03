@@ -56,7 +56,7 @@ interface SendSMSToolData {
 }
 
 function createContentForAssistant(businessData: BusinessData): string {
-	const toolName = `send_sms_${businessData.businessName.toLowerCase().replace(/[^a-z0-9_-]/g, '_')}`
+	const functionName = `send_sms_${businessData.businessName.toLowerCase().replace(/[^a-z0-9_-]/g, '_')}`
 	const systemPrompt = `You are a friendly and professional AI voice assistant named Jasmin representing ${businessData.businessName}. 
 You handle both inbound and outbound calls for ${
 		businessData.businessName
