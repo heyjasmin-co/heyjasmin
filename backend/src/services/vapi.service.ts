@@ -56,7 +56,13 @@ interface SendSMSToolData {
 }
 
 function createContentForAssistant(businessData: BusinessData): string {
-	const functionName = `send_sms_${businessData.businessName.toLowerCase().replace(/[^a-z0-9_-]/g, '_')}`
+	const sanitizedName = businessData.businessName
+		.replace(/[^a-zA-Z0-9_-]/g, '_') // Replace invalid chars with underscore
+		.replace(/_{2,}/g, '_') // Replace multiple underscores with single
+		.replace(/^[_-]+|[_-]+$/g, '') // Remove leading/trailing underscores or hyphens
+		.substring(0, 54) // Leave room for "send_sms_" prefix (64 - 9 = 55, but safer with 54)
+
+	const toolName = `send_sms_${sanitizedName}`
 	const systemPrompt = `You are a friendly and professional AI voice assistant named Jasmin representing ${businessData.businessName}. 
 You handle both inbound and outbound calls for ${
 		businessData.businessName
@@ -69,7 +75,7 @@ Your main goals:
    - Available services: ${businessData.services.map((s) => `\n      ${s}`).join('')}
 3. If the caller wants to book or reschedule an appointment:
    - Inform the caller that you will send them a quick text message (SMS) with a secure booking link.
-   - Use the "${functionName}" tool to send a message like:
+   - Use the "${toolName}" tool to send a message like:
      "Hi ${businessData.customerName || '{customer-name}'}, here's your booking link for ${businessData.businessName}: ${
 			businessData.bookingLink
 		}. Please confirm your appointment through this link."
@@ -114,7 +120,7 @@ You can choose a time that works best for you. Thank you!
 ---
 
 ### Tools Used
-- **${functionName}** → sends booking link to customer in real time.
+- **${toolName}** → sends booking link to customer in real time.
 
 ---
 
@@ -427,10 +433,17 @@ export async function handleCreateAssistantCall(request: FastifyRequest, vapiMes
  */
 export async function createSendSMSTool(businessData: SendSMSToolData): Promise<SmsFunctionCall> {
 	try {
+		const sanitizedName = businessData.businessName
+			.replace(/[^a-zA-Z0-9_-]/g, '_') // Replace invalid chars with underscore
+			.replace(/_{2,}/g, '_') // Replace multiple underscores with single
+			.replace(/^[_-]+|[_-]+$/g, '') // Remove leading/trailing underscores or hyphens
+			.substring(0, 54) // Leave room for "send_sms_" prefix (64 - 9 = 55, but safer with 54)
+
+		const toolName = `send_sms_${sanitizedName}`
 		const payload = {
 			type: 'sms',
 			function: {
-				name: `send_sms_${businessData.businessName.toLowerCase().replace(/[^a-z0-9_-]/g, '_')}`,
+				name: toolName,
 				description: 'Send an SMS message to the customer with booking information, confirmations, or general details.',
 				parameters: {
 					type: 'object',
