@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import TitleCard from "@/components/TitleCard";
-import {
-  SuperAdminChangeEmailData,
-  SuperAdminChangePasswordData,
-} from "@/lib/superAdminService";
 import { colorTheme } from "@/theme/colorTheme";
 import { errorToast, successToast } from "@/utils/react-toast";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import infoIcon from "../../../assets/image/infoIcon.png";
 import {
+  SuperAdminChangeEmailData,
+  SuperAdminChangePasswordData,
   useSuperAdminChangeEmail,
   useSuperAdminChangePassword,
 } from "../../../hooks/useSuperAdmin";

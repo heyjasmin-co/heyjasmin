@@ -25,5 +25,7 @@ export const updateBusinessAssistantById = async (
 		updated?.aiAgentSettings.assistantId!
 	)
 
+	await Business.findByIdAndUpdate(businessId, { $set: { hasPendingChanges: false } })
+
 	return updated
 }

@@ -1,47 +1,49 @@
+import TrainingSources from "@/components/dashboard/TrainingSources";
+import Loading from "@/components/Loading";
+import BusinessDetails from "@/components/settings/BusinessDetails";
+import BusinessHours from "@/components/settings/BusinessHours";
+import BusinessTitleCard from "@/components/settings/BusinessTitleCard";
+import CoreService from "@/components/settings/CoreService";
+import { useUserData } from "@/context/UserDataContext";
+import { useBusinessDetails, useUpdateAssistant } from "@/hooks/useBusiness";
+import { appName } from "@/theme/appName";
+import { BusinessDetailsType } from "@/types/BusinessTypes";
+import { errorToast, successToast } from "@/utils/react-toast";
+import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
-import TrainingSources from "../../../../components/dashboard/TrainingSources";
-import Loading from "../../../../components/Loading";
-import BusinessDetails from "../../../../components/settings/BusinessDetails";
-import BusinessHours from "../../../../components/settings/BusinessHours";
-import BusinessTitleCard from "../../../../components/settings/BusinessTitleCard";
-import CoreService from "../../../../components/settings/CoreService";
-import { useUserData } from "../../../../context/UserDataContext";
-import {
-  useBusinessDetails,
-  useUpdateAssistant,
-} from "../../../../hooks/useBusiness";
-import { useTeammates } from "../../../../hooks/useUser";
-import { appName } from "../../../../theme/appName";
-import { BusinessDetailsType } from "../../../../types/BusinessTypes";
-import { errorToast, successToast } from "../../../../utils/react-toast";
 
 export default function BusinessDetailsPage() {
   const { userData } = useUserData();
-  const [businessDetailsState, setBusinessDetailsState] =
-    useState<BusinessDetailsType | null>(null);
-  if (!userData?.businessId) {
-    return <Loading />;
-  }
-  const { data: businessDetails, isLoading } = useBusinessDetails(
-    userData?.businessId!,
+  const [businessInfo, setBusinessInfo] = useState<BusinessDetailsType | null>(
+    null,
   );
-  const { data: businessUsers } = useTeammates(userData?.businessId!);
-  const updateAssistantMutation = useUpdateAssistant(userData?.businessId!);
+  const { data: businessDetails, isLoading } = useBusinessDetails(
+    userData?.businessId || "",
+  );
+  const {
+    isPending: updateAssistantPending,
+    mutateAsync: updateAssistantMutation,
+  } = useUpdateAssistant(userData?.businessId || "");
 
   useEffect(() => {
     if (businessDetails) {
-      setBusinessDetailsState(businessDetails);
+      setBusinessInfo(businessDetails);
     }
   }, [businessDetails]);
 
+  if (!userData?.businessId) {
+    return <Loading />;
+  }
+
   const handleUpdateAgent = async () => {
-    updateAssistantMutation.mutate(undefined, {
-      onSuccess: (data: any) => {
-        setBusinessDetailsState(data);
+    updateAssistantMutation(undefined, {
+      onSuccess: (data: BusinessDetailsType) => {
+        setBusinessInfo(data);
         successToast("AI Agent updated successfully");
       },
-      onError: (error: any) => {
-        const message = error.response?.data?.error || "Update failed";
+      onError: (error: Error) => {
+        const axiosError = error as AxiosError<{ error: string }>;
+        const message = axiosError.response?.data?.error || "Update failed";
         errorToast(message);
       },
     });
@@ -49,36 +51,36 @@ export default function BusinessDetailsPage() {
 
   return (
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
-      {isLoading && !businessDetails ? (
+      {isLoading && !businessInfo ? (
         <Loading />
       ) : (
         <div className="flex flex-col gap-5">
-          {businessDetails && (
+          {businessInfo && (
             <>
               <BusinessTitleCard
-                checkBusinessDetails={businessDetails}
-                businessDetails={businessDetails}
+                businessDetails={businessInfo}
                 title="Business Information"
                 canEdit={userData?.role !== "viewer"}
+                isLoading={updateAssistantPending}
                 handleUpdateAgent={handleUpdateAgent}
                 subtitle={`This business information gives ${appName} the context to handle your calls.`}
               />
-              <TrainingSources businessWebsite={businessDetails.website!} />
+              <TrainingSources businessWebsite={businessInfo.website!} />
               <BusinessDetails
-                setBusinessDetails={setBusinessDetailsState}
-                businessOverview={businessDetails.overview!}
-                businessName={businessDetails.name}
-                businessAddress={businessDetails.address!}
+                setBusinessDetails={setBusinessInfo}
+                businessOverview={businessInfo.overview!}
+                businessName={businessInfo.name}
+                businessAddress={businessInfo.address!}
                 canEdit={userData?.role !== "viewer"}
               />
               <CoreService
-                businessServices={businessDetails.services}
-                setBusinessDetails={setBusinessDetailsState}
+                businessServices={businessInfo.services}
+                setBusinessDetails={setBusinessInfo}
                 canEdit={userData?.role !== "viewer"}
               />
               <BusinessHours
-                hours={businessDetails.businessHours}
-                setBusinessDetails={setBusinessDetailsState}
+                hours={businessInfo.businessHours}
+                setBusinessDetails={setBusinessInfo}
                 canEdit={userData?.role !== "viewer"}
               />
             </>

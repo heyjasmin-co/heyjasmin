@@ -1,19 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useUpdateBusinessInformation } from "@/hooks/useBusiness";
 import { Textarea, TextInput } from "flowbite-react";
 import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
 import { colorTheme } from "../../theme/colorTheme";
 import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
-
-type UpdateBusinessInformationResponse = {
-  name: string;
-  overview: string;
-  address: string;
-};
 
 type BusinessDetailsProps = {
   businessOverview: string;
@@ -47,8 +41,10 @@ function BusinessDetails({
     address: null,
   });
 
-  const apiClient = useApiClient();
   const { userData } = useUserData();
+  const updateInfoMutation = useUpdateBusinessInformation(
+    userData?.businessId || "",
+  );
 
   const handleSave = async () => {
     const validationErrors: any = {};
@@ -71,41 +67,33 @@ function BusinessDetails({
     });
 
     setLoading(true);
-    try {
-      const updateData = { name, overview, address };
+    updateInfoMutation.mutate(
+      { name, overview, address },
+      {
+        onSuccess: (updated) => {
+          setBusinessDetails((pv) => {
+            if (!pv) return null;
 
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: UpdateBusinessInformationResponse;
-      }>(`/businesses/information/${userData?.businessId}`, updateData);
-
-      const updated = response.data.data;
-
-      setBusinessDetails((pv) => {
-        if (!pv) return null;
-
-        return {
-          ...pv,
-          name: updated.name,
-          overview: updated.overview || "",
-          address: updated.address || "",
-        };
-      });
-      localStorage.setItem(
-        "businessDetails",
-        JSON.stringify(response.data.data),
-      );
-      successToast(response.data.message);
-    } catch (error: any) {
-      console.error(error);
-      errorToast(
-        error?.response?.data?.error || "Failed to update business info.",
-      );
-    } finally {
-      setIsEditing(false);
-      setLoading(false);
-    }
+            return {
+              ...pv,
+              name: updated.name,
+              overview: updated.overview || "",
+              address: updated.address || "",
+              hasPendingChanges: true,
+            };
+          });
+          successToast("Business information updated successfully");
+          setIsEditing(false);
+          setLoading(false);
+        },
+        onError: (error: any) => {
+          errorToast(
+            error?.response?.data?.error || "Failed to update business info.",
+          );
+          setLoading(false);
+        },
+      },
+    );
   };
 
   return (

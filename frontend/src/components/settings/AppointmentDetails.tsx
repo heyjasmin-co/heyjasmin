@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import infoIcon from "@/assets/image/infoIcon.png";
+import { useUpdateBusinessAppointment } from "@/hooks/useBusiness";
 import { Textarea, TextInput, ToggleSwitch } from "flowbite-react";
 import { useEffect, useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
 import { colorTheme } from "../../theme/colorTheme";
 import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
@@ -41,8 +41,10 @@ function AppointmentDetails({
     link: null,
   });
 
-  const apiClient = useApiClient();
   const { userData } = useUserData();
+  const updateAppointmentMutation = useUpdateBusinessAppointment(
+    userData?.businessId || "",
+  );
 
   const handleSave = async () => {
     const validationErrors: any = {};
@@ -77,37 +79,37 @@ function AppointmentDetails({
 
     setErrors({ message: null, link: null });
     setLoading(true);
-    try {
-      const response = await apiClient.patch(
-        `/businesses/appointment/${userData?.businessId}`,
-        {
-          appointmentEnabled,
-          appointmentMessage: message,
-          schedulingLink: link,
+
+    updateAppointmentMutation.mutate(
+      {
+        appointmentEnabled,
+        appointmentMessage: message,
+        schedulingLink: link,
+      },
+      {
+        onSuccess: (data) => {
+          setBusinessDetails((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              appointmentSettings: data,
+              hasPendingChanges: true,
+            };
+          });
+
+          successToast("Appointment settings updated");
+          setIsEditing(false);
+          setLoading(false);
         },
-      );
-
-      setBusinessDetails((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          appointmentSettings: {
-            appointmentEnabled,
-            appointmentMessage: message,
-            schedulingLink: link,
-          },
-        };
-      });
-
-      successToast(response.data?.message || "Appointment settings updated");
-      setIsEditing(false);
-    } catch (error: any) {
-      errorToast(
-        error?.response?.data?.error || "Failed to update appointment settings",
-      );
-    } finally {
-      setLoading(false);
-    }
+        onError: (error: any) => {
+          errorToast(
+            error?.response?.data?.error ||
+              "Failed to update appointment settings",
+          );
+          setLoading(false);
+        },
+      },
+    );
   };
 
   useEffect(() => {

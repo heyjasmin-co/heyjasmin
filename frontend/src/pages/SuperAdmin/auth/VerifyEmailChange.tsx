@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { superAdminService } from "@/lib/superAdminService";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
 import { errorToast, successToast } from "@/utils/react-toast";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useVerifyEmailChange } from "../../../hooks/useSuperAdmin";
 
 const VerifyEmailChange = () => {
   const navigate = useNavigate();
@@ -14,6 +14,8 @@ const VerifyEmailChange = () => {
   const [verifying, setVerifying] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const verificationAttempted = useRef(false);
+
+  const verifyMutation = useVerifyEmailChange();
 
   useEffect(() => {
     const performVerification = async () => {
@@ -26,27 +28,29 @@ const VerifyEmailChange = () => {
         return;
       }
 
-      try {
-        const { data } = await superAdminService.verifyEmailChange({
-          token,
-          id,
-        });
-        if (data.success) {
-          successToast(
-            "Email updated successfully! Please login with your new email.",
-          );
-          // Redirect to login or dashboard
-          navigate("/super-admin/auth/login", { replace: true });
-        }
-      } catch (err: any) {
-        const msg =
-          err.response?.data?.error ||
-          "Verification failed. The link may be expired.";
-        setError(msg);
-        errorToast(msg);
-      } finally {
-        setVerifying(false);
-      }
+      verifyMutation.mutate(
+        { token, id },
+        {
+          onSuccess: (response: any) => {
+            if (response.data.success) {
+              successToast(
+                "Email updated successfully! Please login with your new email.",
+              );
+              navigate("/super-admin/auth/login", { replace: true });
+            }
+          },
+          onError: (err: any) => {
+            const msg =
+              err.response?.data?.error ||
+              "Verification failed. The link may be expired.";
+            setError(msg);
+            errorToast(msg);
+          },
+          onSettled: () => {
+            setVerifying(false);
+          },
+        },
+      );
     };
 
     performVerification();

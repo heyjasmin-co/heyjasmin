@@ -7,7 +7,11 @@ export const updateBusinessInformationById = async (
 	args: UpdateBusinessInformationByIdInput
 ): Promise<UpdateBusinessInformationByIdOutput> => {
 	const { businessId, ...updateData } = args
-	const updateBusinessInformation = await Business.findByIdAndUpdate(businessId, { $set: updateData }, { new: true, runValidators: true })
+	const updateBusinessInformation = await Business.findByIdAndUpdate(
+		businessId,
+		{ $set: { ...updateData, hasPendingChanges: true } },
+		{ new: true, runValidators: true }
+	)
 		.select('name overview address')
 		.lean()
 

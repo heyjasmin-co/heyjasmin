@@ -13,6 +13,7 @@ export interface UserData {
   assistantNumber: string | null;
   businessName: string | null;
   subscription: SubscriptionDetails | null;
+  hasSubscription?: boolean;
 }
 
 export interface SubscriptionDetails {
@@ -99,7 +100,11 @@ export const useTeammates = (businessId?: string) => {
   return useQuery({
     queryKey: ["teammates", businessId],
     queryFn: async () => {
-      const response = await apiClient.get(`/users/teammates`);
+      const response = await apiClient.get<{
+        success: boolean;
+        message: string;
+        data: BusinessUserType[];
+      }>(`/business-users/${businessId}`);
       return response.data.data;
     },
     enabled: !!businessId,

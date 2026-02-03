@@ -1,7 +1,3 @@
-import {
-  SuperAdminForgotPasswordData,
-  SuperAdminResetPasswordData,
-} from "@/lib/superAdminService";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
@@ -9,6 +5,8 @@ import { errorToast, successToast } from "@/utils/react-toast";
 import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
+  SuperAdminForgotPasswordData,
+  SuperAdminResetPasswordData,
   useSuperAdminForgotPassword,
   useSuperAdminResetPassword,
 } from "../../../hooks/useSuperAdmin";

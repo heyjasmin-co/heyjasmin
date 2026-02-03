@@ -1,12 +1,12 @@
-import { useState } from "react";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import TitleCard from "@/components/TitleCard";
 import { appName } from "@/theme/appName";
+import { useState } from "react";
 import { HiTrash } from "react-icons/hi";
 import infoIcon from "../../../assets/image/infoIcon.png";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import Loading from "../../../components/Loading";
 import {
+  SuperAdminBusiness,
   useDeleteBusiness,
   useSuperAdminBusinesses,
 } from "../../../hooks/useSuperAdmin";
@@ -29,9 +29,9 @@ const BusinessesList = () => {
   } = useSuperAdminBusinesses(page, limit);
   const deleteMutation = useDeleteBusiness();
 
-  const businesses = response?.data?.businesses || [];
-  const total = response?.data?.total || 0;
-  const totalPages = response?.data?.pages || 0;
+  const businesses = response?.businesses || [];
+  const total = response?.total || 0;
+  const totalPages = response?.pages || 0;
 
   const handleDeleteClick = (id: string) => {
     setSelectedBusinessId(id);
@@ -46,7 +46,7 @@ const BusinessesList = () => {
         setSelectedBusinessId(null);
         successToast("Business deleted successfully");
       },
-      onError: (error: any) => {
+      onError: (error: Error) => {
         console.error("Failed to delete business", error);
         errorToast("Failed to delete business");
       },
@@ -152,7 +152,7 @@ const BusinessesList = () => {
                       </td>
                     </tr>
                   ) : (
-                    businesses.map((business: any) => (
+                    businesses.map((business: SuperAdminBusiness) => (
                       <tr key={business._id}>
                         <td className="px-4 py-3">
                           <div className="flex flex-col">

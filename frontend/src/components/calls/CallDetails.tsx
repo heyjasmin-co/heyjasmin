@@ -8,11 +8,10 @@ export default function CallDetails() {
   const { callId } = useParams<{ callId: string }>();
   const { userData } = useUserData();
 
-  const {
-    data: call,
-    isLoading,
-    error,
-  } = useCallDetails(callId, userData?.businessId ?? undefined);
+  const { data: call, isLoading } = useCallDetails(
+    callId,
+    userData?.businessId ?? undefined,
+  );
 
   if (isLoading) return <Loading />;
 

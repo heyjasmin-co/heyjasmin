@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useSuperAdminSignup } from "@/hooks/useSuperAdmin";
-import { SuperAdminSignupData } from "@/lib/superAdminService";
+import {
+  SuperAdminSignupData,
+  useSuperAdminSignup,
+} from "@/hooks/useSuperAdmin";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { appName } from "../../../theme/appName";

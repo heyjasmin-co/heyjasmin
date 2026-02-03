@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import celebIcon from "../../../../assets/image/celebIcon.png";
 import websiteIcon from "../../../../assets/image/websiteIcon.png";
@@ -33,8 +34,9 @@ export default function Dashboard() {
       onSuccess: () => {
         successToast("AI Agent configuration updated");
       },
-      onError: (error: any) => {
-        const message = error.response?.data?.error || "Update failed";
+      onError: (error: Error) => {
+        const axiosError = error as AxiosError<{ error: string }>;
+        const message = axiosError.response?.data?.error || "Update failed";
         errorToast(message);
       },
     });

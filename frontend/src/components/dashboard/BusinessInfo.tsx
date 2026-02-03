@@ -104,6 +104,10 @@ function BusinessInfo({
       if (address.trim() === "") {
         errors.address = "Business address is required.";
       }
+      if (services.length === 0) {
+        errorToast("Please specify at least one service.");
+        return;
+      }
       if (Object.keys(errors).length) {
         setErrors(errors);
         const showError = Object.keys(errors)[0];
@@ -137,7 +141,11 @@ function BusinessInfo({
       successToast(response.data.message);
     } catch (error: any) {
       console.error(error);
-      errorToast(error.response.data.error);
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Update failed";
+      errorToast(message);
     } finally {
       setLoading(false);
     }

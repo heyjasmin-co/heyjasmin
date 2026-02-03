@@ -27,7 +27,11 @@ export const updateBusinessDetailsById = async (
 	try {
 		return await runTransaction(async (session) => {
 			// Step 1: Update business info
-			const updatedBusinessInfo = await Business.findByIdAndUpdate(businessId, { $set: { ...updateData } }, { new: true, session })
+			const updatedBusinessInfo = await Business.findByIdAndUpdate(
+				businessId,
+				{ $set: { ...updateData, hasPendingChanges: true } },
+				{ new: true, session }
+			)
 
 			if (!updatedBusinessInfo) {
 				throw new Error(`No business found with the provided ID: ${businessId}`)

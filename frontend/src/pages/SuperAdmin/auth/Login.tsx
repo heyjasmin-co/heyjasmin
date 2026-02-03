@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SuperAdminLoginData } from "@/lib/superAdminService";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
 import { errorToast } from "@/utils/react-toast";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSuperAdminLogin } from "../../../hooks/useSuperAdmin";
+import {
+  SuperAdminLoginData,
+  useSuperAdminLogin,
+} from "../../../hooks/useSuperAdmin";
 
 const Login = () => {
   const navigate = useNavigate();

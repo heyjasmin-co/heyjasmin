@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useUpdateBusinessServices } from "@/hooks/useBusiness";
 import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
 import { colorTheme } from "../../theme/colorTheme";
 import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
@@ -22,8 +22,10 @@ function CoreService({
   const [isEditing, setIsEditing] = useState(false);
   const [services, setServices] = useState<string[]>(businessServices);
   const [saving, setSaving] = useState(false);
-  const apiClient = useApiClient();
   const { userData } = useUserData();
+  const updateServicesMutation = useUpdateBusinessServices(
+    userData?.businessId || "",
+  );
 
   const [newService, setNewService] = useState("");
 
@@ -43,29 +45,30 @@ function CoreService({
   const handleSave = async () => {
     if (!userData?.businessId) return;
     setSaving(true);
-    try {
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: string[];
-      }>(`/businesses/services/${userData.businessId}`, { services });
+    updateServicesMutation.mutate(services, {
+      onSuccess: (updateService) => {
+        setBusinessDetails((pv) => {
+          if (!pv) return null;
 
-      const updateService = response.data.data;
-      setBusinessDetails((pv) => {
-        if (!pv) return null;
-
-        return {
-          ...pv,
-          services: updateService,
-        };
-      });
-      successToast(response.data.message);
-      setIsEditing(false);
-    } catch (error: any) {
-      errorToast(error?.response?.data?.error || "Failed to update services.");
-    } finally {
-      setSaving(false);
-    }
+          return {
+            ...pv,
+            services: updateService,
+            hasPendingChanges: true,
+          };
+        });
+        successToast("Services updated successfully");
+        setIsEditing(false);
+        setSaving(false);
+      },
+      onError: (error: any) => {
+        const message =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to update services.";
+        errorToast(message);
+        setSaving(false);
+      },
+    });
   };
 
   return (

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export type BusinessDetailsType = {
   _id?: string;
   name: string;
@@ -28,6 +27,7 @@ export type BusinessDetailsType = {
   };
   clerkOrganizationId?: string;
   isSetupComplete: boolean;
+  hasPendingChanges: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -49,8 +49,8 @@ export interface IBusinessHour {
 export interface BusinessCreationType {
   id: string;
   name: string;
-  messageAudio: any;
-  greetingAudio: any;
+  messageAudio: string;
+  greetingAudio: string;
 }
 
 export type BusinessAppointmentOutputType = {

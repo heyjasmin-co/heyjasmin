@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useUpdateBusinessHours } from "@/hooks/useBusiness";
 import { useState } from "react";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
 import { colorTheme } from "../../theme/colorTheme";
 import { BusinessDetailsType, IBusinessHour } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
@@ -22,8 +22,10 @@ function BusinessHours({
   const [isEditing, setIsEditing] = useState(false);
   const [businessHours, setBusinessHours] = useState(hours);
   const [saving, setSaving] = useState(false);
-  const apiClient = useApiClient();
   const { userData } = useUserData();
+  const updateHoursMutation = useUpdateBusinessHours(
+    userData?.businessId || "",
+  );
 
   const handleToggleDay = (index: number) => {
     if (!isEditing) return;
@@ -53,31 +55,28 @@ function BusinessHours({
   const handleSave = async () => {
     if (!userData?.businessId) return;
     setSaving(true);
-    try {
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: IBusinessHour[];
-      }>(`/businesses/hours/${userData.businessId}`, { businessHours });
+    updateHoursMutation.mutate(businessHours, {
+      onSuccess: (updateHours) => {
+        setBusinessDetails((pv) => {
+          if (!pv) return null;
 
-      const updateHours = response.data.data;
-      setBusinessDetails((pv) => {
-        if (!pv) return null;
-
-        return {
-          ...pv,
-          businessHours: updateHours,
-        };
-      });
-      successToast(response.data.message);
-      setIsEditing(false);
-    } catch (error: any) {
-      errorToast(
-        error?.response?.data?.error || "Failed to update business hours.",
-      );
-    } finally {
-      setSaving(false);
-    }
+          return {
+            ...pv,
+            businessHours: updateHours,
+            hasPendingChanges: true,
+          };
+        });
+        successToast("Business hours updated successfully");
+        setIsEditing(false);
+        setSaving(false);
+      },
+      onError: (error: any) => {
+        errorToast(
+          error?.response?.data?.error || "Failed to update business hours.",
+        );
+        setSaving(false);
+      },
+    });
   };
 
   return (

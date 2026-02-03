@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import TitleCard from "@/components/TitleCard";
 import { appName } from "@/theme/appName";
 import { useState } from "react";
@@ -7,6 +6,7 @@ import infoIcon from "../../../assets/image/infoIcon.png";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import Loading from "../../../components/Loading";
 import {
+  SuperAdminUser,
   useDeleteUser,
   useSuperAdminUsers,
 } from "../../../hooks/useSuperAdmin";
@@ -27,9 +27,9 @@ const UsersList = () => {
   } = useSuperAdminUsers(page, limit);
   const deleteMutation = useDeleteUser();
 
-  const users = response?.data?.users || [];
-  const total = response?.data?.total || 0;
-  const totalPages = response?.data?.pages || 0;
+  const users = response?.users || [];
+  const total = response?.total || 0;
+  const totalPages = response?.pages || 0;
 
   const handleDeleteClick = (id: string) => {
     setSelectedUserId(id);
@@ -44,7 +44,7 @@ const UsersList = () => {
         setSelectedUserId(null);
         successToast("User and all associated data deleted successfully");
       },
-      onError: (error: any) => {
+      onError: (error: Error) => {
         console.error("Failed to delete user", error);
         errorToast("Failed to delete user");
       },
@@ -145,7 +145,7 @@ const UsersList = () => {
                       </td>
                     </tr>
                   ) : (
-                    users.map((user: any) => (
+                    users.map((user: SuperAdminUser) => (
                       <tr key={user._id}>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">

@@ -15,6 +15,7 @@ export const updateBusinessAppointmentById = async (
 				'appointmentSettings.appointmentEnabled': appointmentEnabled,
 				'appointmentSettings.appointmentMessage': appointmentMessage,
 				'appointmentSettings.schedulingLink': schedulingLink,
+				hasPendingChanges: true,
 			},
 		},
 		{ new: true }

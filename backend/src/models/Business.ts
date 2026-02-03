@@ -36,6 +36,7 @@ interface IBusiness extends Document {
 		schedulingLink: string | null
 	}
 	isSetupComplete: boolean
+	hasPendingChanges: boolean
 	createdAt: Date
 	updatedAt: Date
 }
@@ -101,6 +102,7 @@ const businessSchema = new Schema<IBusiness>(
 
 		// Setup Status
 		isSetupComplete: { type: Boolean, default: false },
+		hasPendingChanges: { type: Boolean, default: false },
 	},
 	{ timestamps: true }
 )

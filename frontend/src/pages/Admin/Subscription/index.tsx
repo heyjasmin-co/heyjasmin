@@ -75,12 +75,7 @@ export default function SubscriptionPage() {
 
   const handleSelectPlan = (id: number) => {
     setSelectedPlan(id);
-    user.setUserData((prev: any) => {
-      if (prev) {
-        return { ...prev, hasSubscription: true };
-      }
-      return prev;
-    });
+    user.updateUserData({ hasSubscription: true });
     navigate("/admin/dashboard");
   };
 
