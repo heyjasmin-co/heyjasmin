@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import TitleCard from "@/components/TitleCard";
+import { appName } from "@/theme/appName";
 import { useCallback, useEffect, useState } from "react";
 import { HiTrash } from "react-icons/hi";
+import infoIcon from "../../../assets/image/infoIcon.png";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import Loading from "../../../components/Loading";
 import { superAdminService } from "../../../lib/superAdminService";
@@ -77,30 +80,46 @@ const BusinessesList = () => {
   }
 
   return (
-    <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
+    <div className="flex h-full flex-1 flex-col gap-4 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
+      <TitleCard
+        title="Registered Businesses"
+        subtitle="Administrative overview of registered businesses"
+        hasButton={false}
+      />
       <div
         className="w-full rounded-xl border border-gray-200 bg-white shadow-lg"
         style={{ fontFamily: "'Outfit', sans-serif" }}
       >
         <div className="h-full w-full divide-y divide-gray-200">
           {/* Header */}
-          <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center space-x-3">
-              <div
-                className="flex h-8 w-8 items-center justify-center rounded-full"
-                style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
-              >
-                <i className="fa-solid fa-building text-white"></i>
+          <div className="flex flex-col gap-4 px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div
+                  className="flex h-8 w-8 items-center justify-center rounded-full"
+                  style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+                >
+                  <i className="fa-solid fa-building text-white"></i>
+                </div>
+                <h5 className="text-lg font-bold text-gray-900">
+                  Registered Businesses
+                </h5>
               </div>
-              <h5 className="text-lg font-bold text-gray-900">
-                Registered Businesses
-              </h5>
+
+              <div className="flex items-center gap-4">
+                <div className="text-sm font-medium whitespace-nowrap text-gray-500">
+                  Total: <span className="text-gray-900">{total}</span>
+                </div>
+              </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="text-sm font-medium whitespace-nowrap text-gray-500">
-                Total: <span className="text-gray-900">{total}</span>
-              </div>
+            <div className="flex gap-2">
+              <img src={infoIcon} alt="Training Icon" className="h-6 w-6" />
+
+              <p className="text-sm text-gray-700">
+                This section lists all registered businesses in {appName}. Super
+                Admins have permission to view and delete businesses only.
+              </p>
             </div>
           </div>
 
