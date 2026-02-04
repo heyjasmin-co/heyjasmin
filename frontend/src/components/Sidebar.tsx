@@ -199,6 +199,23 @@ export default function Sidebar() {
                       <span className="ml-2 sm:ml-3">Appointments</span>
                     </NavLink>
                   </li>
+                  <li>
+                    <NavLink
+                      to="/admin/dashboard/settings/transfer-calls"
+                      className="group flex items-center rounded-lg px-3 py-2 text-xs sm:text-sm"
+                      style={({ isActive }) => ({
+                        backgroundColor: isActive
+                          ? colorTheme.secondaryColor(0.9)
+                          : "transparent",
+                        color: isActive ? "white" : "#374151",
+                        fontWeight: 500,
+                      })}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <i className="fa-solid fa-phone-volume text-sm sm:text-base"></i>
+                      <span className="ml-2 sm:ml-3">Transfer Calls</span>
+                    </NavLink>
+                  </li>
                 </ul>
               )}
             </li>

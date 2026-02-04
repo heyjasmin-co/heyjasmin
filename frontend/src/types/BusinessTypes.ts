@@ -26,6 +26,10 @@ export type BusinessDetailsType = {
     appointmentMessage: string | null;
     schedulingLink: string | null;
   };
+  callTransferSettings: {
+    enabled: boolean;
+    scenarios: ITransferScenario[];
+  };
   clerkOrganizationId?: string;
   isSetupComplete: boolean;
   createdAt: Date;
@@ -44,6 +48,15 @@ export interface IBusinessHour {
   start: string;
   end: string;
   isOpen: boolean;
+}
+
+export interface ITransferScenario {
+  _id?: string;
+  name: string;
+  phoneNumber: string;
+  warmTransfer: boolean;
+  availability: "always" | "business_hours" | "custom" | "none";
+  customHours?: IBusinessHour[];
 }
 
 export interface BusinessCreationType {

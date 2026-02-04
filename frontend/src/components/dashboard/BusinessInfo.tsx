@@ -90,7 +90,6 @@ function BusinessInfo({
     updated[index][field] = value;
     setBusinessHours(updated);
   };
-
   const handleTalkToAgent = async () => {
     try {
       setLoading(true);
