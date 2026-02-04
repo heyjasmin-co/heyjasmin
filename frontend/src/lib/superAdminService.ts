@@ -3,7 +3,7 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:3000"; // Adjust fallback as needed
 
 const api = axios.create({
-  baseURL: `${API_URL}/api/v1`,
+  baseURL: `${API_URL}`,
 });
 
 api.interceptors.request.use((config) => {
@@ -45,26 +45,26 @@ export interface SuperAdminChangeEmailData {
 
 export const superAdminService = {
   // Auth
-  signup: (data: SuperAdminSignupData) => api.post("/super-admin/signup", data),
-  login: (data: SuperAdminLoginData) => api.post("/super-admin/login", data),
+  signup: (data: SuperAdminSignupData) => api.post("super-admin/signup", data),
+  login: (data: SuperAdminLoginData) => api.post("super-admin/login", data),
   forgotPassword: (data: SuperAdminForgotPasswordData) =>
-    api.post("/super-admin/forgot-password", data),
+    api.post("super-admin/forgot-password", data),
   resetPassword: (data: SuperAdminResetPasswordData) =>
-    api.post("/super-admin/reset-password", data),
+    api.post("super-admin/reset-password", data),
 
   // Protected
   changePassword: (data: SuperAdminChangePasswordData) =>
-    api.post("/super-admin/change-password", data),
+    api.post("super-admin/change-password", data),
   changeEmail: (data: SuperAdminChangeEmailData) =>
-    api.post("/super-admin/change-email", data),
+    api.post("super-admin/change-email", data),
   verifyEmailChange: (data: { token: string; id: string }) =>
-    api.post("/super-admin/verify-email-change", data),
+    api.post("super-admin/verify-email-change", data),
 
   getBusinesses: (params?: { page: number; limit: number }) =>
-    api.get("/super-admin/businesses", { params }),
-  deleteBusiness: (id: string) => api.delete(`/super-admin/businesses/${id}`),
+    api.get("super-admin/businesses", { params }),
+  deleteBusiness: (id: string) => api.delete(`super-admin/businesses/${id}`),
 
   getUsers: (params?: { page: number; limit: number }) =>
-    api.get("/super-admin/users", { params }),
-  deleteUser: (id: string) => api.delete(`/super-admin/users/${id}`),
+    api.get("super-admin/users", { params }),
+  deleteUser: (id: string) => api.delete(`super-admin/users/${id}`),
 };
