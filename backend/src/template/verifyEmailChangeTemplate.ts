@@ -1,29 +1,11 @@
-export const sendInviteToNewUserTemplate = ({
-	businessName,
-	email,
-	invitationUrl,
-	role,
-	expiresAt,
-}: {
-	businessName: string
-	email: string
-	invitationUrl: string
-	role: string
-	expiresAt: Date
-}) => {
-	const formattedExpiry = new Date(expiresAt).toLocaleDateString('en-US', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-	})
-
+export const verifyEmailChangeTemplate = ({ verifyUrl, newEmail }: { verifyUrl: string; newEmail: string }) => {
 	return `
-<!DOCTYPE html>
+<!DocType html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to heyjasmin</title>
+    <title>Verify Email Change</title>
   </head>
 
   <body
@@ -40,7 +22,7 @@ export const sendInviteToNewUserTemplate = ({
         style="
           background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%);
           border-radius: 20px;
-          padding: 40px 32px;
+          padding: 36px 32px;
           box-shadow: 0 10px 30px rgba(124, 58, 237, 0.15);
           border: 1px solid #ede9fe;
         "
@@ -53,40 +35,33 @@ export const sendInviteToNewUserTemplate = ({
             style="width: 160px"
           />
         </div>
-        <p style="font-size: 18px; margin: 0 0 12px 0">
-          Hello ${businessName},
+        <h2 style="margin: 0 0 16px 0; font-size: 22px; color: #4c1d95">
+          Verify Your New Email Address
+        </h2>
+
+        <p style="font-size: 15px; color: #374151; line-height: 1.6">
+          You have requested to change your admin email address to
+          <strong>${newEmail}</strong>.
         </p>
 
-        <p style="font-size: 15px; line-height: 1.6; color: #374151">
-          You've been invited to join <strong>heyjasmin</strong>. Click below to
-          activate your account.
-        </p>
-
-        <!-- Invite Details Box -->
-        <div
+        <p
           style="
-            background: #faf5ff;
-            border: 1px solid #e9d5ff;
-            padding: 16px;
-            border-radius: 12px;
-            margin: 20px 0;
-            font-size: 14px;
-            color: #4c1d95;
+            font-size: 15px;
+            color: #374151;
+            line-height: 1.6;
+            margin-top: 16px;
           "
         >
-          <p style="margin: 4px 0"><strong>Invited Email:</strong> ${email}</p>
-
-          <p style="margin: 4px 0"><strong>Role:</strong> ${role}</p>
-
-          <p style="margin: 4px 0">
-            <strong>Expires On:</strong> ${formattedExpiry}
-          </p>
-        </div>
+          To complete this change, please confirm by clicking the button below.
+          For security reasons, this email was sent to your
+          <strong>current</strong>
+          email address.
+        </p>
 
         <!-- CTA Button -->
-        <div style="text-align: center; margin: 30px 0">
+        <div style="text-align: center; margin: 28px 0">
           <a
-            href="${invitationUrl}"
+            href="${verifyUrl}"
             style="
               display: inline-block;
               padding: 14px 28px;
@@ -99,21 +74,28 @@ export const sendInviteToNewUserTemplate = ({
               box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35);
             "
           >
-            Accept Invitation
+            Confirm Email Change
           </a>
         </div>
 
         <!-- Fallback Link -->
-        <p style="font-size: 13px; color: #6b7280">
-          If the button doesn’t work, copy and paste this link:
+        <p style="font-size: 13px; color: #6b7280; line-height: 1.6">
+          If the button doesn’t work, copy and paste this link into your
+          browser:
         </p>
 
-        <p style="font-size: 13px; color: #7c3aed; word-break: break-all">
-          ${invitationUrl}
+        <p style="font-size: 13px; word-break: break-all">
+          <a href="${verifyUrl}" style="color: #7c3aed; text-decoration: none">
+            ${verifyUrl}
+          </a>
+        </p>
+
+        <p style="margin-top: 24px; font-size: 14px; color: #6b7280">
+          If you did not request this change, please ignore this email or
+          contact support if you suspect unauthorized activity.
         </p>
 
         <p style="margin-top: 24px; font-size: 14px; color: #374151">
-          Talk soon,<br />
           <strong>The heyjasmin team</strong>
         </p>
       </div>

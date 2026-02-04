@@ -26,6 +26,7 @@ interface IBusiness extends Document {
 		assistantName?: string
 		assistantPhoneNumberId?: string | null
 		assistantSetup?: string
+		assistantToolId?: string | null
 		twilioNumber?: string
 		twilioId?: string
 	}
@@ -86,6 +87,7 @@ const businessSchema = new Schema<IBusiness>(
 			assistantPhoneNumberId: { type: String, default: null },
 			assistantSetup: { type: String, default: null },
 			assistantName: { type: String, default: null },
+			assistantToolId: { type: String, default: null },
 			twilioNumber: { type: String, default: null },
 			twilioId: { type: String, default: null },
 		},
