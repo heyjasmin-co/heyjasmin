@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"; // Adjust fallback as needed
+const API_URL = import.meta.env.VITE_PUBLIC_API_URL || "http://localhost:3000"; // Adjust fallback as needed
 
 const api = axios.create({
   baseURL: `${API_URL}/api/v1`,
