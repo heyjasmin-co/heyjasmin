@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import TitleCard from "@/components/TitleCard";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { appName } from "@/theme/appName";
 import { useCallback, useEffect, useState } from "react";
 import { HiTrash } from "react-icons/hi";
 import infoIcon from "../../../assets/image/infoIcon.png";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import Loading from "../../../components/Loading";
-import { superAdminService } from "../../../lib/superAdminService";
 import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast, successToast } from "../../../utils/react-toast";
 
 const BusinessesList = () => {
+  const superAdmin = useSuperAdmin();
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -27,7 +28,7 @@ const BusinessesList = () => {
   const fetchBusinesses = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await superAdminService.getBusinesses({
+      const { data } = await superAdmin.getBusinesses({
         page,
         limit,
       });
@@ -42,7 +43,7 @@ const BusinessesList = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, limit]);
+  }, [page, limit, superAdmin]);
 
   useEffect(() => {
     fetchBusinesses();
@@ -57,7 +58,7 @@ const BusinessesList = () => {
     if (!selectedBusinessId) return;
     setIsDeleting(true);
     try {
-      await superAdminService.deleteBusiness(selectedBusinessId);
+      await superAdmin.deleteBusiness(selectedBusinessId);
       setBusinesses(businesses.filter((b) => b._id !== selectedBusinessId));
       setShowDeleteModal(false);
       setSelectedBusinessId(null);

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useSuperAdminClient } from "@/lib/axios";
-import { SuperAdminSignupData } from "@/lib/superAdminService";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
+import { SuperAdminSignupData } from "@/types/SuperAdminTypes";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { appName } from "../../../theme/appName";
@@ -9,7 +9,7 @@ import { errorToast, successToast } from "../../../utils/react-toast";
 
 const Signup = () => {
   const navigate = useNavigate();
-  const apiClient = useSuperAdminClient();
+  const superAdmin = useSuperAdmin();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<SuperAdminSignupData>({
@@ -21,7 +21,7 @@ const Signup = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await apiClient.post("/super-admin/signup", formData);
+      const { data } = await superAdmin.signup(formData);
       if (data.success) {
         successToast("Account created successfully!");
         navigate("/super-admin/auth/login");

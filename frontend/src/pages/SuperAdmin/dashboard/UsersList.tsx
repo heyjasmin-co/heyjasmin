@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import TitleCard from "@/components/TitleCard";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { appName } from "@/theme/appName";
 import { useCallback, useEffect, useState } from "react";
 import { HiTrash } from "react-icons/hi";
 import infoIcon from "../../../assets/image/infoIcon.png";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import Loading from "../../../components/Loading";
-import { superAdminService } from "../../../lib/superAdminService";
 import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast, successToast } from "../../../utils/react-toast";
 
 const UsersList = () => {
+  const superAdmin = useSuperAdmin();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -25,7 +26,7 @@ const UsersList = () => {
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await superAdminService.getUsers({
+      const { data } = await superAdmin.getUsers({
         page,
         limit,
       });
@@ -40,7 +41,7 @@ const UsersList = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, limit]);
+  }, [page, limit, superAdmin]);
 
   useEffect(() => {
     fetchUsers();
@@ -55,7 +56,7 @@ const UsersList = () => {
     if (!selectedUserId) return;
     setIsDeleting(true);
     try {
-      await superAdminService.deleteUser(selectedUserId);
+      await superAdmin.deleteUser(selectedUserId);
       successToast("User and all associated data deleted successfully");
       setShowDeleteModal(false);
       setSelectedUserId(null);

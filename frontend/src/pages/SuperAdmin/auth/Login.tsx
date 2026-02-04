@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useSuperAdminClient } from "@/lib/axios";
-import { SuperAdminLoginData } from "@/lib/superAdminService";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
+import { SuperAdminLoginData } from "@/types/SuperAdminTypes";
 import { errorToast } from "@/utils/react-toast";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
-  const apiClient = useSuperAdminClient();
+  const superAdmin = useSuperAdmin();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<SuperAdminLoginData>({
@@ -21,7 +21,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await apiClient.post("/super-admin/login", formData);
+      const { data } = await superAdmin.login(formData);
       if (data.success) {
         localStorage.setItem("superAdminToken", data.token);
         navigate("/super-admin/dashboard/businesses");

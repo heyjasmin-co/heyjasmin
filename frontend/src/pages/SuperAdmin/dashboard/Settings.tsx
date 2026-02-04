@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import TitleCard from "@/components/TitleCard";
-import { useSuperAdminClient } from "@/lib/axios";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
+import { colorTheme } from "@/theme/colorTheme";
 import {
   SuperAdminChangeEmailData,
   SuperAdminChangePasswordData,
-} from "@/lib/superAdminService";
-import { colorTheme } from "@/theme/colorTheme";
+} from "@/types/SuperAdminTypes";
 import { errorToast, successToast } from "@/utils/react-toast";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +13,7 @@ import infoIcon from "../../../assets/image/infoIcon.png";
 
 const Settings = () => {
   const navigate = useNavigate();
-  const apiClient = useSuperAdminClient();
+  const superAdmin = useSuperAdmin();
   const [loading, setLoading] = useState({ password: false, email: false });
   const [showPasswords, setShowPasswords] = useState({
     current: false,
@@ -37,10 +37,7 @@ const Settings = () => {
     e.preventDefault();
     setLoading({ ...loading, password: true });
     try {
-      const { data } = await apiClient.post(
-        "/super-admin/change-password",
-        pwData,
-      );
+      const { data } = await superAdmin.changePassword(pwData);
       if (data.success) {
         successToast("Password updated successfully");
         setPwData({ currentPassword: "", newPassword: "" });
@@ -57,10 +54,7 @@ const Settings = () => {
     e.preventDefault();
     setLoading({ ...loading, email: true });
     try {
-      const { data } = await apiClient.post(
-        "/super-admin/change-email",
-        emailData,
-      );
+      const { data } = await superAdmin.changeEmail(emailData);
       if (data.success) {
         successToast(
           "Verification email sent! Please check your current email to confirm the change. You have been logged out for security.",

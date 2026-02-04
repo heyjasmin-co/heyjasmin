@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { superAdminService } from "@/lib/superAdminService";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
 import { errorToast, successToast } from "@/utils/react-toast";
@@ -11,6 +11,7 @@ const VerifyEmailChange = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const id = searchParams.get("id");
+  const superAdmin = useSuperAdmin();
   const [verifying, setVerifying] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const verificationAttempted = useRef(false);
@@ -27,7 +28,7 @@ const VerifyEmailChange = () => {
       }
 
       try {
-        const { data } = await superAdminService.verifyEmailChange({
+        const { data } = await superAdmin.verifyEmailChange({
           token,
           id,
         });
@@ -50,7 +51,7 @@ const VerifyEmailChange = () => {
     };
 
     performVerification();
-  }, [token, id, navigate]);
+  }, [token, id, navigate, superAdmin]);
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">

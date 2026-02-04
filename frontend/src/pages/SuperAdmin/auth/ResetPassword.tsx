@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useSuperAdminClient } from "@/lib/axios";
-import { SuperAdminForgotPasswordData } from "@/lib/superAdminService";
+import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
+import { SuperAdminForgotPasswordData } from "@/types/SuperAdminTypes";
 import { errorToast, successToast } from "@/utils/react-toast";
 import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -12,7 +12,7 @@ const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const id = searchParams.get("id");
-  const apiClient = useSuperAdminClient();
+  const superAdmin = useSuperAdmin();
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -46,10 +46,9 @@ const ResetPassword = () => {
         return;
       }
 
-      const { data } = await apiClient.post("/super-admin/reset-password", {
+      const { data } = await superAdmin.resetPassword({
         token: resetData.token,
         newPassword: resetData.newPassword,
-        id,
       });
       if (data.success) {
         successToast("Password reset successfully!");
@@ -67,10 +66,7 @@ const ResetPassword = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await apiClient.post(
-        "/super-admin/forgot-password",
-        forgotData,
-      );
+      const { data } = await superAdmin.forgotPassword(forgotData);
       if (data.success) {
         successToast("Reset link sent to your email!");
         setForgotData({ email: "" });
