@@ -21,6 +21,7 @@ interface TransferScenarioModalProps {
   setBusinessDetails: React.Dispatch<
     React.SetStateAction<BusinessDetailsType | null>
   >;
+  refetch?: () => Promise<void>;
 }
 
 type AvailabilityType = "always" | "business_hours" | "custom" | "none";
@@ -48,6 +49,7 @@ export default function TransferScenarioModal({
   scenario,
   businessDetails,
   setBusinessDetails,
+  refetch,
 }: TransferScenarioModalProps) {
   const { userData } = useUserData();
   const apiClient = useApiClient();
@@ -145,6 +147,7 @@ export default function TransferScenarioModal({
 
       successToast(scenario ? "Scenario updated" : "Scenario added");
       onClose();
+      if (refetch) await refetch();
     } catch (error: any) {
       errorToast(error?.response?.data?.error || "Failed to save scenario");
     } finally {
@@ -449,7 +452,7 @@ export default function TransferScenarioModal({
             onClick={handleSave}
             disabled={loading}
             className="rounded-full px-8 py-2 text-sm font-bold text-white shadow-xl transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
-            style={{ backgroundColor: colorTheme.secondaryColor(1) }}
+            style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
           >
             {loading ? "Saving..." : "Save"}
           </button>

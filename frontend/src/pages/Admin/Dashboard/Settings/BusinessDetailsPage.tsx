@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import TrainingSources from "../../../../components/dashboard/TrainingSources";
 import Loading from "../../../../components/Loading";
 import BusinessDetails from "../../../../components/settings/BusinessDetails";
@@ -17,15 +17,6 @@ export default function BusinessDetailsPage() {
   const apiClient = useApiClient();
   const { userData } = useUserData();
   const [loading, setLoading] = useState(false);
-  const [checkBusinessDetails, setCheckBusinessDetails] =
-    useState<BusinessDetailsType | null>(() => {
-      const stored = localStorage.getItem("businessDetails");
-      try {
-        return stored ? (JSON.parse(stored) as BusinessDetailsType) : null;
-      } catch {
-        return null;
-      }
-    });
   const [businessDetails, setBusinessDetails] =
     useState<BusinessDetailsType | null>(null);
   const fetchBusinessDetails = async () => {
@@ -37,14 +28,6 @@ export default function BusinessDetailsPage() {
         data: BusinessDetailsType;
       }>("/businesses/" + userData?.businessId);
 
-      //Set to localStorage for future use
-      if (!localStorage.getItem("businessDetails")) {
-        localStorage.setItem(
-          "businessDetails",
-          JSON.stringify(response.data.data),
-        );
-      }
-      setCheckBusinessDetails(response.data.data);
       setBusinessDetails(response.data.data);
       successToast(response.data.message);
     } catch (error: any) {
@@ -63,8 +46,6 @@ export default function BusinessDetailsPage() {
         message: string;
         data: BusinessDetailsType;
       }>("/businesses/update-assistant/" + userData?.businessId);
-      localStorage.clear();
-      setCheckBusinessDetails(response.data.data);
       setBusinessDetails(response.data.data);
       successToast(response.data.message);
     } catch (error: any) {
@@ -75,13 +56,12 @@ export default function BusinessDetailsPage() {
     }
   };
 
-  // UseEffect
   useLayoutEffect(() => {
-    fetchBusinessDetails();
-  }, []);
-  useEffect(() => {
-    localStorage.setItem("businessDetails", JSON.stringify(businessDetails));
-  }, [businessDetails]);
+    const fetch = async () => {
+      await fetchBusinessDetails();
+    };
+    fetch();
+  }, [userData?.businessId]);
 
   return (
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
@@ -89,10 +69,9 @@ export default function BusinessDetailsPage() {
         <Loading />
       ) : (
         <div className="flex flex-col gap-5">
-          {businessDetails && checkBusinessDetails && (
+          {businessDetails && (
             <>
               <BusinessTitleCard
-                checkBusinessDetails={checkBusinessDetails}
                 businessDetails={businessDetails}
                 title="Business Information"
                 canEdit={userData?.role !== "viewer"}
@@ -106,16 +85,19 @@ export default function BusinessDetailsPage() {
                 businessName={businessDetails.name}
                 businessAddress={businessDetails.address!}
                 canEdit={userData?.role !== "viewer"}
+                refetch={fetchBusinessDetails}
               />
               <CoreService
                 businessServices={businessDetails.services}
                 setBusinessDetails={setBusinessDetails}
                 canEdit={userData?.role !== "viewer"}
+                refetch={fetchBusinessDetails}
               />
               <BusinessHours
                 hours={businessDetails.businessHours}
                 setBusinessDetails={setBusinessDetails}
                 canEdit={userData?.role !== "viewer"}
+                refetch={fetchBusinessDetails}
               />
             </>
           )}

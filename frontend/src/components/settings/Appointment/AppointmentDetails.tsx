@@ -21,6 +21,7 @@ type AppointmentDetailsProps = {
     React.SetStateAction<BusinessDetailsType | null>
   >;
   hasAccess: boolean;
+  refetch?: () => Promise<void>;
 };
 
 function AppointmentDetails({
@@ -30,6 +31,7 @@ function AppointmentDetails({
   canEdit,
   setBusinessDetails,
   hasAccess,
+  refetch,
 }: AppointmentDetailsProps) {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
@@ -106,6 +108,7 @@ function AppointmentDetails({
 
       successToast(response.data?.message || "Appointment settings updated");
       setIsEditing(false);
+      if (refetch) await refetch();
     } catch (error: any) {
       errorToast(
         error?.response?.data?.error || "Failed to update appointment settings",

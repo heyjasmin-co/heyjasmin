@@ -87,6 +87,7 @@ export const updateBusinessDetailsById = async (
 							twilioNumber: twilioNumber.phoneNumber,
 							twilioId: twilioNumber.sid,
 						},
+						hasPublish: false,
 					},
 				},
 				{ new: true, session }

@@ -3,6 +3,7 @@ export type BusinessDetailsType = {
   _id?: string;
   name: string;
   overview?: string;
+  hasPublish: boolean;
   address?: string;
   website?: string;
   services: string[];

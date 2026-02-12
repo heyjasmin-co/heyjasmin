@@ -15,6 +15,7 @@ type TransferCallsContentProps = {
   >;
   canEdit: boolean;
   hasAccess: boolean;
+  refetch?: () => Promise<void>;
 };
 
 export default function TransferCallsContent({
@@ -22,6 +23,7 @@ export default function TransferCallsContent({
   setBusinessDetails,
   canEdit,
   hasAccess,
+  refetch,
 }: TransferCallsContentProps) {
   const [showModal, setShowModal] = useState(false);
   const [editingScenario, setEditingScenario] = useState<any>(null);
@@ -136,6 +138,7 @@ export default function TransferCallsContent({
           scenario={editingScenario}
           businessDetails={businessDetails}
           setBusinessDetails={setBusinessDetails}
+          refetch={refetch}
         />
       )}
     </div>

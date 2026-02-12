@@ -13,11 +13,13 @@ type BusinessServiceProps = {
   setBusinessDetails: React.Dispatch<
     React.SetStateAction<BusinessDetailsType | null>
   >;
+  refetch?: () => Promise<void>;
 };
 function CoreService({
   businessServices,
   setBusinessDetails,
   canEdit,
+  refetch,
 }: BusinessServiceProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [services, setServices] = useState<string[]>(businessServices);
@@ -61,6 +63,7 @@ function CoreService({
       });
       successToast(response.data.message);
       setIsEditing(false);
+      if (refetch) await refetch();
     } catch (error: any) {
       errorToast(error?.response?.data?.error || "Failed to update services.");
     } finally {

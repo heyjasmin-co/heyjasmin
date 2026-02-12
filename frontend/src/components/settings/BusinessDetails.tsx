@@ -23,6 +23,7 @@ type BusinessDetailsProps = {
   setBusinessDetails: React.Dispatch<
     React.SetStateAction<BusinessDetailsType | null>
   >;
+  refetch?: () => Promise<void>;
 };
 
 function BusinessDetails({
@@ -31,6 +32,7 @@ function BusinessDetails({
   businessAddress,
   canEdit,
   setBusinessDetails,
+  refetch,
 }: BusinessDetailsProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(businessName);
@@ -92,11 +94,8 @@ function BusinessDetails({
           address: updated.address || "",
         };
       });
-      localStorage.setItem(
-        "businessDetails",
-        JSON.stringify(response.data.data),
-      );
       successToast(response.data.message);
+      if (refetch) await refetch();
     } catch (error: any) {
       console.error(error);
       errorToast(

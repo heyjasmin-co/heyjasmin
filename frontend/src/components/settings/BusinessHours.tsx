@@ -13,11 +13,13 @@ type BusinessHoursProps = {
   setBusinessDetails: React.Dispatch<
     React.SetStateAction<BusinessDetailsType | null>
   >;
+  refetch?: () => Promise<void>;
 };
 function BusinessHours({
   hours,
   setBusinessDetails,
   canEdit,
+  refetch,
 }: BusinessHoursProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [businessHours, setBusinessHours] = useState(hours);
@@ -71,6 +73,7 @@ function BusinessHours({
       });
       successToast(response.data.message);
       setIsEditing(false);
+      if (refetch) await refetch();
     } catch (error: any) {
       errorToast(
         error?.response?.data?.error || "Failed to update business hours.",

@@ -12,15 +12,6 @@ export default function AppointmentInfo() {
   const { userData } = useUserData();
   const apiClient = useApiClient();
   const [loading, setLoading] = useState(false);
-  const [checkBusinessDetails, setCheckBusinessDetails] =
-    useState<BusinessDetailsType | null>(() => {
-      const stored = localStorage.getItem("businessAppointmentDetails");
-      try {
-        return stored ? (JSON.parse(stored) as BusinessDetailsType) : null;
-      } catch {
-        return null;
-      }
-    });
   const [businessDetails, setBusinessDetails] =
     useState<BusinessDetailsType | null>(null);
 
@@ -35,15 +26,7 @@ export default function AppointmentInfo() {
         data: BusinessDetailsType;
       }>("/businesses/" + userData?.businessId);
 
-      const accountInfo = response.data.data;
-      if (!localStorage.getItem("businessDetails")) {
-        localStorage.setItem(
-          "businessAppointmentDetails",
-          JSON.stringify(response.data.data),
-        );
-      }
-      setCheckBusinessDetails(accountInfo);
-      setBusinessDetails(accountInfo);
+      setBusinessDetails(response.data.data);
       successToast("Appointment info fetched successfully");
     } catch (error: any) {
       const message = error.response.data.error;
@@ -62,8 +45,6 @@ export default function AppointmentInfo() {
         message: string;
         data: BusinessDetailsType;
       }>("/businesses/update-assistant/" + userData?.businessId);
-      localStorage.clear();
-      setCheckBusinessDetails(response.data.data);
       setBusinessDetails(response.data.data);
       successToast(response.data.message);
     } catch (error: any) {
@@ -75,19 +56,20 @@ export default function AppointmentInfo() {
   };
   // UseEffect
   useEffect(() => {
-    fetchAccountDetails();
-  }, [subscriptionPlan]);
+    const fetch = async () => {
+      await fetchAccountDetails();
+    };
+    fetch();
+  }, [userData?.businessId]);
 
   return (
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
       {loading && !businessDetails ? (
         <Loading />
       ) : (
-        businessDetails &&
-        checkBusinessDetails && (
+        businessDetails && (
           <div className="flex flex-col gap-5">
             <BusinessTitleCard
-              checkBusinessDetails={checkBusinessDetails}
               businessDetails={businessDetails}
               title="Appointments"
               canEdit={userData?.role !== "viewer"}
@@ -108,6 +90,7 @@ export default function AppointmentInfo() {
                 businessDetails?.appointmentSettings.appointmentEnabled
               }
               canEdit={userData?.role !== "viewer"}
+              refetch={fetchAccountDetails}
             />
           </div>
         )

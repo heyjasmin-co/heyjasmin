@@ -10,6 +10,7 @@ interface IBusinessHour {
 
 interface IBusiness extends Document {
 	name: string
+	hasPublish: boolean
 	overview?: string
 	address?: string
 	website?: string
@@ -44,6 +45,7 @@ const businessSchema = new Schema<IBusiness>(
 	{
 		// Basic Info
 		name: { type: String, required: true, trim: true },
+		hasPublish: { type: Boolean, default: false },
 		overview: { type: String, default: '' },
 		address: { type: String, default: '' },
 		website: { type: String, default: '' },

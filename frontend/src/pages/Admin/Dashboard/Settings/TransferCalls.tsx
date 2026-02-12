@@ -13,15 +13,6 @@ export default function TransferCalls() {
   const { userData } = useUserData();
   const apiClient = useApiClient();
   const [loading, setLoading] = useState(false);
-  const [checkBusinessDetails, setCheckBusinessDetails] =
-    useState<BusinessDetailsType | null>(() => {
-      const stored = localStorage.getItem("businessTransferDetails");
-      try {
-        return stored ? (JSON.parse(stored) as BusinessDetailsType) : null;
-      } catch {
-        return null;
-      }
-    });
   const [businessDetails, setBusinessDetails] =
     useState<BusinessDetailsType | null>(null);
 
@@ -35,13 +26,6 @@ export default function TransferCalls() {
       }>("/businesses/" + userData?.businessId);
 
       const accountInfo = response.data.data;
-      if (!localStorage.getItem("businessTransferDetails")) {
-        localStorage.setItem(
-          "businessTransferDetails",
-          JSON.stringify(response.data.data),
-        );
-      }
-      setCheckBusinessDetails(accountInfo);
       setBusinessDetails(accountInfo);
     } catch (error: any) {
       const message = error.response?.data?.error || "Failed to fetch info";
@@ -60,14 +44,7 @@ export default function TransferCalls() {
         data: BusinessDetailsType;
       }>("/businesses/update-assistant/" + userData?.businessId);
 
-      // Update both local states after successful publish
-      setCheckBusinessDetails(response.data.data);
       setBusinessDetails(response.data.data);
-      localStorage.setItem(
-        "businessTransferDetails",
-        JSON.stringify(response.data.data),
-      );
-
       successToast(response.data.message);
     } catch (error: any) {
       const message = error.response?.data?.error || "Failed to publish";
@@ -81,7 +58,10 @@ export default function TransferCalls() {
   const hasAccess = subscriptionPlan === "pro" || subscriptionPlan === "plus";
 
   useEffect(() => {
-    fetchAccountDetails();
+    const fetch = async () => {
+      await fetchAccountDetails();
+    };
+    fetch();
   }, [userData?.businessId]);
 
   return (
@@ -89,11 +69,9 @@ export default function TransferCalls() {
       {loading && !businessDetails ? (
         <Loading />
       ) : (
-        businessDetails &&
-        checkBusinessDetails && (
+        businessDetails && (
           <div className="flex flex-col gap-5">
             <BusinessTitleCard
-              checkBusinessDetails={checkBusinessDetails}
               businessDetails={businessDetails}
               title="Transfer Calls"
               canEdit={userData?.role !== "viewer"}
@@ -106,6 +84,7 @@ export default function TransferCalls() {
               setBusinessDetails={setBusinessDetails}
               canEdit={userData?.role !== "viewer"}
               hasAccess={hasAccess}
+              refetch={fetchAccountDetails}
             />
           </div>
         )
