@@ -77,6 +77,9 @@ export default function TransferCalls() {
     }
   };
 
+  const subscriptionPlan = userData?.subscription?.plan;
+  const hasAccess = subscriptionPlan === "pro" || subscriptionPlan === "plus";
+
   useEffect(() => {
     fetchAccountDetails();
   }, [userData?.businessId]);
@@ -85,27 +88,27 @@ export default function TransferCalls() {
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-2 py-6 shadow-lg sm:px-6">
       {loading && !businessDetails ? (
         <Loading />
-      ) : businessDetails && checkBusinessDetails ? (
-        <div className="flex flex-col gap-5">
-          <BusinessTitleCard
-            checkBusinessDetails={checkBusinessDetails}
-            businessDetails={businessDetails}
-            title="Transfer Calls"
-            canEdit={userData?.role !== "viewer"}
-            handleUpdateAgent={handleUpdateAgent}
-            subtitle={`Allow ${appName} to transfer a call.`}
-          />
-
-          <TransferCallsContent
-            businessDetails={businessDetails}
-            setBusinessDetails={setBusinessDetails}
-            canEdit={userData?.role !== "viewer"}
-          />
-        </div>
       ) : (
-        <div className="flex h-full items-center justify-center">
-          <Loading />
-        </div>
+        businessDetails &&
+        checkBusinessDetails && (
+          <div className="flex flex-col gap-5">
+            <BusinessTitleCard
+              checkBusinessDetails={checkBusinessDetails}
+              businessDetails={businessDetails}
+              title="Transfer Calls"
+              canEdit={userData?.role !== "viewer"}
+              handleUpdateAgent={handleUpdateAgent}
+              subtitle={`Allow ${appName} to transfer a call.`}
+            />
+
+            <TransferCallsContent
+              businessDetails={businessDetails}
+              setBusinessDetails={setBusinessDetails}
+              canEdit={userData?.role !== "viewer"}
+              hasAccess={hasAccess}
+            />
+          </div>
+        )
       )}
     </div>
   );

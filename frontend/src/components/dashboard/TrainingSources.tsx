@@ -1,10 +1,10 @@
+import { appName } from "@/theme/appName";
 import { FloatingLabel } from "flowbite-react";
 import { useState } from "react";
 import cancelIcon from "../../assets/image/cancelIcon.png";
 import completeIcon from "../../assets/image/completeIcon.png";
-import infoIcon from "../../assets/image/infoIcon.png";
-import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
+import InfoCard from "../shared/InfoCard";
 type TrainingSourcesProps = {
   businessWebsite: string;
 };
@@ -32,15 +32,10 @@ function TrainingSources({ businessWebsite }: TrainingSourcesProps) {
         </div>
 
         {/* Info */}
-        <div className="flex gap-2 px-4 py-3">
-          <img src={infoIcon} alt="Training Icon" className="h-6 w-6" />
-
-          <p className="text-sm text-gray-700">
-            {appName} uses these sources to learn about your business, helping
-            her answer caller questions effectively. You can update these
-            sources to retrain {appName} anytime.
-          </p>
-        </div>
+        <InfoCard
+          className="flex gap-2 px-4 py-3"
+          message={`${appName} uses these sources to learn about your business, helping her answer caller questions effectively. You can update these sources to retrain ${appName} anytime.`}
+        />
 
         {/* Sources & Edit */}
         <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">

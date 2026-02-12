@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import infoIcon from "@/assets/image/infoIcon.png";
+import InfoCard from "@/components/shared/InfoCard";
+import PlanBanner from "@/components/shared/PlanBanner";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
 import { BusinessDetailsType } from "@/types/BusinessTypes";
@@ -13,16 +14,17 @@ type TransferCallsContentProps = {
     React.SetStateAction<BusinessDetailsType | null>
   >;
   canEdit: boolean;
+  hasAccess: boolean;
 };
 
 export default function TransferCallsContent({
   businessDetails,
   setBusinessDetails,
   canEdit,
+  hasAccess,
 }: TransferCallsContentProps) {
   const [showModal, setShowModal] = useState(false);
   const [editingScenario, setEditingScenario] = useState<any>(null);
-
   const scenarios = businessDetails.callTransferSettings?.scenarios || [];
 
   const handleAdd = () => {
@@ -54,16 +56,14 @@ export default function TransferCallsContent({
           </div>
         </div>
 
+        {/* Premium Banner */}
+        <PlanBanner />
+
         {/* Info Box */}
-        <div className="flex gap-3 px-4 py-4">
-          <img src={infoIcon} alt="Info" className="mt-0.5 h-6 w-6" />
-          <p className="text-sm leading-relaxed text-gray-600">
-            {appName} can transfer a call to a person or department at the
-            caller’s request. The phone numbers used for these transfers must be
-            unique for each scenario and must be different from the phone number
-            forwarding to {appName}.
-          </p>
-        </div>
+        <InfoCard
+          className="flex gap-3 px-4 py-4"
+          message={`${appName} can transfer a call to a person or department at the caller’s request. The phone numbers used for these transfers must be unique for each scenario and must be different from the phone number forwarding to ${appName}.`}
+        />
 
         {/* List Section */}
         <div className="border-t border-gray-200 px-4 py-6">
@@ -71,10 +71,13 @@ export default function TransferCallsContent({
             <h6 className="text-md font-bold text-gray-800">
               Transfer Scenarios
             </h6>
-            {canEdit && (
+            {hasAccess && canEdit && (
               <button
                 onClick={handleAdd}
-                className="flex items-center gap-2 rounded-lg bg-purple-50 px-4 py-2 text-sm font-bold text-purple-700 transition-colors hover:bg-purple-100"
+                className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-purple-100"
+                style={{
+                  backgroundColor: colorTheme.secondaryColor(0.9),
+                }}
               >
                 <i className="fa-solid fa-plus text-xs"></i>
                 <span>Add</span>
@@ -83,7 +86,11 @@ export default function TransferCallsContent({
           </div>
 
           {scenarios.length === 0 ? (
-            <EmptyScenarios onAdd={handleAdd} canEdit={canEdit} />
+            <EmptyScenarios
+              onAdd={handleAdd}
+              canEdit={canEdit}
+              hasAccess={hasAccess}
+            />
           ) : (
             <div className="flex flex-col gap-3">
               {scenarios.map((s: any, idx: number) => (

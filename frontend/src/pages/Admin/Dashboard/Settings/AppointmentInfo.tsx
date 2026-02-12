@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Loading from "@/components/Loading";
-import AppointmentDetails from "@/components/settings/AppointmentDetails";
-import AppointmentLockCard from "@/components/settings/AppointmentLockCard";
+import AppointmentDetails from "@/components/settings/Appointment/AppointmentDetails";
 import BusinessTitleCard from "@/components/settings/BusinessTitleCard";
 import { useApiClient } from "@/lib/axios";
 import { BusinessDetailsType } from "@/types/BusinessTypes";
@@ -24,14 +23,10 @@ export default function AppointmentInfo() {
     });
   const [businessDetails, setBusinessDetails] =
     useState<BusinessDetailsType | null>(null);
-  
 
   const subscriptionPlan = userData?.subscription?.plan; // essential / pro / plus / trial
   const hasAccess = subscriptionPlan === "pro" || subscriptionPlan === "plus";
-  const isTrial = subscriptionPlan === "trial";
-
   const fetchAccountDetails = async () => {
-    if (!hasAccess) return;
     try {
       setLoading(true);
       const response = await apiClient.get<{
@@ -87,36 +82,35 @@ export default function AppointmentInfo() {
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
       {loading && !businessDetails ? (
         <Loading />
-      ) : hasAccess && businessDetails && checkBusinessDetails ? (
-        <div className="flex flex-col gap-5">
-          <BusinessTitleCard
-            checkBusinessDetails={checkBusinessDetails}
-            businessDetails={businessDetails}
-            title="Appointments"
-            canEdit={userData?.role !== "viewer"}
-            handleUpdateAgent={handleUpdateAgent}
-            subtitle="Allow your agent to handle appointments"
-          />
-
-          <AppointmentDetails
-            setBusinessDetails={setBusinessDetails}
-            appointmentMessage={
-              businessDetails?.appointmentSettings.appointmentMessage || ""
-            }
-            schedulingLink={
-              businessDetails?.appointmentSettings.schedulingLink || ""
-            }
-            appointmentEnabled={
-              businessDetails?.appointmentSettings.appointmentEnabled
-            }
-            canEdit={userData?.role !== "viewer"}
-          />
-        </div>
       ) : (
-        <AppointmentLockCard
-          subscriptionPlan={subscriptionPlan || ""}
-          isTrial={isTrial}
-        />
+        businessDetails &&
+        checkBusinessDetails && (
+          <div className="flex flex-col gap-5">
+            <BusinessTitleCard
+              checkBusinessDetails={checkBusinessDetails}
+              businessDetails={businessDetails}
+              title="Appointments"
+              canEdit={userData?.role !== "viewer"}
+              handleUpdateAgent={handleUpdateAgent}
+              subtitle="Allow your agent to handle appointments"
+            />
+
+            <AppointmentDetails
+              setBusinessDetails={setBusinessDetails}
+              hasAccess={hasAccess}
+              appointmentMessage={
+                businessDetails?.appointmentSettings.appointmentMessage || ""
+              }
+              schedulingLink={
+                businessDetails?.appointmentSettings.schedulingLink || ""
+              }
+              appointmentEnabled={
+                businessDetails?.appointmentSettings.appointmentEnabled
+              }
+              canEdit={userData?.role !== "viewer"}
+            />
+          </div>
+        )
       )}
     </div>
   );

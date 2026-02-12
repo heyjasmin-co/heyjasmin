@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import infoIcon from "@/assets/image/infoIcon.png";
+import editIcon from "@/assets/image/editIcon.png";
+import saveIcon from "@/assets/image/saveIcon.png";
+import InfoCard from "@/components/shared/InfoCard";
+import PlanBanner from "@/components/shared/PlanBanner";
 import { Textarea, TextInput, ToggleSwitch } from "flowbite-react";
 import { useEffect, useState } from "react";
-import editIcon from "../../assets/image/editIcon.png";
-import saveIcon from "../../assets/image/saveIcon.png";
-import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
-import { colorTheme } from "../../theme/colorTheme";
-import { BusinessDetailsType } from "../../types/BusinessTypes";
-import { errorToast, successToast } from "../../utils/react-toast";
+import { useNavigate } from "react-router-dom";
+import { useUserData } from "../../../context/UserDataContext";
+import { useApiClient } from "../../../lib/axios";
+import { colorTheme } from "../../../theme/colorTheme";
+import { BusinessDetailsType } from "../../../types/BusinessTypes";
+import { errorToast, successToast } from "../../../utils/react-toast";
 
 type AppointmentDetailsProps = {
   appointmentEnabled: boolean;
@@ -18,6 +20,7 @@ type AppointmentDetailsProps = {
   setBusinessDetails: React.Dispatch<
     React.SetStateAction<BusinessDetailsType | null>
   >;
+  hasAccess: boolean;
 };
 
 function AppointmentDetails({
@@ -26,7 +29,9 @@ function AppointmentDetails({
   schedulingLink,
   canEdit,
   setBusinessDetails,
+  hasAccess,
 }: AppointmentDetailsProps) {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [appointmentEnabled, setAppointmentEnabled] = useState(initialEnabled);
   const [message, setMessage] = useState(appointmentMessage);
@@ -137,14 +142,15 @@ function AppointmentDetails({
           </h5>
         </div>
 
+        {/* Premium Banner */}
+        <PlanBanner />
+
         {/* Info */}
-        <div className="flex gap-2 px-4 py-3">
-          <img src={infoIcon} alt="Info" className="h-6 w-6" />
-          <p className="text-sm text-gray-700">
-            Allow your agent to send a text message with your appointment
-            scheduling link to callers.
-          </p>
-        </div>
+        <InfoCard
+          className="flex gap-2 px-4 py-3"
+          message="Allow your agent to send a text message with your appointment
+            scheduling link to callers."
+        />
 
         {/* Content */}
         <div className="flex flex-col gap-4 px-4 py-3">
@@ -171,9 +177,6 @@ function AppointmentDetails({
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
             <span className="text-md shrink-0 font-bold text-gray-800 sm:w-40">
               Text Message
-              {/* {appointmentEnabled && (
-                <span className="ml-1 text-red-500">*</span>
-              )} */}
             </span>
 
             <div className="flex-1">
@@ -200,9 +203,6 @@ function AppointmentDetails({
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
             <span className="text-md shrink-0 font-bold text-gray-800 sm:w-40">
               Scheduling Link
-              {/* {appointmentEnabled && (
-                <span className="ml-1 text-red-500">*</span>
-              )} */}
             </span>
 
             <div className="flex-1">
@@ -237,13 +237,23 @@ function AppointmentDetails({
                 <img src={saveIcon} className="h-5 w-5" />
                 {loading ? "Saving..." : "Save"}
               </button>
-            ) : (
+            ) : hasAccess ? (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 rounded-lg bg-purple-600 px-6 py-2 text-sm font-semibold text-white hover:bg-purple-700"
+                className="flex items-center gap-2 rounded-lg px-6 py-2 text-sm font-semibold text-white hover:bg-purple-700"
+                style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
               >
                 <img src={editIcon} className="h-5 w-5" />
                 Edit
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate("/admin/dashboard/account/billing")}
+                className="flex items-center gap-2 rounded-lg px-6 py-2 text-sm font-semibold text-white hover:bg-purple-700"
+                style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
+              >
+                Upgrade Plan
+                <i className="fa-solid fa-arrow-right" />
               </button>
             )}
           </div>
