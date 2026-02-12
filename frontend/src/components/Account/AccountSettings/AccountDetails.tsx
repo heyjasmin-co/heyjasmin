@@ -1,6 +1,5 @@
 import { useClerk } from "@clerk/clerk-react";
-import { useState } from "react";
-import { useApiClient } from "../../../lib/axios";
+import { useLogout } from "../../../api/hooks/useUserQueries";
 import { colorTheme } from "../../../theme/colorTheme";
 import { UserDetailsType } from "../../../types/UsersTypes";
 import { errorToast, successToast } from "../../../utils/react-toast";
@@ -9,23 +8,20 @@ type AccountDetailsProps = {
   accountInformation: UserDetailsType;
 };
 function AccountDetails({ accountInformation }: AccountDetailsProps) {
-  const apiClient = useApiClient();
   const { signOut } = useClerk();
-  const [loading, setLoading] = useState(false);
+  const { mutate: logout, isPending: loading } = useLogout();
 
-  const handleSignOut = async () => {
-    setLoading(true);
-    try {
-      await apiClient.post("/users/logout");
-      successToast("User logged out successfully.");
-
-      await new Promise((res) => setTimeout(res, 2000));
-      await signOut({ redirectUrl: "/admin/sign-in" });
-    } catch {
-      errorToast("Failed to log out. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+  const handleSignOut = () => {
+    logout(undefined, {
+      onSuccess: async () => {
+        successToast("User logged out successfully.");
+        await new Promise((res) => setTimeout(res, 2000));
+        await signOut({ redirectUrl: "/admin/sign-in" });
+      },
+      onError: () => {
+        errorToast("Failed to log out. Please try again.");
+      },
+    });
   };
   return (
     <div

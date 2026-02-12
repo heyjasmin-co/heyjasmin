@@ -1,31 +1,27 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useUpdateBusinessHours } from "../../api/hooks/useBusinessQueries";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
 import { colorTheme } from "../../theme/colorTheme";
-import { BusinessDetailsType, IBusinessHour } from "../../types/BusinessTypes";
+import { IBusinessHour } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
+
 type BusinessHoursProps = {
   hours: IBusinessHour[];
   canEdit: boolean;
-  setBusinessDetails: React.Dispatch<
-    React.SetStateAction<BusinessDetailsType | null>
-  >;
   refetch?: () => Promise<void>;
 };
-function BusinessHours({
-  hours,
-  setBusinessDetails,
-  canEdit,
-  refetch,
-}: BusinessHoursProps) {
+
+function BusinessHours({ hours, canEdit, refetch }: BusinessHoursProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [businessHours, setBusinessHours] = useState(hours);
-  const [saving, setSaving] = useState(false);
-  const apiClient = useApiClient();
   const { userData } = useUserData();
+  const updateHoursMutation = useUpdateBusinessHours();
+
+  useEffect(() => {
+    setBusinessHours(hours);
+  }, [hours]);
 
   const handleToggleDay = (index: number) => {
     if (!isEditing) return;
@@ -54,34 +50,33 @@ function BusinessHours({
 
   const handleSave = async () => {
     if (!userData?.businessId) return;
-    setSaving(true);
+
     try {
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: IBusinessHour[];
-      }>(`/businesses/hours/${userData.businessId}`, { businessHours });
-
-      const updateHours = response.data.data;
-      setBusinessDetails((pv) => {
-        if (!pv) return null;
-
-        return {
-          ...pv,
-          businessHours: updateHours,
-        };
+      const response = await updateHoursMutation.mutateAsync({
+        businessId: userData.businessId,
+        businessHours: businessHours,
       });
-      successToast(response.data.message);
+
+      successToast(response.message);
       setIsEditing(false);
       if (refetch) await refetch();
-    } catch (error: any) {
-      errorToast(
-        error?.response?.data?.error || "Failed to update business hours.",
-      );
-    } finally {
-      setSaving(false);
+    } catch (error: unknown) {
+      let errorMessage = "Failed to update business hours.";
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response: { data: { error?: string } };
+        };
+        errorMessage =
+          axiosError.response?.data?.error ||
+          "Failed to update business hours.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      errorToast(errorMessage);
     }
   };
+
+  const saving = updateHoursMutation.isPending;
 
   return (
     <div

@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { AxiosError } from "axios";
 import { useState } from "react";
 import ReactGoogleAutocomplete from "react-google-autocomplete";
+import { useUpdateBusinessDetails } from "../../api/hooks/useBusinessQueries";
 import editIcon from "../../assets/image/editIcon.png";
 import nextIcon from "../../assets/image/nextIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
 import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
 import { BusinessDetailsType } from "../../types/BusinessTypes";
@@ -28,12 +28,16 @@ function BusinessInfo({
 }: BusinessInfoProps) {
   //States
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState<string>(businessDetails.name ?? "");
+  const [name, setName] = useState<string>(businessDetails?.name ?? "");
   const [overview, setOverview] = useState<string>(
-    businessDetails.overview ?? "",
+    businessDetails?.overview ?? "",
   );
-  const [address, setAddress] = useState<string>(businessDetails.address ?? "");
-  const [services, setServices] = useState<string[]>(businessDetails.services);
+  const [address, setAddress] = useState<string>(
+    businessDetails?.address ?? "",
+  );
+  const [services, setServices] = useState<string[]>(
+    businessDetails?.services ?? [],
+  );
   const [newService, setNewService] = useState("");
   const [errors, setErrors] = useState<{
     businessName: string | null;
@@ -45,21 +49,20 @@ function BusinessInfo({
     address: null,
   });
   const [businessHours, setBusinessHours] = useState(
-    businessDetails.businessHours.map((hour) => ({
+    (businessDetails?.businessHours || []).map((hour) => ({
       ...hour,
       start:
-        hour.start.includes("AM") || hour.start.includes("PM")
+        hour.start?.includes("AM") || hour.start?.includes("PM")
           ? convertTo24Hour(hour.start)
-          : hour.start,
+          : hour.start || "09:00",
       end:
-        hour.end.includes("AM") || hour.end.includes("PM")
+        hour.end?.includes("AM") || hour.end?.includes("PM")
           ? convertTo24Hour(hour.end)
-          : hour.end,
+          : hour.end || "17:00",
     })),
   );
-  const [loading, setLoading] = useState(false);
-  // Hooks
-  const apiClient = useApiClient();
+  const { mutate: updateBusiness, isPending: loading } =
+    useUpdateBusinessDetails();
   const { userData, setUserData } = useUserData();
 
   // Handles
@@ -90,63 +93,63 @@ function BusinessInfo({
     updated[index][field] = value;
     setBusinessHours(updated);
   };
+
   const handleTalkToAgent = async () => {
-    try {
-      setLoading(true);
-      const errors: any = {};
-      if (name.trim() === "") {
-        errors.businessName = "Business name is required.";
-      }
-      if (overview.trim() === "") {
-        errors.overview = "Business description is required.";
-      }
-      if (address.trim() === "") {
-        errors.address = "Business address is required.";
-      }
-      if (Object.keys(errors).length) {
-        setErrors(errors);
-        const showError = Object.keys(errors)[0];
-        errorToast(errors[showError]);
-        return;
-      } else {
-        setErrors({
-          businessName: null,
-          overview: null,
-          address: null,
-        });
-      }
-      const updateData = {
-        name,
-        overview,
-        address,
-        services,
-        businessHours,
-      };
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: BusinessDetailsType;
-      }>("/businesses/" + userData?.businessId, updateData);
-      setUserData((pv) => ({
-        ...pv!,
-        businessName: response.data.data.name,
-        dbUserId: pv?.dbUserId ?? null,
-        clerkId: pv?.clerkId ?? null,
-        businessId: pv?.businessId ?? null,
-        isSetupComplete: pv?.isSetupComplete ?? false,
-        role: pv?.role ?? null,
-        assistantNumber:
-          response.data.data.aiAgentSettings.twilioNumber ?? null,
-        subscription: pv?.subscription ?? null,
-      }));
-      setBusinessDetails(response.data.data);
-      successToast(response.data.message);
-    } catch (error: any) {
-      console.error(error);
-      errorToast(error.response.data.error);
-    } finally {
-      setLoading(false);
+    const errorList: Partial<Record<keyof typeof errors, string>> = {};
+    if (name.trim() === "") {
+      errorList.businessName = "Business name is required.";
     }
+    if (overview.trim() === "") {
+      errorList.overview = "Business description is required.";
+    }
+    if (address.trim() === "") {
+      errorList.address = "Business address is required.";
+    }
+    if (Object.keys(errorList).length) {
+      setErrors((prev) => ({ ...prev, ...errorList }));
+      const firstErrorKey = Object.keys(errorList)[0] as keyof typeof errorList;
+      errorToast(errorList[firstErrorKey]!);
+      return;
+    } else {
+      setErrors({
+        businessName: null,
+        overview: null,
+        address: null,
+      });
+    }
+
+    const updateData = {
+      name,
+      overview,
+      address,
+      services,
+      businessHours,
+    };
+
+    updateBusiness(
+      { businessId: userData?.businessId || "", data: updateData },
+      {
+        onSuccess: (response) => {
+          const updatedBusiness = response.data;
+          setUserData((pv) => ({
+            ...pv!,
+            businessName: updatedBusiness.name,
+            assistantNumber:
+              updatedBusiness.aiAgentSettings.twilioNumber ?? null,
+          }));
+          setBusinessDetails(updatedBusiness);
+          successToast(response.message);
+          setIsEditing(false);
+        },
+        onError: (err: unknown) => {
+          const axiosError = err as AxiosError<{ error: string }>;
+          console.error(axiosError);
+          errorToast(
+            axiosError.response?.data?.error || "Failed to update business",
+          );
+        },
+      },
+    );
   };
 
   return (
@@ -178,7 +181,7 @@ function BusinessInfo({
         <div className="flex flex-col gap-5 px-4 py-4">
           {/* Business Name */}
           <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
-            <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
+            <span className="text-md shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
               Business Name:
             </span>
             <div className="w-full">
@@ -201,7 +204,7 @@ function BusinessInfo({
 
           {/* Business Overview */}
           <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
-            <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
+            <span className="text-md shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
               Business Overview:
             </span>
             <div className="w-full">
@@ -224,15 +227,15 @@ function BusinessInfo({
 
           {/* Primary Address */}
           <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
-            <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
+            <span className="text-md shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
               Business Address:
             </span>
             <ReactGoogleAutocomplete
               apiKey={import.meta.env.VITE_GOOGLE_MAP_API}
-              onChange={(e: any) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setAddress(e.target.value);
               }}
-              onPlaceSelected={(place) => {
+              onPlaceSelected={(place: google.maps.places.PlaceResult) => {
                 if (!place?.formatted_address) {
                   return;
                 }

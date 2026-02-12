@@ -1,26 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useApiClient } from "@/lib/axios";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
-import {
-  BusinessDetailsType,
-  IBusinessHour,
-  ITransferScenario,
-} from "@/types/BusinessTypes";
+import { IBusinessHour, ITransferScenario } from "@/types/BusinessTypes";
 import { errorToast, successToast } from "@/utils/react-toast";
 import { ToggleSwitch } from "flowbite-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUpdateTransferScenario } from "../../../api/hooks/useBusinessQueries";
 import { useUserData } from "../../../context/UserDataContext";
 
 interface TransferScenarioModalProps {
   isOpen: boolean;
   onClose: () => void;
   scenario?: ITransferScenario | null;
-  businessDetails: BusinessDetailsType;
-  setBusinessDetails: React.Dispatch<
-    React.SetStateAction<BusinessDetailsType | null>
-  >;
   refetch?: () => Promise<void>;
 }
 
@@ -37,7 +28,7 @@ const daysOfWeek = [
 ];
 
 const defaultHours: IBusinessHour[] = daysOfWeek.map((day) => ({
-  day: day as any,
+  day: day as IBusinessHour["day"],
   start: "08:00",
   end: "17:00",
   isOpen: day !== "Saturday" && day !== "Sunday",
@@ -47,13 +38,10 @@ export default function TransferScenarioModal({
   isOpen,
   onClose,
   scenario,
-  businessDetails,
-  setBusinessDetails,
   refetch,
 }: TransferScenarioModalProps) {
   const { userData } = useUserData();
-  const apiClient = useApiClient();
-  const [loading, setLoading] = useState(false);
+  const updateScenarioMutation = useUpdateTransferScenario();
 
   const navigate = useNavigate();
 
@@ -65,7 +53,9 @@ export default function TransferScenarioModal({
     customHours: [...defaultHours],
   });
 
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof ITransferScenario, string>>
+  >({});
 
   useEffect(() => {
     if (scenario) {
@@ -103,11 +93,10 @@ export default function TransferScenarioModal({
   };
 
   const validate = () => {
-    const newErrors: any = {};
+    const newErrors: Partial<Record<keyof ITransferScenario, string>> = {};
     if (!formData.name.trim()) newErrors.name = "Scenario is required";
     if (!formData.phoneNumber.trim())
       newErrors.phoneNumber = "Phone number is required";
-    // Basic phone validation could be added here
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -115,45 +104,31 @@ export default function TransferScenarioModal({
   const handleSave = async () => {
     if (!validate()) return;
 
-    setLoading(true);
     try {
-      const currentScenarios =
-        businessDetails.callTransferSettings?.scenarios || [];
-      let updatedScenarios;
-
-      if (scenario && scenario._id) {
-        updatedScenarios = currentScenarios.map((s) =>
-          s._id === scenario._id ? formData : s,
-        );
-      } else {
-        updatedScenarios = [
-          ...currentScenarios,
-          { ...formData, _id: Date.now().toString() },
-        ];
-      }
-
-      // Mocking API call pattern from codebase
-      await apiClient.patch(`/businesses/transfer/${userData?.businessId}`, {
-        scenarios: updatedScenarios,
+      await updateScenarioMutation.mutateAsync({
+        businessId: userData?.businessId || "",
+        scenario: formData,
       });
-
-      setBusinessDetails((prev: any) => ({
-        ...prev,
-        callTransferSettings: {
-          ...prev.callTransferSettings,
-          scenarios: updatedScenarios,
-        },
-      }));
 
       successToast(scenario ? "Scenario updated" : "Scenario added");
       onClose();
       if (refetch) await refetch();
-    } catch (error: any) {
-      errorToast(error?.response?.data?.error || "Failed to save scenario");
-    } finally {
-      setLoading(false);
+    } catch (error: unknown) {
+      let errorMessage = "Failed to save scenario";
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response: { data: { error?: string } };
+        };
+        errorMessage =
+          axiosError.response?.data?.error || "Failed to save scenario";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      errorToast(errorMessage);
     }
   };
+
+  const loading = updateScenarioMutation.isPending;
 
   const availabilityTabs: { id: AvailabilityType; label: string }[] = [
     { id: "always", label: "Always" },

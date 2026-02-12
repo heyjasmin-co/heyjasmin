@@ -1,18 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import InfoCard from "@/components/shared/InfoCard";
 import PlanBanner from "@/components/shared/PlanBanner";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
-import { BusinessDetailsType } from "@/types/BusinessTypes";
-import React, { useState } from "react";
+import { BusinessDetailsType, ITransferScenario } from "@/types/BusinessTypes";
+import { useState } from "react";
 import EmptyScenarios from "./EmptyScenarios";
 import TransferScenarioModal from "./TransferScenarioModal";
 
 type TransferCallsContentProps = {
   businessDetails: BusinessDetailsType;
-  setBusinessDetails: React.Dispatch<
-    React.SetStateAction<BusinessDetailsType | null>
-  >;
   canEdit: boolean;
   hasAccess: boolean;
   refetch?: () => Promise<void>;
@@ -20,13 +16,13 @@ type TransferCallsContentProps = {
 
 export default function TransferCallsContent({
   businessDetails,
-  setBusinessDetails,
   canEdit,
   hasAccess,
   refetch,
 }: TransferCallsContentProps) {
   const [showModal, setShowModal] = useState(false);
-  const [editingScenario, setEditingScenario] = useState<any>(null);
+  const [editingScenario, setEditingScenario] =
+    useState<ITransferScenario | null>(null);
   const scenarios = businessDetails.callTransferSettings?.scenarios || [];
 
   const handleAdd = () => {
@@ -34,7 +30,7 @@ export default function TransferCallsContent({
     setShowModal(true);
   };
 
-  const handleEdit = (scenario: any) => {
+  const handleEdit = (scenario: ITransferScenario) => {
     setEditingScenario(scenario);
     setShowModal(true);
   };
@@ -95,7 +91,7 @@ export default function TransferCallsContent({
             />
           ) : (
             <div className="flex flex-col gap-3">
-              {scenarios.map((s: any, idx: number) => (
+              {scenarios.map((s: ITransferScenario, idx: number) => (
                 <div
                   key={idx}
                   className="group flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-colors hover:bg-gray-50"
@@ -136,8 +132,6 @@ export default function TransferCallsContent({
           isOpen={showModal}
           onClose={() => setShowModal(false)}
           scenario={editingScenario}
-          businessDetails={businessDetails}
-          setBusinessDetails={setBusinessDetails}
           refetch={refetch}
         />
       )}

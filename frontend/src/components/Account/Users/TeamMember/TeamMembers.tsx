@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import InfoCard from "@/components/shared/InfoCard";
 import { useState } from "react";
+import {
+  useDeleteTeamMember,
+  useUpdateTeamMember,
+} from "../../../../api/hooks/useTeamQueries";
 import { useUserData } from "../../../../context/UserDataContext";
-import { useApiClient } from "../../../../lib/axios";
 import { appName } from "../../../../theme/appName";
 import { colorTheme } from "../../../../theme/colorTheme";
-import {
-  BusinessUsersDetailsType,
-  BusinessUserType,
-} from "../../../../types/BusinessUsersTypes";
+import { BusinessUsersDetailsType } from "../../../../types/BusinessUsersTypes";
 import { errorToast, successToast } from "../../../../utils/react-toast";
 import { canEdit } from "../../../../utils/role-base";
 import { capitalizeString } from "../../../../utils/string-utils";
@@ -28,13 +28,14 @@ type BusinessUsersProps = {
 };
 
 function TeamMembers({ businessUsers }: BusinessUsersProps) {
-  const [members, setMembers] = useState(businessUsers);
   const [openModal, setOpenModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [removeMode, setRemoveMode] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const { userData } = useUserData();
-  const apiClient = useApiClient();
+
+  const updateMemberMutation = useUpdateTeamMember();
+  const deleteMemberMutation = useDeleteTeamMember();
 
   // Handlers
   const handleModal = () => {
@@ -74,39 +75,37 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
   }) => {
     try {
       const { businessUserId, role } = member;
-      const response = await apiClient.patch<{
-        message: string;
-        success: boolean;
-        data: BusinessUserType;
-      }>(`/business-users/${businessUserId}`, { role });
+      const response = await updateMemberMutation.mutateAsync({
+        businessId: userData?.businessId || "",
+        businessUserId,
+        data: { role },
+      });
 
-      const updatedUser = response.data.data;
-      setMembers((prevMembers) =>
-        prevMembers.map((m) =>
-          m._id === updatedUser._id ? { ...m, ...updatedUser } : m,
-        ),
-      );
-      successToast(response.data.message);
-    } catch (error: any) {
-      const message = error.response?.data?.error || "Something went wrong.";
-      errorToast(message);
+      successToast(response.message);
+      handleModal();
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error && (error as any).response?.data?.error
+          ? (error as any).response.data.error
+          : "Something went wrong.";
+      errorToast(errorMessage);
     }
   };
 
   const handleRemoveMember = async (businessUserId: string) => {
     try {
-      const response = await apiClient.delete<{
-        message: string;
-        success: boolean;
-        data: BusinessUserType;
-      }>("/business-users/" + businessUserId);
-      const user = response.data.data;
-
-      setMembers(members.filter((member) => member._id !== user._id));
-      successToast(response.data.message);
-    } catch (error: any) {
-      const message = error.response?.data?.error || "Something went wrong.";
-      errorToast(message);
+      const response = await deleteMemberMutation.mutateAsync({
+        businessId: userData?.businessId || "",
+        businessUserId,
+      });
+      successToast(response.message);
+      setRemoveMode(false);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error && (error as any).response?.data?.error
+          ? (error as any).response.data.error
+          : "Something went wrong.";
+      errorToast(errorMessage);
     }
   };
 
@@ -162,7 +161,7 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {members.map((member) => (
+                  {businessUsers.map((member) => (
                     <tr key={member._id}>
                       <td className="px-4 py-3 font-medium text-gray-900">
                         {member.name}

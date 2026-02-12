@@ -1,33 +1,33 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useUpdateBusinessServices } from "../../api/hooks/useBusinessQueries";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
 import { colorTheme } from "../../theme/colorTheme";
-import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
+
 type BusinessServiceProps = {
   businessServices: string[];
   canEdit: boolean;
-  setBusinessDetails: React.Dispatch<
-    React.SetStateAction<BusinessDetailsType | null>
-  >;
   refetch?: () => Promise<void>;
 };
+
 function CoreService({
   businessServices,
-  setBusinessDetails,
   canEdit,
   refetch,
 }: BusinessServiceProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [services, setServices] = useState<string[]>(businessServices);
-  const [saving, setSaving] = useState(false);
-  const apiClient = useApiClient();
+
   const { userData } = useUserData();
+  const updateServicesMutation = useUpdateBusinessServices();
 
   const [newService, setNewService] = useState("");
+
+  useEffect(() => {
+    setServices(businessServices);
+  }, [businessServices]);
 
   const handleAddService = () => {
     if (newService.trim() !== "") {
@@ -44,32 +44,32 @@ function CoreService({
 
   const handleSave = async () => {
     if (!userData?.businessId) return;
-    setSaving(true);
+
     try {
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: string[];
-      }>(`/businesses/services/${userData.businessId}`, { services });
-
-      const updateService = response.data.data;
-      setBusinessDetails((pv) => {
-        if (!pv) return null;
-
-        return {
-          ...pv,
-          services: updateService,
-        };
+      const response = await updateServicesMutation.mutateAsync({
+        businessId: userData.businessId,
+        services,
       });
-      successToast(response.data.message);
+
+      successToast(response.message);
       setIsEditing(false);
       if (refetch) await refetch();
-    } catch (error: any) {
-      errorToast(error?.response?.data?.error || "Failed to update services.");
-    } finally {
-      setSaving(false);
+    } catch (error: unknown) {
+      let errorMessage = "Failed to update services.";
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response: { data: { error?: string } };
+        };
+        errorMessage =
+          axiosError.response?.data?.error || "Failed to update services.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      errorToast(errorMessage);
     }
   };
+
+  const saving = updateServicesMutation.isPending;
 
   return (
     <div

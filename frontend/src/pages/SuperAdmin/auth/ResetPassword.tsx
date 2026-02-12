@@ -48,7 +48,7 @@ const ResetPassword = () => {
 
       const { data } = await superAdmin.resetPassword({
         token: resetData.token,
-        newPassword: resetData.newPassword,
+        password: resetData.newPassword,
       });
       if (data.success) {
         successToast("Password reset successfully!");
@@ -83,16 +83,16 @@ const ResetPassword = () => {
     <div className="flex min-h-screen flex-col lg:flex-row">
       {/* Left branding section */}
       <div
-        className="relative hidden flex-1 flex-col items-center justify-center overflow-y-auto bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700 p-8 text-white lg:flex"
+        className="relative hidden flex-1 flex-col items-center justify-center overflow-y-auto bg-linear-to-br from-purple-600 via-indigo-600 to-blue-700 p-8 text-white lg:flex"
         style={{ backgroundColor: colorTheme.primary(1) }}
       >
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent"></div>
 
         <div className="relative z-10 w-full max-w-lg space-y-10 px-4 text-center">
           {/* Branding */}
           <div>
-            <h1 className="bg-gradient-to-r from-white via-purple-200 to-indigo-200 bg-clip-text text-4xl font-extrabold text-transparent drop-shadow-lg md:text-5xl">
+            <h1 className="bg-linear-to-r from-white via-purple-200 to-indigo-200 bg-clip-text text-4xl font-extrabold text-transparent drop-shadow-lg md:text-5xl">
               {appName}
             </h1>
             <p className="mt-4 text-lg font-medium opacity-90 md:text-xl">

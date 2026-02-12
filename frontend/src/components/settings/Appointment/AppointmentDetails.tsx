@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import editIcon from "@/assets/image/editIcon.png";
 import saveIcon from "@/assets/image/saveIcon.png";
 import InfoCard from "@/components/shared/InfoCard";
@@ -6,10 +5,9 @@ import PlanBanner from "@/components/shared/PlanBanner";
 import { Textarea, TextInput, ToggleSwitch } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUpdateAppointmentSettings } from "../../../api/hooks/useBusinessQueries";
 import { useUserData } from "../../../context/UserDataContext";
-import { useApiClient } from "../../../lib/axios";
 import { colorTheme } from "../../../theme/colorTheme";
-import { BusinessDetailsType } from "../../../types/BusinessTypes";
 import { errorToast, successToast } from "../../../utils/react-toast";
 
 type AppointmentDetailsProps = {
@@ -17,9 +15,6 @@ type AppointmentDetailsProps = {
   appointmentMessage: string;
   schedulingLink: string;
   canEdit: boolean;
-  setBusinessDetails: React.Dispatch<
-    React.SetStateAction<BusinessDetailsType | null>
-  >;
   hasAccess: boolean;
   refetch?: () => Promise<void>;
 };
@@ -29,7 +24,6 @@ function AppointmentDetails({
   appointmentMessage,
   schedulingLink,
   canEdit,
-  setBusinessDetails,
   hasAccess,
   refetch,
 }: AppointmentDetailsProps) {
@@ -38,7 +32,6 @@ function AppointmentDetails({
   const [appointmentEnabled, setAppointmentEnabled] = useState(initialEnabled);
   const [message, setMessage] = useState(appointmentMessage);
   const [link, setLink] = useState(schedulingLink);
-  const [loading, setLoading] = useState(false);
 
   const [errors, setErrors] = useState<{
     message: string | null;
@@ -48,13 +41,18 @@ function AppointmentDetails({
     link: null,
   });
 
-  const apiClient = useApiClient();
   const { userData } = useUserData();
+  const updateAppointmentMutation = useUpdateAppointmentSettings();
+
+  useEffect(() => {
+    setAppointmentEnabled(initialEnabled);
+    setMessage(appointmentMessage);
+    setLink(schedulingLink);
+  }, [initialEnabled, appointmentMessage, schedulingLink]);
 
   const handleSave = async () => {
-    const validationErrors: any = {};
+    const validationErrors: Partial<Record<"message" | "link", string>> = {};
 
-    // ✅ Required ONLY when appointment is enabled
     if (appointmentEnabled) {
       if (!message.trim()) {
         validationErrors.message = "Text message is required.";
@@ -65,11 +63,10 @@ function AppointmentDetails({
     }
 
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+      setErrors((prev) => ({ ...prev, ...validationErrors }));
       return;
     }
 
-    // ✅ Check if values changed
     const messageToSend = appointmentEnabled ? message : null;
     const linkToSend = appointmentEnabled ? link : null;
 
@@ -83,40 +80,37 @@ function AppointmentDetails({
     }
 
     setErrors({ message: null, link: null });
-    setLoading(true);
+
     try {
-      const response = await apiClient.patch(
-        `/businesses/appointment/${userData?.businessId}`,
-        {
+      const response = await updateAppointmentMutation.mutateAsync({
+        businessId: userData?.businessId || "",
+        data: {
           appointmentEnabled,
           appointmentMessage: message,
           schedulingLink: link,
         },
-      );
-
-      setBusinessDetails((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          appointmentSettings: {
-            appointmentEnabled,
-            appointmentMessage: message,
-            schedulingLink: link,
-          },
-        };
       });
 
-      successToast(response.data?.message || "Appointment settings updated");
+      successToast(response.message || "Appointment settings updated");
       setIsEditing(false);
       if (refetch) await refetch();
-    } catch (error: any) {
-      errorToast(
-        error?.response?.data?.error || "Failed to update appointment settings",
-      );
-    } finally {
-      setLoading(false);
+    } catch (error: unknown) {
+      let errorMessage = "Failed to update appointment settings";
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response: { data: { error?: string } };
+        };
+        errorMessage =
+          axiosError.response?.data?.error ||
+          "Failed to update appointment settings";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      errorToast(errorMessage);
     }
   };
+
+  const loading = updateAppointmentMutation.isPending;
 
   useEffect(() => {
     if (!appointmentEnabled) {

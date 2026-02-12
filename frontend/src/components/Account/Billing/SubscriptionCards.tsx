@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import InfoCard from "@/components/shared/InfoCard";
+import { AxiosError } from "axios";
 import { useState } from "react";
+import { useCreatePaymentIntent } from "../../../api/hooks/useStripeMutation";
 import { useUserData } from "../../../context/UserDataContext";
-import { useApiClient } from "../../../lib/axios";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast } from "../../../utils/react-toast";
@@ -17,40 +17,46 @@ interface SubscriptionCardsProps {
     priceId: string;
   }) => void;
 }
+// ... (skipping some lines)
 function SubscriptionCards({
   handleCreatePaymentIntent,
 }: SubscriptionCardsProps) {
   const [subscriptions] = useState<SubscriptionCard[]>(subscriptionCards);
   const [loadingId, setLoadingId] = useState<number | null>(null);
-  const apiClient = useApiClient();
   const { userData } = useUserData();
+  const { mutate: createPaymentIntent } = useCreatePaymentIntent();
   const currentSusbcription = userData?.subscription?.stripePriceId;
+
   const handleSubscribe = async (sub: SubscriptionCard) => {
-    try {
-      setLoadingId(sub.id);
+    setLoadingId(sub.id);
 
-      const response = await apiClient.post<{
-        success: boolean;
-        message: string;
-        data: { clientSecret: string };
-      }>("/stripe/create", {
-        businessId: userData?.businessId,
-        priceId: sub.priceId,
-      });
-
-      if (response.data.success) {
-        const clientSecret = response.data.data.clientSecret;
-        handleCreatePaymentIntent({
-          priceId: sub.priceId!,
-          clientSecret,
-        });
-      }
-    } catch (error: any) {
-      console.error("Payment Intent Error:", error);
-      errorToast("");
-    } finally {
-      setLoadingId(null);
-    }
+    createPaymentIntent(
+      {
+        businessId: userData?.businessId || "",
+        priceId: sub.priceId!,
+      },
+      {
+        onSuccess: (response) => {
+          if (response.success) {
+            handleCreatePaymentIntent({
+              priceId: sub.priceId!,
+              clientSecret: response.data.clientSecret,
+            });
+          }
+        },
+        onError: (error: unknown) => {
+          const axiosError = error as AxiosError<{ error: string }>;
+          console.error("Payment Intent Error:", axiosError);
+          errorToast(
+            axiosError.response?.data?.error ||
+              "Failed to initiate payment. Please try again.",
+          );
+        },
+        onSettled: () => {
+          setLoadingId(null);
+        },
+      },
+    );
   };
 
   return (
@@ -62,7 +68,7 @@ function SubscriptionCards({
       <div className="flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div className="flex items-center gap-3">
           <div
-            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
             style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
           >
             <i className="fa-solid fa-credit-card text-sm text-white"></i>

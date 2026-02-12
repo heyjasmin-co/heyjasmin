@@ -1,50 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useLayoutEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useBusinessCalls } from "../../api/hooks/useCallQueries";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
 import { colorTheme } from "../../theme/colorTheme";
-import { CallsType } from "../../types/CallsType";
-import { errorToast, successToast } from "../../utils/react-toast";
 import { formatPhoneNumber } from "../../utils/string-utils";
 import Loading from "../Loading";
 
 export default function CallsList() {
-  const apiClient = useApiClient();
-  const [calls, setCalls] = useState<CallsType>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { userData } = useUserData();
+  const {
+    data: callsResponse,
+    isLoading: loading,
+    isError: hasError,
+    refetch: fetchCalls,
+  } = useBusinessCalls(userData?.businessId);
 
-  const fetchCalls = async () => {
-    if (!userData?.businessId) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const res = await apiClient.get<{
-        success: boolean;
-        message: string;
-        data: CallsType;
-      }>(`/calls/${userData.businessId}`);
-
-      setCalls(res.data.data);
-      successToast(res.data.message);
-    } catch (err: any) {
-      console.error(err);
-      setError("Failed to fetch calls");
-      errorToast("Failed to fetch calls");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useLayoutEffect(() => {
-    if (userData?.businessId) {
-      fetchCalls();
-    }
-  }, [userData?.businessId]);
+  const calls = callsResponse?.data || [];
+  const error = hasError ? "Failed to fetch calls" : null;
 
   return (
     <div
@@ -58,7 +29,7 @@ export default function CallsList() {
         <div className="flex h-full flex-col items-center justify-center">
           <p className="text-sm text-red-500">{error}</p>
           <button
-            onClick={fetchCalls}
+            onClick={() => fetchCalls()}
             className="mt-3 rounded-md bg-purple-500 px-4 py-1.5 text-sm text-white shadow-sm hover:bg-purple-600"
           >
             Retry
@@ -77,7 +48,7 @@ export default function CallsList() {
               </span>
               <i
                 className="fa-solid fa-rotate-right ml-3 cursor-pointer text-sm text-gray-400 hover:text-gray-600"
-                onClick={fetchCalls}
+                onClick={() => fetchCalls()}
               />
             </div>
           </div>

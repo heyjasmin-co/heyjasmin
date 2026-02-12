@@ -1,6 +1,15 @@
 import { useUser } from "@clerk/clerk-react";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { useApiClient } from "../lib/axios";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { queryKeys } from "../api/QueryKeys";
+import { useMe } from "../api/hooks/useUserQueries";
 
 export interface UserData {
   dbUserId: string | null;
@@ -41,62 +50,55 @@ const UserDataContext = createContext<UserDataContextType | undefined>(
 );
 
 export function UserDataProvider({ children }: { children: React.ReactNode }) {
-  const { user, isSignedIn } = useUser();
-  const apiClient = useApiClient();
+  const { isSignedIn } = useUser();
+  const queryClient = useQueryClient();
 
+  const { data: meResponse, isLoading, refetch } = useMe();
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  const fetchUserData = async () => {
-    if (!user || !isSignedIn) {
+  useEffect(() => {
+    if (meResponse?.data) {
+      // If the API returns UserMeResponse (user + businessUser), map it.
+      // If it returns UserData, this might need adjustment.
+      // Assuming UserMeResponse for now based on UserTypes.ts
+      const data = meResponse.data;
+      if ("user" in data) {
+        setUserData({
+          dbUserId: data.user._id,
+          clerkId: data.user.clerkId,
+          businessId: data.businessUser?.businessId || null,
+          isSetupComplete: !!data.businessUser, // simplified
+          role: data.businessUser?.role || null,
+          assistantNumber: null, // these might come from elsewhere
+          businessName: null,
+          subscription: null,
+        });
+      } else {
+        setUserData(data as unknown as UserData);
+      }
+    } else if (!isSignedIn) {
       setUserData(null);
-      setLoading(false);
-      return;
     }
-
-    try {
-      setLoading(true);
-      const response = await apiClient.get<{
-        message: string;
-        success: boolean;
-        data: UserData;
-      }>("/users/me");
-
-      setUserData(response.data.data);
-    } catch (error) {
-      console.error("Failed to fetch user data:", error);
-
-      // Fallback user data
-      setUserData({
-        dbUserId: null,
-        clerkId: null,
-        businessId: null,
-        isSetupComplete: false,
-        role: null,
-        assistantNumber: null,
-        businessName: null,
-        subscription: null,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [meResponse, isSignedIn]);
 
   const updateUserData = (data: Partial<UserData>) => {
     setUserData((prev) => (prev ? { ...prev, ...data } : null));
   };
 
-  const refreshUserData = async () => {
-    await fetchUserData();
-  };
-
-  useEffect(() => {
-    fetchUserData();
-  }, [isSignedIn]);
+  const refreshUserData = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: queryKeys.users.me() });
+    await refetch();
+  }, [queryClient, refetch]);
 
   const contextValue = useMemo(
-    () => ({ userData, loading, updateUserData, refreshUserData, setUserData }),
-    [userData, loading],
+    () => ({
+      userData,
+      loading: isLoading,
+      updateUserData,
+      refreshUserData,
+      setUserData,
+    }),
+    [userData, isLoading, refreshUserData],
   );
 
   return (

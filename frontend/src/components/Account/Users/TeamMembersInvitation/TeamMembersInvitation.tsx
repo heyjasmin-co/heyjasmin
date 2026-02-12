@@ -1,8 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import InfoCard from "@/components/shared/InfoCard";
 import { useState } from "react";
+import {
+  useCreateInvitation,
+  useRevokeInvitation,
+} from "../../../../api/hooks/useTeamQueries";
 import { useUserData } from "../../../../context/UserDataContext";
-import { useApiClient } from "../../../../lib/axios";
 import { appName } from "../../../../theme/appName";
 import { colorTheme } from "../../../../theme/colorTheme";
 import { BusinessUserInvitationsType } from "../../../../types/BusinessUserInvitationsTypes";
@@ -28,14 +30,13 @@ type BusinessUserInvitationsProps = {
 function TeamMembersInvitation({
   businessUserInvitations,
 }: BusinessUserInvitationsProps) {
-  const [members, setMembers] = useState(businessUserInvitations);
-
   const [openModal, setOpenModal] = useState(false);
   const [removeMode, setRemoveMode] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
-  const apiClient = useApiClient();
   const { userData } = useUserData();
+  const createInvitationMutation = useCreateInvitation();
+  const revokeInvitationMutation = useRevokeInvitation();
 
   // Handlers
   const handleModal = () => {
@@ -56,35 +57,40 @@ function TeamMembersInvitation({
 
   const handleRemoveMember = async (invitationToken: string) => {
     try {
-      const response = await apiClient.delete<{
-        success: boolean;
-        message: string;
-        data: BusinessUserInvitationsType;
-      }>(`/business-user-invitations/revoke/${invitationToken}`);
+      const response = await revokeInvitationMutation.mutateAsync({
+        businessId: userData?.businessId || "",
+        invitationToken,
+      });
 
-      setMembers((prev) =>
-        prev.filter((member) => member.invitationToken !== invitationToken),
-      );
-      successToast(response.data.message);
-    } catch (error: any) {
-      errorToast(
-        error?.response?.data?.error || "Failed to cancel invitation.",
-      );
-      console.error("Error removing member:", error);
+      successToast(response.message);
+      setRemoveMode(false);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error && (error as any).response?.data?.error
+          ? (error as any).response.data.error
+          : "Failed to cancel invitation.";
+      errorToast(errorMessage);
     }
   };
   const handleAddMember = async (member: { email: string; role: string }) => {
     try {
-      const response = await apiClient.post<{
-        success: boolean;
-        message: string;
-        data: BusinessUserInvitationsType;
-      }>(`/business-user-invitations/create/${userData?.businessId}`, member);
+      const response = await createInvitationMutation.mutateAsync({
+        businessId: userData?.businessId || "",
+        data: {
+          name: "", // Basic invitation doesn't require name in the modal, but hook expects it.
+          email: member.email,
+          role: member.role,
+        },
+      });
 
-      setMembers((prev) => [...prev, response.data.data]);
-      successToast(response.data.message);
-    } catch (error: any) {
-      errorToast(error?.response?.data?.error || "Failed to send invitation.");
+      successToast(response.message);
+      handleModal();
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error && (error as any).response?.data?.error
+          ? (error as any).response.data.error
+          : "Failed to send invitation.";
+      errorToast(errorMessage);
     }
   };
 
@@ -156,8 +162,8 @@ function TeamMembersInvitation({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {members.length > 0 ? (
-                    members.map((member) => (
+                  {businessUserInvitations.length > 0 ? (
+                    businessUserInvitations.map((member) => (
                       <tr
                         key={member._id}
                         className="transition-colors duration-150 hover:bg-gray-50"
@@ -178,7 +184,9 @@ function TeamMembersInvitation({
                         {userData?.role !== "viewer" && (
                           <td className="flex items-center gap-3 px-4 py-3">
                             <button
-                              onClick={() => handleDelete(member as any)}
+                              onClick={() =>
+                                handleDelete(member as unknown as Member)
+                              }
                               className="inline-flex items-center justify-center rounded-md bg-red-50 p-2 text-red-600 transition-colors duration-200 hover:bg-red-100"
                               title="Delete"
                             >
