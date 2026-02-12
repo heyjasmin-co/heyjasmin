@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import InfoCard from "@/components/shared/InfoCard";
 import { useState } from "react";
-import infoIcon from "../../../../assets/image/infoIcon.png";
 import { useUserData } from "../../../../context/UserDataContext";
 import { useApiClient } from "../../../../lib/axios";
 import { appName } from "../../../../theme/appName";
@@ -129,12 +129,10 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
           </div>
 
           {/* Info */}
-          <div className="flex gap-2 px-4 py-3">
-            <img src={infoIcon} alt="Info Icon" className="h-6 w-6" />
-            <p className="text-sm text-gray-700">
-              Anyone added below can log in to the {appName} admin dashboard.
-            </p>
-          </div>
+          <InfoCard
+            className="flex gap-2 px-4 py-3"
+            message={`Anyone added below can log in to the ${appName} admin dashboard.`}
+          />
 
           {/* Members Table */}
           <div className="flex flex-col gap-6 px-4 py-4">

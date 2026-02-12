@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import InfoCard from "@/components/shared/InfoCard";
 import { useState } from "react";
-import infoIcon from "../../../assets/image/infoIcon.png";
 import { useUserData } from "../../../context/UserDataContext";
 import { useApiClient } from "../../../lib/axios";
 import { appName } from "../../../theme/appName";
@@ -74,14 +74,12 @@ function SubscriptionCards({
       </div>
 
       {/* Info */}
-      <div className="flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-start sm:px-5">
-        <img src={infoIcon} alt="Info Icon" className="h-5 w-5 flex-shrink-0" />
-        <p className="text-xs text-gray-700">
-          Manage the subscription plans for {appName}. View pricing, features,
+      <InfoCard
+        className="flex gap-2 border-t border-gray-200 px-3 py-2"
+        message={`Manage the subscription plans for ${appName}. View pricing, features,
           and choose the plan that best fits your needs. You can update or
-          upgrade anytime.
-        </p>
-      </div>
+          upgrade anytime.`}
+      />
 
       {/* Subscription Cards */}
       <div

@@ -2,7 +2,6 @@
 import { useState } from "react";
 import ReactGoogleAutocomplete from "react-google-autocomplete";
 import editIcon from "../../assets/image/editIcon.png";
-import infoIcon from "../../assets/image/infoIcon.png";
 import nextIcon from "../../assets/image/nextIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
@@ -12,6 +11,7 @@ import { colorTheme } from "../../theme/colorTheme";
 import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
 import { convertTo24Hour, formatTime } from "../../utils/time";
+import InfoCard from "../shared/InfoCard";
 
 type BusinessInfoProps = {
   businessDetails: BusinessDetailsType;
@@ -169,10 +169,10 @@ function BusinessInfo({
         </div>
 
         {/* Info Text */}
-        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start">
-          <img src={infoIcon} alt="Info Icon" className="h-6 w-6 shrink-0" />
-          <p className="text-sm text-gray-700">{`This business information gives ${appName} the context to handle your calls. You can update or add to it anytime — this is just the starting point.`}</p>
-        </div>
+        <InfoCard
+          className="flex gap-2 px-4 py-3"
+          message={`This business information gives ${appName} the context to handle your calls. You can update or add to it anytime — this is just the starting point.`}
+        />
 
         {/* Form Section */}
         <div className="flex flex-col gap-5 px-4 py-4">
@@ -408,8 +408,10 @@ function BusinessInfo({
             <button
               disabled={loading}
               onClick={handleTalkToAgent}
-              className={`flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto ${
-                loading && "cursor-not-allowed bg-gray-100 text-gray-400"
+              className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-md transition-all active:scale-95 sm:w-auto ${
+                loading
+                  ? "cursor-not-allowed bg-gray-400"
+                  : "bg-purple-600 hover:bg-purple-700"
               }`}
             >
               <span className="text-xl font-bold">
