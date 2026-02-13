@@ -51,14 +51,8 @@ function BusinessInfo({
   const [businessHours, setBusinessHours] = useState(
     (businessDetails?.businessHours || []).map((hour) => ({
       ...hour,
-      start:
-        hour.start?.includes("AM") || hour.start?.includes("PM")
-          ? convertTo24Hour(hour.start)
-          : hour.start || "09:00",
-      end:
-        hour.end?.includes("AM") || hour.end?.includes("PM")
-          ? convertTo24Hour(hour.end)
-          : hour.end || "17:00",
+      start: convertTo24Hour(hour.start) || "09:00",
+      end: convertTo24Hour(hour.end) || "17:00",
     })),
   );
   const { mutate: updateBusiness, isPending: loading } =

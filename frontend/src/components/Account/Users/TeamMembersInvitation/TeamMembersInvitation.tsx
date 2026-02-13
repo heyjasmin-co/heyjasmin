@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import InfoCard from "@/components/shared/InfoCard";
 import { useState } from "react";
 import {

@@ -5,6 +5,7 @@ export interface IUser {
   firstName: string;
   lastName: string;
   profileImage: string;
+  businessCount?: number;
   createdAt: string;
   updatedAt: string;
 }

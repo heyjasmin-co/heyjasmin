@@ -23,8 +23,9 @@ export interface SuperAdminForgotPasswordData {
 }
 
 export interface SuperAdminResetPasswordData {
-  password?: string;
+  newPassword?: string;
   token?: string;
+  id?: string;
 }
 
 export interface SuperAdminChangePasswordData {
@@ -51,11 +52,8 @@ export interface SuperAdminUserParams {
 
 export interface SuperAdminLoginResponse {
   success: boolean;
-  message: string;
-  data: {
-    token: string;
-    superAdmin: ISuperAdmin;
-  };
+  message?: string;
+  token: string;
 }
 
 export interface SuperAdminBusinessesResponse {
@@ -72,4 +70,14 @@ export interface SuperAdminUsersResponse {
   users: IUser[];
   total: number;
   pages: number;
+}
+export interface SuperAdminSuccessResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface SuperAdminSignupResponse {
+  success: boolean;
+  message: string;
+  data: ISuperAdmin;
 }

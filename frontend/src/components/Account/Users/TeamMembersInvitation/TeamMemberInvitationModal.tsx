@@ -48,8 +48,6 @@ function TeamMemberInvitationModal({
     setRole("Admin");
     setError("");
     setLoading(false);
-
-    handleModel();
   };
 
   return (

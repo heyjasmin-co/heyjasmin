@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { SuperAdminSignupData } from "@/types/SuperAdminTypes";
+import { AxiosError } from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { appName } from "../../../theme/appName";
@@ -26,8 +26,9 @@ const Signup = () => {
         successToast("Account created successfully!");
         navigate("/super-admin/auth/login");
       }
-    } catch (error: any) {
-      const msg = error.response?.data?.error || "Signup failed";
+    } catch (error) {
+      const err = error as AxiosError<{ error: string }>;
+      const msg = err.response?.data?.error || "Signup failed";
       errorToast(msg);
     } finally {
       setLoading(false);

@@ -82,7 +82,6 @@ function TeamMembers({ businessUsers }: BusinessUsersProps) {
       });
 
       successToast(response.message);
-      handleModal();
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error && (error as any).response?.data?.error

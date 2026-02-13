@@ -95,7 +95,8 @@ function SubscriptionCards({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
           {subscriptions.map((sub) => {
             const isPopular = sub.name === "Pro";
-            const isCurrent = sub.priceId === currentSusbcription;
+            const isCurrent =
+              sub.priceId === currentSusbcription && sub.priceId !== null;
             const isExpired =
               isCurrent && userData?.subscription?.status !== "active";
             return (

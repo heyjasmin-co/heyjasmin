@@ -1,3 +1,5 @@
+import { IUser } from "./UserTypes";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type BusinessDetailsType = {
   _id?: string;
@@ -13,7 +15,7 @@ export type BusinessDetailsType = {
 
   totalCallMinutes: number;
 
-  ownerUserId?: string;
+  ownerUserId?: string | IUser;
   aiAgentSettings: {
     assistantId?: string;
     assistantName?: string;
@@ -33,6 +35,15 @@ export type BusinessDetailsType = {
   };
   clerkOrganizationId?: string;
   isSetupComplete: boolean;
+
+  subscription?: {
+    plan?: string;
+    status?: string;
+    [key: string]: any;
+  };
+
+  memberCount?: number;
+
   createdAt: Date;
   updatedAt: Date;
 };

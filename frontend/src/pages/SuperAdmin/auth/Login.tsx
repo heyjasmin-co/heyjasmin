@@ -1,37 +1,35 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useSuperAdmin } from "@/hooks/useSuperAdmin";
+import { useSuperAdminLogin } from "@/api/hooks/useSuperAdminQueries";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
 import { SuperAdminLoginData } from "@/types/SuperAdminTypes";
 import { errorToast } from "@/utils/react-toast";
+import { AxiosError } from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
-  const superAdmin = useSuperAdmin();
-  const [loading, setLoading] = useState(false);
+  const loginMutation = useSuperAdminLogin();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<SuperAdminLoginData>({
     email: "",
     password: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      const { data } = await superAdmin.login(formData);
-      if (data.success) {
-        localStorage.setItem("superAdminToken", data.token);
-        navigate("/super-admin/dashboard/businesses");
-      }
-    } catch (error: any) {
-      const msg = error.response?.data?.error || "Login failed";
-      errorToast(msg);
-    } finally {
-      setLoading(false);
-    }
+    loginMutation.mutate(formData, {
+      onSuccess: (data) => {
+        if (data.success) {
+          localStorage.setItem("superAdminToken", data.token);
+          navigate("/super-admin/dashboard/businesses");
+        }
+      },
+      onError: (error: AxiosError<{ error: string }>) => {
+        const msg = error.response?.data?.error || "Login failed";
+        errorToast(msg);
+      },
+    });
   };
 
   return (
@@ -150,12 +148,12 @@ const Login = () => {
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loginMutation.isPending}
                 className="group relative flex w-full items-center justify-center overflow-hidden rounded-lg px-6 py-3.5 text-base font-bold text-white transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                 style={{ backgroundColor: colorTheme.primary(1) }}
               >
                 <div className="absolute inset-0 bg-white/0 transition-colors group-hover:bg-white/10" />
-                {loading ? (
+                {loginMutation.isPending ? (
                   <span className="flex items-center justify-center gap-2">
                     <i className="fa-solid fa-spinner fa-spin"></i>
                     Authenticating...

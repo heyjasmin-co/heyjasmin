@@ -1,28 +1,33 @@
 import { AxiosInstance } from "axios";
 import {
-  ISuperAdmin,
   SuperAdminBusinessParams,
   SuperAdminBusinessesResponse,
+  SuperAdminChangeEmailData,
   SuperAdminChangePasswordData,
   SuperAdminLoginData,
   SuperAdminLoginResponse,
   SuperAdminResetPasswordData,
   SuperAdminSignupData,
+  SuperAdminSignupResponse,
+  SuperAdminSuccessResponse,
   SuperAdminUserParams,
   SuperAdminUsersResponse,
 } from "../../types/SuperAdminTypes";
 
 export const superAdminService = (apiClient: AxiosInstance) => ({
-  signup: async (data: SuperAdminSignupData) => {
-    const response = await apiClient.post<{
-      success: boolean;
-      message: string;
-      data: ISuperAdmin;
-    }>("/super-admin/signup", data);
+  signup: async (
+    data: SuperAdminSignupData,
+  ): Promise<SuperAdminSignupResponse> => {
+    const response = await apiClient.post<SuperAdminSignupResponse>(
+      "/super-admin/signup",
+      data,
+    );
     return response.data;
   },
 
-  login: async (data: SuperAdminLoginData) => {
+  login: async (
+    data: SuperAdminLoginData,
+  ): Promise<SuperAdminLoginResponse> => {
     const response = await apiClient.post<SuperAdminLoginResponse>(
       "/super-admin/login",
       data,
@@ -30,43 +35,51 @@ export const superAdminService = (apiClient: AxiosInstance) => ({
     return response.data;
   },
 
-  forgotPassword: async (email: string) => {
-    const response = await apiClient.post<{
-      success: boolean;
-      message: string;
-    }>("/super-admin/forgot-password", { email });
+  forgotPassword: async (email: string): Promise<SuperAdminSuccessResponse> => {
+    const response = await apiClient.post<SuperAdminSuccessResponse>(
+      "/super-admin/forgot-password",
+      { email },
+    );
     return response.data;
   },
 
-  resetPassword: async (data: SuperAdminResetPasswordData) => {
-    const response = await apiClient.post<{
-      success: boolean;
-      message: string;
-    }>("/super-admin/reset-password", data);
+  resetPassword: async (
+    data: SuperAdminResetPasswordData,
+  ): Promise<SuperAdminSuccessResponse> => {
+    const response = await apiClient.post<SuperAdminSuccessResponse>(
+      "/super-admin/reset-password",
+      data,
+    );
     return response.data;
   },
 
-  changePassword: async (data: SuperAdminChangePasswordData) => {
-    const response = await apiClient.post<{
-      success: boolean;
-      message: string;
-    }>("/super-admin/change-password", data);
+  changePassword: async (
+    data: SuperAdminChangePasswordData,
+  ): Promise<SuperAdminSuccessResponse> => {
+    const response = await apiClient.post<SuperAdminSuccessResponse>(
+      "/super-admin/change-password",
+      data,
+    );
     return response.data;
   },
 
-  changeEmail: async (email: string) => {
-    const response = await apiClient.post<{
-      success: boolean;
-      message: string;
-    }>("/super-admin/change-email", { email });
+  changeEmail: async (
+    data: SuperAdminChangeEmailData,
+  ): Promise<SuperAdminSuccessResponse> => {
+    const response = await apiClient.post<SuperAdminSuccessResponse>(
+      "/super-admin/change-email",
+      data,
+    );
     return response.data;
   },
 
-  verifyEmailChange: async (token: string) => {
-    const response = await apiClient.post<{
-      success: boolean;
-      message: string;
-    }>("/super-admin/verify-email-change", { token });
+  verifyEmailChange: async (
+    token: string,
+  ): Promise<SuperAdminSuccessResponse> => {
+    const response = await apiClient.post<SuperAdminSuccessResponse>(
+      "/super-admin/verify-email-change",
+      { token },
+    );
     return response.data;
   },
 
@@ -86,19 +99,17 @@ export const superAdminService = (apiClient: AxiosInstance) => ({
     return response.data;
   },
 
-  deleteBusiness: async (id: string) => {
-    const response = await apiClient.delete<{
-      success: boolean;
-      message: string;
-    }>(`/super-admin/businesses/${id}`);
+  deleteBusiness: async (id: string): Promise<SuperAdminSuccessResponse> => {
+    const response = await apiClient.delete<SuperAdminSuccessResponse>(
+      `/super-admin/businesses/${id}`,
+    );
     return response.data;
   },
 
-  deleteUser: async (id: string) => {
-    const response = await apiClient.delete<{
-      success: boolean;
-      message: string;
-    }>(`/super-admin/users/${id}`);
+  deleteUser: async (id: string): Promise<SuperAdminSuccessResponse> => {
+    const response = await apiClient.delete<SuperAdminSuccessResponse>(
+      `/super-admin/users/${id}`,
+    );
     return response.data;
   },
 });

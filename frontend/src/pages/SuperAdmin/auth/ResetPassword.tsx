@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
 import { SuperAdminForgotPasswordData } from "@/types/SuperAdminTypes";
 import { errorToast, successToast } from "@/utils/react-toast";
+import { AxiosError } from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -48,14 +48,16 @@ const ResetPassword = () => {
 
       const { data } = await superAdmin.resetPassword({
         token: resetData.token,
-        password: resetData.newPassword,
+        newPassword: resetData.newPassword,
+        id: id || "",
       });
       if (data.success) {
         successToast("Password reset successfully!");
         navigate("/super-admin/auth/login");
       }
-    } catch (error: any) {
-      const msg = error.response?.data?.error || "Failed to reset password";
+    } catch (error) {
+      const err = error as AxiosError<{ error: string }>;
+      const msg = err.response?.data?.error || "Failed to reset password";
       errorToast(msg);
     } finally {
       setLoading(false);
@@ -71,8 +73,9 @@ const ResetPassword = () => {
         successToast("Reset link sent to your email!");
         setForgotData({ email: "" });
       }
-    } catch (error: any) {
-      const msg = error.response?.data?.error || "Failed to send reset link";
+    } catch (error) {
+      const err = error as AxiosError<{ error: string }>;
+      const msg = err.response?.data?.error || "Failed to send reset link";
       errorToast(msg);
     } finally {
       setLoading(false);
