@@ -53,7 +53,7 @@ export default function TransferCalls() {
           <BusinessTitleCard
             businessDetails={businessDetails}
             title="Transfer Calls"
-            canEdit={userData?.role !== "viewer"}
+            canEdit={hasAccess && userData?.role !== "viewer"}
             handleUpdateAgent={handleUpdateAgent}
             subtitle={`Allow ${appName} to transfer a call.`}
           />
