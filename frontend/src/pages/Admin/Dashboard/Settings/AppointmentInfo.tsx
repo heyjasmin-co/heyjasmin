@@ -63,7 +63,7 @@ export default function AppointmentInfo() {
           <BusinessTitleCard
             businessDetails={businessDetails}
             title="Appointments"
-            canEdit={userData?.role !== "viewer"}
+            canEdit={hasAccess && userData?.role !== "viewer"}
             handleUpdateAgent={handleUpdateAgent}
             subtitle="Allow your agent to handle appointments"
           />
