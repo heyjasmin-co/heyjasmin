@@ -1,15 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { AxiosError } from "axios";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useApiClient } from "../../../lib/axios";
+import { useAcceptInvitation } from "../../../api/hooks/useInvitationQueries";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
 
 export default function JoinOrganization() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const apiClient = useApiClient();
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutate: acceptInvitation, isPending: isLoading } =
+    useAcceptInvitation();
   const [error, setError] = useState("");
 
   // Get URL parameters
@@ -18,24 +18,26 @@ export default function JoinOrganization() {
   const businessName = searchParams.get("businessName");
   const email = searchParams.get("email");
   const invitationToken = searchParams.get("invitationToken");
-  const handleJoinOrganization = async () => {
-    setIsLoading(true);
+
+  const handleJoinOrganization = () => {
     setError("");
 
-    try {
-      // Call your API to join the organization
-      await apiClient.post(`/business-user-invitations/accept`, {
-        userId,
-        invitationToken,
-      });
-
-      // Redirect to dashboard on success
-      navigate("/admin/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    acceptInvitation(
+      { userId, invitationToken },
+      {
+        onSuccess: () => {
+          navigate("/admin/dashboard");
+        },
+        onError: (err: unknown) => {
+          const axiosError = err as AxiosError<{ error: string }>;
+          setError(
+            axiosError.response?.data?.error ||
+              axiosError.message ||
+              "Something went wrong. Please try again.",
+          );
+        },
+      },
+    );
   };
 
   const handleDecline = () => {
@@ -46,14 +48,14 @@ export default function JoinOrganization() {
     <div className="flex min-h-screen">
       {/* Left branding section */}
       <div
-        className="relative hidden w-1/2 flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700 p-12 text-white lg:flex"
+        className="relative hidden w-1/2 flex-col items-center justify-center overflow-hidden bg-linear-to-br from-purple-600 via-indigo-600 to-blue-700 p-12 text-white lg:flex"
         style={{ backgroundColor: colorTheme.primary(1) }}
       >
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent"></div>
 
         <div className="relative z-10 text-center">
-          <h1 className="bg-gradient-to-r from-white via-purple-200 to-indigo-200 bg-clip-text text-5xl font-extrabold text-transparent drop-shadow-lg">
+          <h1 className="bg-linear-to-r from-white via-purple-200 to-indigo-200 bg-clip-text text-5xl font-extrabold text-transparent drop-shadow-lg">
             {appName}
           </h1>
           <p className="mt-4 text-lg font-medium opacity-90">

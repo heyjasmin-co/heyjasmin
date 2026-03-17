@@ -1,20 +1,24 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  useSuperAdminChangeEmail,
+  useSuperAdminChangePassword,
+} from "@/api/hooks/useSuperAdminQueries";
 import TitleCard from "@/components/TitleCard";
-import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { colorTheme } from "@/theme/colorTheme";
 import {
   SuperAdminChangeEmailData,
   SuperAdminChangePasswordData,
 } from "@/types/SuperAdminTypes";
 import { errorToast, successToast } from "@/utils/react-toast";
+import { AxiosError } from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import infoIcon from "../../../assets/image/infoIcon.png";
 
 const Settings = () => {
   const navigate = useNavigate();
-  const superAdmin = useSuperAdmin();
-  const [loading, setLoading] = useState({ password: false, email: false });
+  const changePasswordMutation = useSuperAdminChangePassword();
+  const changeEmailMutation = useSuperAdminChangeEmail();
+
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
@@ -33,44 +37,42 @@ const Settings = () => {
     password: "",
   });
 
-  const handleChangePassword = async (e: React.FormEvent) => {
+  const handleChangePassword = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading({ ...loading, password: true });
-    try {
-      const { data } = await superAdmin.changePassword(pwData);
-      if (data.success) {
-        successToast("Password updated successfully");
-        setPwData({ currentPassword: "", newPassword: "" });
-      }
-    } catch (err: any) {
-      const msg = err.response?.data?.error || "Failed to update password";
-      errorToast(msg);
-    } finally {
-      setLoading({ ...loading, password: false });
-    }
+    changePasswordMutation.mutate(pwData, {
+      onSuccess: (data) => {
+        if (data.success) {
+          successToast("Password updated successfully");
+          setPwData({ currentPassword: "", newPassword: "" });
+        }
+      },
+      onError: (err: AxiosError<{ error: string }>) => {
+        const msg = err.response?.data?.error || "Failed to update password";
+        errorToast(msg);
+      },
+    });
   };
 
-  const handleChangeEmail = async (e: React.FormEvent) => {
+  const handleChangeEmail = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading({ ...loading, email: true });
-    try {
-      const { data } = await superAdmin.changeEmail(emailData);
-      if (data.success) {
-        successToast(
-          "Verification email sent! Please check your current email to confirm the change. You have been logged out for security.",
-        );
-        setEmailData({ newEmail: "", password: "" });
-        localStorage.removeItem("superAdminToken");
-        setTimeout(() => {
-          navigate("/super-admin/auth/login");
-        }, 3000);
-      }
-    } catch (err: any) {
-      const msg = err.response?.data?.error || "Failed to update email";
-      errorToast(msg);
-    } finally {
-      setLoading({ ...loading, email: false });
-    }
+    changeEmailMutation.mutate(emailData, {
+      onSuccess: (data) => {
+        if (data.success) {
+          successToast(
+            "Verification email sent! Please check your current email to confirm the change. You have been logged out for security.",
+          );
+          setEmailData({ newEmail: "", password: "" });
+          localStorage.removeItem("superAdminToken");
+          setTimeout(() => {
+            navigate("/super-admin/auth/login");
+          }, 3000);
+        }
+      },
+      onError: (err: AxiosError<{ error: string }>) => {
+        const msg = err.response?.data?.error || "Failed to update email";
+        errorToast(msg);
+      },
+    });
   };
 
   return (
@@ -194,14 +196,14 @@ const Settings = () => {
                   </div>
                   <button
                     type="submit"
-                    disabled={loading.password}
+                    disabled={changePasswordMutation.isPending}
                     className={`mt-2 flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold shadow-md transition-all ${
-                      loading.password
+                      changePasswordMutation.isPending
                         ? "cursor-not-allowed bg-gray-300 text-gray-500"
                         : "bg-purple-600 text-white hover:bg-purple-700 focus:ring-2 focus:ring-purple-400 focus:ring-offset-1 active:scale-95"
                     }`}
                   >
-                    {loading.password ? (
+                    {changePasswordMutation.isPending ? (
                       <>
                         <i className="fa-solid fa-spinner fa-spin"></i>
                         <span>Updating...</span>
@@ -314,14 +316,14 @@ const Settings = () => {
                   </div>
                   <button
                     type="submit"
-                    disabled={loading.email}
+                    disabled={changeEmailMutation.isPending}
                     className={`mt-2 flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold shadow-md transition-all ${
-                      loading.email
+                      changeEmailMutation.isPending
                         ? "cursor-not-allowed bg-gray-300 text-gray-500"
                         : "bg-purple-600 text-white hover:bg-purple-700 focus:ring-2 focus:ring-purple-400 focus:ring-offset-1 active:scale-95"
                     }`}
                   >
-                    {loading.email ? (
+                    {changeEmailMutation.isPending ? (
                       <>
                         <i className="fa-solid fa-spinner fa-spin"></i>
                         <span>Updating...</span>

@@ -1,9 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import TitleCard from "@/components/TitleCard";
-import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { appName } from "@/theme/appName";
-import { useCallback, useEffect, useState } from "react";
+import { AxiosError } from "axios";
+import { useState } from "react";
 import { HiTrash } from "react-icons/hi";
+import {
+  useDeleteUserAsSuperAdmin,
+  useSuperAdminUsers,
+} from "../../../api/hooks/useSuperAdminQueries";
 import infoIcon from "../../../assets/image/infoIcon.png";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import Loading from "../../../components/Loading";
@@ -11,65 +14,51 @@ import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast, successToast } from "../../../utils/react-toast";
 
 const UsersList = () => {
-  const superAdmin = useSuperAdmin();
-  const [users, setUsers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
   // Pagination state
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { data } = await superAdmin.getUsers({
-        page,
-        limit,
-      });
-      if (data.success) {
-        setUsers(data.users);
-        setTotal(data.total);
-        setTotalPages(data.pages);
-      }
-    } catch (error) {
-      console.error("Failed to fetch users", error);
-      errorToast("Failed to fetch users");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, limit, superAdmin]);
+  // Queries
+  const { data: usersData, isLoading: isUsersLoading } = useSuperAdminUsers({
+    page,
+    limit,
+  });
 
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+  const users = usersData?.users || [];
+  const total = usersData?.total || 0;
+  const totalPages = usersData?.pages || 0;
+
+  // Mutations
+  const { mutate: deleteUser, isPending: isDeleting } =
+    useDeleteUserAsSuperAdmin();
+
+  // Local state for modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const handleDeleteClick = (id: string) => {
     setSelectedUserId(id);
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     if (!selectedUserId) return;
-    setIsDeleting(true);
-    try {
-      await superAdmin.deleteUser(selectedUserId);
-      successToast("User and all associated data deleted successfully");
-      setShowDeleteModal(false);
-      setSelectedUserId(null);
-      fetchUsers();
-    } catch (error) {
-      console.error("Failed to delete user", error);
-      errorToast("Failed to delete user");
-    } finally {
-      setIsDeleting(false);
-    }
+
+    deleteUser(selectedUserId, {
+      onSuccess: () => {
+        successToast("User and all associated data deleted successfully");
+        setShowDeleteModal(false);
+        setSelectedUserId(null);
+      },
+      onError: (error) => {
+        console.error("Failed to delete user", error);
+        const err = error as AxiosError<{ error: string }>;
+        errorToast(err.response?.data?.error || "Failed to delete user");
+      },
+    });
   };
 
-  if (loading && users.length === 0) {
+  if (isUsersLoading && users.length === 0) {
     return (
       <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
         <Loading />
@@ -145,7 +134,7 @@ const UsersList = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {users.length === 0 && !loading ? (
+                  {users.length === 0 && !isUsersLoading ? (
                     <tr>
                       <td
                         colSpan={5}

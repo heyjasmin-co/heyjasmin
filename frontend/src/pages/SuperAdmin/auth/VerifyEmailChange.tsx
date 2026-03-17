@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useSuperAdmin } from "@/hooks/useSuperAdmin";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
 import { errorToast, successToast } from "@/utils/react-toast";
+import { AxiosError } from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -39,9 +39,10 @@ const VerifyEmailChange = () => {
           // Redirect to login or dashboard
           navigate("/super-admin/auth/login", { replace: true });
         }
-      } catch (err: any) {
+      } catch (err) {
+        const error = err as AxiosError<{ error: string }>;
         const msg =
-          err.response?.data?.error ||
+          error.response?.data?.error ||
           "Verification failed. The link may be expired.";
         setError(msg);
         errorToast(msg);

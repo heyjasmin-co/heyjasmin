@@ -1,84 +1,65 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { convertTo24Hour } from "@/utils/time";
+import { useEffect, useState } from "react";
+import { useUpdateBusinessHours } from "../../api/hooks/useBusinessQueries";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
 import { colorTheme } from "../../theme/colorTheme";
-import { BusinessDetailsType, IBusinessHour } from "../../types/BusinessTypes";
+import { IBusinessHour } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
+import BusinessHoursSelector from "../shared/BusinessHoursSelector";
+
 type BusinessHoursProps = {
   hours: IBusinessHour[];
   canEdit: boolean;
-  setBusinessDetails: React.Dispatch<
-    React.SetStateAction<BusinessDetailsType | null>
-  >;
+  refetch?: () => Promise<void>;
 };
-function BusinessHours({
-  hours,
-  setBusinessDetails,
-  canEdit,
-}: BusinessHoursProps) {
+
+function BusinessHours({ hours, canEdit, refetch }: BusinessHoursProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [businessHours, setBusinessHours] = useState(hours);
-  const [saving, setSaving] = useState(false);
-  const apiClient = useApiClient();
+  const [businessHours, setBusinessHours] = useState(
+    (hours || []).map((hour) => ({
+      ...hour,
+      start: convertTo24Hour(hour.start) || "09:00",
+      end: convertTo24Hour(hour.end) || "17:00",
+    })),
+  );
   const { userData } = useUserData();
+  const updateHoursMutation = useUpdateBusinessHours();
 
-  const handleToggleDay = (index: number) => {
-    if (!isEditing) return;
-    const updated = [...businessHours];
-    updated[index].isOpen = !updated[index].isOpen;
-    setBusinessHours(updated);
-  };
-
-  const handleTimeChange = (
-    index: number,
-    field: "start" | "end",
-    value: string,
-  ) => {
-    const updated = [...businessHours];
-    updated[index][field] = value;
-    setBusinessHours(updated);
-  };
-
-  const formatTime = (time: string) => {
-    const [hour, minute] = time.split(":");
-    const h = parseInt(hour);
-    const ampm = h >= 12 ? "PM" : "AM";
-    const displayHour = h % 12 || 12;
-    return `${displayHour}:${minute} ${ampm}`;
-  };
+  useEffect(() => {
+    setBusinessHours(hours);
+  }, [hours]);
 
   const handleSave = async () => {
     if (!userData?.businessId) return;
-    setSaving(true);
+
     try {
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: IBusinessHour[];
-      }>(`/businesses/hours/${userData.businessId}`, { businessHours });
-
-      const updateHours = response.data.data;
-      setBusinessDetails((pv) => {
-        if (!pv) return null;
-
-        return {
-          ...pv,
-          businessHours: updateHours,
-        };
+      const response = await updateHoursMutation.mutateAsync({
+        businessId: userData.businessId,
+        businessHours: businessHours,
       });
-      successToast(response.data.message);
+
+      successToast(response.message);
       setIsEditing(false);
-    } catch (error: any) {
-      errorToast(
-        error?.response?.data?.error || "Failed to update business hours.",
-      );
-    } finally {
-      setSaving(false);
+      if (refetch) await refetch();
+    } catch (error: unknown) {
+      let errorMessage = "Failed to update business hours.";
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response: { data: { error?: string } };
+        };
+        errorMessage =
+          axiosError.response?.data?.error ||
+          "Failed to update business hours.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      errorToast(errorMessage);
     }
   };
+
+  const saving = updateHoursMutation.isPending;
 
   return (
     <div
@@ -100,76 +81,11 @@ function BusinessHours({
         {/* Business Hours: */}
         <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-start sm:gap-6">
           <div className="flex flex-1 flex-col gap-3">
-            {businessHours.map((hour, index) => (
-              <div
-                key={index}
-                className="flex flex-col gap-2 rounded-lg border border-gray-200 p-3 transition-all sm:flex-row sm:items-center sm:justify-between"
-                style={{
-                  opacity: hour.isOpen ? 1 : 0.6,
-                  backgroundColor: hour.isOpen ? "#F9FAFB" : "#F3F4F6",
-                }}
-              >
-                {/* Day and Toggle */}
-                <div className="flex items-center gap-3">
-                  {isEditing && (
-                    <button
-                      onClick={() => handleToggleDay(index)}
-                      className="relative h-6 w-11 rounded-full transition-colors"
-                      style={{
-                        backgroundColor: hour.isOpen
-                          ? colorTheme.secondaryColor(1)
-                          : "#D1D5DB",
-                      }}
-                    >
-                      <span
-                        className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-transform"
-                        style={{
-                          left: hour.isOpen ? "calc(100% - 22px)" : "2px",
-                        }}
-                      />
-                    </button>
-                  )}
-                  <span className="min-w-[100px] text-sm font-semibold text-gray-800">
-                    {hour.day}
-                  </span>
-                </div>
-
-                {/* Time Display/Edit */}
-                {hour.isOpen ? (
-                  <div className="flex flex-wrap items-center gap-2">
-                    {isEditing ? (
-                      <>
-                        <input
-                          type="time"
-                          value={hour.start}
-                          onChange={(e) =>
-                            handleTimeChange(index, "start", e.target.value)
-                          }
-                          className="w-full max-w-[120px] rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none sm:w-auto"
-                        />
-                        <span className="text-gray-500">to</span>
-                        <input
-                          type="time"
-                          value={hour.end}
-                          onChange={(e) =>
-                            handleTimeChange(index, "end", e.target.value)
-                          }
-                          className="w-full max-w-[120px] rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none sm:w-auto"
-                        />
-                      </>
-                    ) : (
-                      <span className="text-sm text-gray-700">
-                        {formatTime(hour.start)} - {formatTime(hour.end)}
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <span className="text-sm font-medium text-gray-500">
-                    Closed
-                  </span>
-                )}
-              </div>
-            ))}
+            <BusinessHoursSelector
+              businessHours={businessHours}
+              onChange={setBusinessHours}
+              isEditing={isEditing}
+            />
           </div>
         </div>
 

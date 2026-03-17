@@ -1,8 +1,11 @@
+import { IUser } from "./UserTypes";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type BusinessDetailsType = {
   _id?: string;
   name: string;
   overview?: string;
+  hasPublish: boolean;
   address?: string;
   website?: string;
   services: string[];
@@ -12,7 +15,7 @@ export type BusinessDetailsType = {
 
   totalCallMinutes: number;
 
-  ownerUserId?: string;
+  ownerUserId?: string | IUser;
   aiAgentSettings: {
     assistantId?: string;
     assistantName?: string;
@@ -26,8 +29,21 @@ export type BusinessDetailsType = {
     appointmentMessage: string | null;
     schedulingLink: string | null;
   };
+  callTransferSettings: {
+    enabled: boolean;
+    scenarios: ITransferScenario[];
+  };
   clerkOrganizationId?: string;
   isSetupComplete: boolean;
+
+  subscription?: {
+    plan?: string;
+    status?: string;
+    [key: string]: any;
+  };
+
+  memberCount?: number;
+
   createdAt: Date;
   updatedAt: Date;
 };
@@ -44,6 +60,15 @@ export interface IBusinessHour {
   start: string;
   end: string;
   isOpen: boolean;
+}
+
+export interface ITransferScenario {
+  _id?: string;
+  name: string;
+  phoneNumber: string;
+  warmTransfer: boolean;
+  availability: "always" | "business_hours" | "custom" | "none";
+  customHours?: IBusinessHour[];
 }
 
 export interface BusinessCreationType {

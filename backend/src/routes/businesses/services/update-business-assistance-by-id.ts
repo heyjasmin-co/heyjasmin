@@ -25,5 +25,8 @@ export const updateBusinessAssistantById = async (
 		updated?.aiAgentSettings.assistantId!
 	)
 
+	updated.hasPublish = false
+	await updated.save()
+
 	return updated
 }

@@ -1,28 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Textarea, TextInput } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useUpdateBusinessInformation } from "../../api/hooks/useBusinessQueries";
 import editIcon from "../../assets/image/editIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
 import { colorTheme } from "../../theme/colorTheme";
-import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
-
-type UpdateBusinessInformationResponse = {
-  name: string;
-  overview: string;
-  address: string;
-};
 
 type BusinessDetailsProps = {
   businessOverview: string;
   businessName: string;
   businessAddress: string;
   canEdit: boolean;
-  setBusinessDetails: React.Dispatch<
-    React.SetStateAction<BusinessDetailsType | null>
-  >;
+  refetch?: () => Promise<void>;
 };
 
 function BusinessDetails({
@@ -30,13 +20,12 @@ function BusinessDetails({
   businessName,
   businessAddress,
   canEdit,
-  setBusinessDetails,
+  refetch,
 }: BusinessDetailsProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(businessName);
   const [overview, setOverview] = useState(businessOverview);
   const [address, setAddress] = useState(businessAddress);
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{
     businessName: string | null;
     overview: string | null;
@@ -47,11 +36,17 @@ function BusinessDetails({
     address: null,
   });
 
-  const apiClient = useApiClient();
   const { userData } = useUserData();
+  const updateInfoMutation = useUpdateBusinessInformation();
+
+  useEffect(() => {
+    setName(businessName);
+    setOverview(businessOverview);
+    setAddress(businessAddress);
+  }, [businessName, businessOverview, businessAddress]);
 
   const handleSave = async () => {
-    const validationErrors: any = {};
+    const validationErrors: Partial<Record<keyof typeof errors, string>> = {};
     if (name.trim() === "")
       validationErrors.businessName = "Business name is required.";
     if (overview.trim() === "")
@@ -60,7 +55,7 @@ function BusinessDetails({
       validationErrors.address = "Business address is required.";
 
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+      setErrors((prev) => ({ ...prev, ...validationErrors }));
       return;
     }
 
@@ -70,43 +65,32 @@ function BusinessDetails({
       address: null,
     });
 
-    setLoading(true);
     try {
       const updateData = { name, overview, address };
-
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: UpdateBusinessInformationResponse;
-      }>(`/businesses/information/${userData?.businessId}`, updateData);
-
-      const updated = response.data.data;
-
-      setBusinessDetails((pv) => {
-        if (!pv) return null;
-
-        return {
-          ...pv,
-          name: updated.name,
-          overview: updated.overview || "",
-          address: updated.address || "",
-        };
+      const response = await updateInfoMutation.mutateAsync({
+        businessId: userData?.businessId || "",
+        data: updateData,
       });
-      localStorage.setItem(
-        "businessDetails",
-        JSON.stringify(response.data.data),
-      );
-      successToast(response.data.message);
-    } catch (error: any) {
-      console.error(error);
-      errorToast(
-        error?.response?.data?.error || "Failed to update business info.",
-      );
-    } finally {
+
+      successToast(response.message);
       setIsEditing(false);
-      setLoading(false);
+      if (refetch) await refetch();
+    } catch (error: unknown) {
+      let errorMessage = "Failed to update business info.";
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response: { data: { error?: string } };
+        };
+        errorMessage =
+          axiosError.response?.data?.error || "Failed to update business info.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      errorToast(errorMessage);
     }
   };
+
+  const loading = updateInfoMutation.isPending;
 
   return (
     <div

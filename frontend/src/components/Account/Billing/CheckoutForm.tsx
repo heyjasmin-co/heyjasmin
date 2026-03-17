@@ -1,12 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   PaymentElement,
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
+import { AxiosError } from "axios";
 import { useMemo, useState } from "react";
+import { useConfirmSubscription } from "../../../api/hooks/useStripeMutation";
 import { useUserData } from "../../../context/UserDataContext";
-import { useApiClient } from "../../../lib/axios";
 import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast } from "../../../utils/react-toast";
 import {
@@ -26,9 +26,9 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
 }) => {
   const stripe = useStripe();
   const elements = useElements();
-  const apiClient = useApiClient();
+  const { mutate: confirmSubscription, isPending: loading } =
+    useConfirmSubscription();
   const [successModal, setSuccessModal] = useState(false);
-  const [loading, setLoading] = useState(false);
   const { userData } = useUserData();
   const selectedPlan: SubscriptionCard | undefined = useMemo(
     () => subscriptionCards.find((plan) => plan.priceId === priceId),
@@ -39,14 +39,9 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
     e.preventDefault();
     if (!stripe || !elements) return;
 
-    setLoading(true);
-
     try {
       const { error, setupIntent } = await stripe.confirmSetup({
         elements,
-        // confirmParams: {
-        //   return_url: `${window.location.origin}/billing/success`,
-        // },
         redirect: "if_required",
       });
 
@@ -54,22 +49,34 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         errorToast(error.message || "Payment failed");
         return;
       }
-      await apiClient.post<{
-        success: boolean;
-        message: string;
-        data: { clientSecret: string };
-      }>("/stripe/confirm", {
-        businessId: userData?.businessId,
-        setupIntentId: setupIntent.id,
-        priceId,
-      });
-      setSuccessModal(true);
-    } catch (err: any) {
-      errorToast(
-        err.response?.data?.error || err.message || "Something went wrong",
+
+      confirmSubscription(
+        {
+          businessId: userData?.businessId || "",
+          setupIntentId: setupIntent.id, // using setupIntentId as per CheckoutForm original logic
+          priceId,
+        },
+        {
+          onSuccess: () => {
+            setSuccessModal(true);
+          },
+          onError: (err: unknown) => {
+            const axiosError = err as AxiosError<{ error: string }>;
+            errorToast(
+              axiosError.response?.data?.error ||
+                axiosError.message ||
+                "Something went wrong",
+            );
+          },
+        },
       );
-    } finally {
-      setLoading(false);
+    } catch (err: unknown) {
+      const axiosError = err as AxiosError<{ error: string }>;
+      errorToast(
+        axiosError.response?.data?.error ||
+          axiosError.message ||
+          "Something went wrong",
+      );
     }
   };
 

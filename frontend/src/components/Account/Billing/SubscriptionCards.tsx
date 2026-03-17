@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import InfoCard from "@/components/shared/InfoCard";
+import { AxiosError } from "axios";
 import { useState } from "react";
-import infoIcon from "../../../assets/image/infoIcon.png";
+import { useCreatePaymentIntent } from "../../../api/hooks/useStripeMutation";
 import { useUserData } from "../../../context/UserDataContext";
-import { useApiClient } from "../../../lib/axios";
 import { appName } from "../../../theme/appName";
 import { colorTheme } from "../../../theme/colorTheme";
 import { errorToast } from "../../../utils/react-toast";
@@ -17,40 +17,46 @@ interface SubscriptionCardsProps {
     priceId: string;
   }) => void;
 }
+// ... (skipping some lines)
 function SubscriptionCards({
   handleCreatePaymentIntent,
 }: SubscriptionCardsProps) {
   const [subscriptions] = useState<SubscriptionCard[]>(subscriptionCards);
   const [loadingId, setLoadingId] = useState<number | null>(null);
-  const apiClient = useApiClient();
   const { userData } = useUserData();
+  const { mutate: createPaymentIntent } = useCreatePaymentIntent();
   const currentSusbcription = userData?.subscription?.stripePriceId;
+
   const handleSubscribe = async (sub: SubscriptionCard) => {
-    try {
-      setLoadingId(sub.id);
+    setLoadingId(sub.id);
 
-      const response = await apiClient.post<{
-        success: boolean;
-        message: string;
-        data: { clientSecret: string };
-      }>("/stripe/create", {
-        businessId: userData?.businessId,
-        priceId: sub.priceId,
-      });
-
-      if (response.data.success) {
-        const clientSecret = response.data.data.clientSecret;
-        handleCreatePaymentIntent({
-          priceId: sub.priceId!,
-          clientSecret,
-        });
-      }
-    } catch (error: any) {
-      console.error("Payment Intent Error:", error);
-      errorToast("");
-    } finally {
-      setLoadingId(null);
-    }
+    createPaymentIntent(
+      {
+        businessId: userData?.businessId || "",
+        priceId: sub.priceId!,
+      },
+      {
+        onSuccess: (response) => {
+          if (response.success) {
+            handleCreatePaymentIntent({
+              priceId: sub.priceId!,
+              clientSecret: response.data.clientSecret,
+            });
+          }
+        },
+        onError: (error: unknown) => {
+          const axiosError = error as AxiosError<{ error: string }>;
+          console.error("Payment Intent Error:", axiosError);
+          errorToast(
+            axiosError.response?.data?.error ||
+              "Failed to initiate payment. Please try again.",
+          );
+        },
+        onSettled: () => {
+          setLoadingId(null);
+        },
+      },
+    );
   };
 
   return (
@@ -62,7 +68,7 @@ function SubscriptionCards({
       <div className="flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div className="flex items-center gap-3">
           <div
-            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
             style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
           >
             <i className="fa-solid fa-credit-card text-sm text-white"></i>
@@ -74,14 +80,12 @@ function SubscriptionCards({
       </div>
 
       {/* Info */}
-      <div className="flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-start sm:px-5">
-        <img src={infoIcon} alt="Info Icon" className="h-5 w-5 flex-shrink-0" />
-        <p className="text-xs text-gray-700">
-          Manage the subscription plans for {appName}. View pricing, features,
+      <InfoCard
+        className="flex gap-2 border-t border-gray-200 px-3 py-2"
+        message={`Manage the subscription plans for ${appName}. View pricing, features,
           and choose the plan that best fits your needs. You can update or
-          upgrade anytime.
-        </p>
-      </div>
+          upgrade anytime.`}
+      />
 
       {/* Subscription Cards */}
       <div
@@ -91,7 +95,8 @@ function SubscriptionCards({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
           {subscriptions.map((sub) => {
             const isPopular = sub.name === "Pro";
-            const isCurrent = sub.priceId === currentSusbcription;
+            const isCurrent =
+              sub.priceId === currentSusbcription && sub.priceId !== null;
             const isExpired =
               isCurrent && userData?.subscription?.status !== "active";
             return (

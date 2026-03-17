@@ -1,45 +1,19 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useCallDetails } from "../../api/hooks/useCallQueries";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
-import { CallType } from "../../types/CallsType";
-import { errorToast, successToast } from "../../utils/react-toast";
 import { formatPhoneNumber } from "../../utils/string-utils";
 import Loading from "../Loading";
 
 export default function CallDetails() {
   const { callId } = useParams<{ callId: string }>();
   const { userData } = useUserData();
-  const apiClient = useApiClient();
 
-  const [call, setCall] = useState<CallType | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { data: callResponse, isLoading: loading } = useCallDetails(
+    callId,
+    userData?.businessId || "",
+  );
 
-  const fetchCallDetails = async () => {
-    if (!userData?.businessId || !callId) return;
-
-    setLoading(true);
-    try {
-      const res = await apiClient.get<{
-        success: boolean;
-        message: string;
-        data: CallType;
-      }>(`/calls/call/${callId}?businessId=${userData.businessId}`);
-
-      setCall(res.data.data);
-      successToast(res.data.message);
-    } catch (err: any) {
-      console.error(err);
-      errorToast("Failed to fetch call details");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCallDetails();
-  }, [callId, userData?.businessId]);
+  const call = callResponse?.data;
 
   if (!call)
     return (
@@ -112,7 +86,7 @@ export default function CallDetails() {
             <h3 className="mb-2 text-base font-semibold text-gray-800">
               Call Summary
             </h3>
-            <p className="rounded-lg bg-gray-50 p-4 text-sm leading-relaxed break-words text-gray-700">
+            <p className="rounded-lg bg-gray-50 p-4 text-sm leading-relaxed wrap-break-word text-gray-700">
               {call.summary || "No summary available."}
             </p>
           </div>

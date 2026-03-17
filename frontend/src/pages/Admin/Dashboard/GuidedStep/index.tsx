@@ -1,5 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useLayoutEffect, useState } from "react";
+import { AxiosError } from "axios";
+import { useEffect, useState } from "react";
+import {
+  useBusinessDetails,
+  useUpdateAssistantSetup,
+} from "../../../../api/hooks/useBusinessQueries";
 import celebIcon from "../../../../assets/image/celebIcon.png";
 import websiteIcon from "../../../../assets/image/websiteIcon.png";
 import Breadcrumb from "../../../../components/dashboard/Breadcrumb";
@@ -9,83 +13,72 @@ import TalkToAgent from "../../../../components/dashboard/TalkToAgent";
 import TrainingSources from "../../../../components/dashboard/TrainingSources";
 import Loading from "../../../../components/Loading";
 import { useUserData } from "../../../../context/UserDataContext";
-import { useScrapeApiClient } from "../../../../lib/axios";
 import { appName } from "../../../../theme/appName";
 import { BusinessDetailsType } from "../../../../types/BusinessTypes";
 import { errorToast, successToast } from "../../../../utils/react-toast";
+
 export default function Dashboard() {
   const [guideStep, setGuideStep] = useState(0);
-  const apiClient = useScrapeApiClient();
   const { userData } = useUserData();
-  const [loading, setLoading] = useState(false);
+  const {
+    data: businessDetailsResponse,
+    isLoading: isFetching,
+    refetch,
+  } = useBusinessDetails(userData?.businessId);
+  const { mutate: updateAssistantSetup } = useUpdateAssistantSetup();
+
   const [businessDetails, setBusinessDetails] =
     useState<BusinessDetailsType | null>(null);
 
-  const fetchBusinessDetails = async () => {
-    setLoading(true);
-    try {
-      const response = await apiClient.get<{
-        success: boolean;
-        message: string;
-        data: BusinessDetailsType;
-      }>("/businesses/" + userData?.businessId);
-
-      setBusinessDetails(response.data.data);
-      successToast(response.data.message);
-    } catch (error: any) {
-      const message = error.response.data.error;
-      errorToast(message);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (businessDetailsResponse?.data) {
+      setBusinessDetails(businessDetailsResponse.data);
     }
-  };
+  }, [businessDetailsResponse]);
+
   const handleLaunchAgent = async (assistantSetup: string) => {
-    setLoading(true);
-    try {
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: BusinessDetailsType["aiAgentSettings"];
-      }>("/businesses/update-assistant-setup/" + userData?.businessId, {
-        assistantSetup,
-      });
-      const aiAgentSettings = response.data.data;
-      setBusinessDetails((prev) =>
-        prev ? { ...prev, aiAgentSettings } : prev,
-      );
-      successToast(response.data.message);
-    } catch (error: any) {
-      const message = error.response.data.error;
-      errorToast(message);
-    } finally {
-      setLoading(false);
-    }
+    updateAssistantSetup(
+      {
+        businessId: userData?.businessId || "",
+        data: { assistantSetup },
+      },
+      {
+        onSuccess: (response) => {
+          const aiAgentSettings = response.data.aiAgentSettings;
+          setBusinessDetails((prev) =>
+            prev ? { ...prev, aiAgentSettings } : prev,
+          );
+          successToast(response.message);
+          refetch(); // Ensure alignment
+        },
+        onError: (error: unknown) => {
+          const apiError = error as AxiosError<{ error: string }>;
+          errorToast(
+            apiError.response?.data?.error || "Failed to update setup",
+          );
+        },
+      },
+    );
   };
 
-  // UseEffect
-  useLayoutEffect(() => {
-    fetchBusinessDetails();
-  }, []);
   useEffect(() => {
     if (businessDetails) {
-      if (
-        businessDetails.aiAgentSettings.assistantSetup === "testing" &&
-        businessDetails.aiAgentSettings.twilioNumber
-      ) {
+      const { assistantSetup, twilioNumber } =
+        businessDetails.aiAgentSettings || {};
+      if (assistantSetup === "testing" && twilioNumber) {
         setGuideStep(1);
-      }
-      if (
-        businessDetails.aiAgentSettings.assistantSetup === "completed" &&
-        businessDetails.aiAgentSettings.twilioNumber
-      ) {
+      } else if (assistantSetup === "completed" && twilioNumber) {
         setGuideStep(2);
+      } else {
+        setGuideStep(0);
       }
     }
   }, [businessDetails]);
+
   return (
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
       {/* Container */}
-      {loading && !businessDetails ? (
+      {isFetching && !businessDetails ? (
         <Loading />
       ) : (
         <div className="mx-auto flex w-full max-w-3xl flex-col space-y-6">

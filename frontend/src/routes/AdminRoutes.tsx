@@ -34,6 +34,9 @@ const AppointmentInfo = lazy(
 const BusinessDetailsPage = lazy(
   () => import("../pages/Admin/Dashboard/Settings/BusinessDetailsPage"),
 );
+const TransferCalls = lazy(
+  () => import("../pages/Admin/Dashboard/Settings/TransferCalls"),
+);
 const SelectBusiness = lazy(() => import("../pages/Admin/SelectBusiness"));
 
 const AdminRoutes = () => {
@@ -83,6 +86,7 @@ const AdminRoutes = () => {
             <Route index element={<Navigate to="business-info" replace />} />
             <Route path="business-info" element={<BusinessDetailsPage />} />
             <Route path="appointments" element={<AppointmentInfo />} />
+            <Route path="transfer-calls" element={<TransferCalls />} />
           </Route>
 
           {/* Account nested routes */}

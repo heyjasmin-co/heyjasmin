@@ -1,20 +1,35 @@
 export const convertTo24Hour = (time12h: string): string => {
-  const [time, modifier] = time12h.split(" ");
-  let hours = time.split(":")[0];
-  const min = time.split(":")[1];
+  if (!time12h) return "";
 
-  if (hours === "12") {
-    hours = "00";
+  // Normalize string: remove spaces, uppercase
+  const normalized = time12h.replace(/\s+/g, "").toUpperCase();
+
+  // Extract parts
+  const modifier = normalized.includes("PM")
+    ? "PM"
+    : normalized.includes("AM")
+      ? "AM"
+      : "";
+  const timePart = normalized.replace("AM", "").replace("PM", "");
+
+  if (!timePart.includes(":")) return time12h;
+
+  const [hoursStr, minutesStr] = timePart.split(":");
+  let hours = parseInt(hoursStr, 10);
+
+  if (modifier === "PM" && hours !== 12) {
+    hours += 12;
+  } else if (modifier === "AM" && hours === 12) {
+    hours = 0;
   }
 
-  if (modifier === "PM") {
-    hours = String(parseInt(hours, 10) + 12);
-  }
-
-  return `${hours.padStart(2, "0")}:${min}`;
+  return `${String(hours).padStart(2, "0")}:${minutesStr}`;
 };
 
 export const formatTime = (time: string) => {
+  if (!time) return "";
+  if (time.match(/am|pm/i)) return time;
+
   const [hour, minute] = time.split(":");
   const h = parseInt(hour);
   const ampm = h >= 12 ? "PM" : "AM";

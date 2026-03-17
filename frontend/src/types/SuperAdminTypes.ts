@@ -1,11 +1,21 @@
-export interface SuperAdminSignupData {
+import { BusinessDetailsType } from "./BusinessTypes";
+import { IUser } from "./UserTypes";
+
+export interface ISuperAdmin {
+  _id: string;
   email: string;
-  password: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SuperAdminLoginData {
   email: string;
-  password: string;
+  password?: string;
+}
+
+export interface SuperAdminSignupData {
+  email: string;
+  password?: string;
 }
 
 export interface SuperAdminForgotPasswordData {
@@ -13,27 +23,61 @@ export interface SuperAdminForgotPasswordData {
 }
 
 export interface SuperAdminResetPasswordData {
-  token: string;
-  newPassword: string;
+  newPassword?: string;
+  token?: string;
   id?: string;
 }
 
 export interface SuperAdminChangePasswordData {
-  currentPassword: string;
-  newPassword: string;
+  currentPassword?: string;
+  newPassword?: string;
 }
 
 export interface SuperAdminChangeEmailData {
   newEmail: string;
-  password: string;
+  password?: string;
 }
 
 export interface SuperAdminBusinessParams {
-  page: number;
-  limit: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface SuperAdminUserParams {
-  page: number;
-  limit: number;
+  search?: string;
+  role?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface SuperAdminLoginResponse {
+  success: boolean;
+  message?: string;
+  token: string;
+}
+
+export interface SuperAdminBusinessesResponse {
+  success: boolean;
+  message: string;
+  businesses: BusinessDetailsType[];
+  total: number;
+  pages: number;
+}
+
+export interface SuperAdminUsersResponse {
+  success: boolean;
+  message: string;
+  users: IUser[];
+  total: number;
+  pages: number;
+}
+export interface SuperAdminSuccessResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface SuperAdminSignupResponse {
+  success: boolean;
+  message: string;
+  data: ISuperAdmin;
 }

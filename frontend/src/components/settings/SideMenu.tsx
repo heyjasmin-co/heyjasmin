@@ -12,8 +12,21 @@ export default function SideMenu() {
   const isPathActive = (path: string) => location.pathname.startsWith(path);
 
   const menuItems = [
-    { name: "Business Information", icon: "shop", to: "/admin/dashboard/settings/business-info" },
-    { name: "Appointments", icon: "calendar-days", to: "/admin/dashboard/settings/appointments" },
+    {
+      name: "Business Information",
+      icon: "shop",
+      to: "/admin/dashboard/settings/business-info",
+    },
+    {
+      name: "Appointments",
+      icon: "calendar-days",
+      to: "/admin/dashboard/settings/appointments",
+    },
+    {
+      name: "Transfer Calls",
+      icon: "phone-volume",
+      to: "/admin/dashboard/settings/transfer-calls",
+    },
   ];
 
   return (

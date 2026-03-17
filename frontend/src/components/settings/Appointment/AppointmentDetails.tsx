@@ -1,23 +1,22 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import infoIcon from "@/assets/image/infoIcon.png";
+import editIcon from "@/assets/image/editIcon.png";
+import saveIcon from "@/assets/image/saveIcon.png";
+import InfoCard from "@/components/shared/InfoCard";
+import PlanBanner from "@/components/shared/PlanBanner";
 import { Textarea, TextInput, ToggleSwitch } from "flowbite-react";
 import { useEffect, useState } from "react";
-import editIcon from "../../assets/image/editIcon.png";
-import saveIcon from "../../assets/image/saveIcon.png";
-import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
-import { colorTheme } from "../../theme/colorTheme";
-import { BusinessDetailsType } from "../../types/BusinessTypes";
-import { errorToast, successToast } from "../../utils/react-toast";
+import { useNavigate } from "react-router-dom";
+import { useUpdateAppointmentSettings } from "../../../api/hooks/useBusinessQueries";
+import { useUserData } from "../../../context/UserDataContext";
+import { colorTheme } from "../../../theme/colorTheme";
+import { errorToast, successToast } from "../../../utils/react-toast";
 
 type AppointmentDetailsProps = {
   appointmentEnabled: boolean;
   appointmentMessage: string;
   schedulingLink: string;
   canEdit: boolean;
-  setBusinessDetails: React.Dispatch<
-    React.SetStateAction<BusinessDetailsType | null>
-  >;
+  hasAccess: boolean;
+  refetch?: () => Promise<void>;
 };
 
 function AppointmentDetails({
@@ -25,13 +24,14 @@ function AppointmentDetails({
   appointmentMessage,
   schedulingLink,
   canEdit,
-  setBusinessDetails,
+  hasAccess,
+  refetch,
 }: AppointmentDetailsProps) {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [appointmentEnabled, setAppointmentEnabled] = useState(initialEnabled);
   const [message, setMessage] = useState(appointmentMessage);
   const [link, setLink] = useState(schedulingLink);
-  const [loading, setLoading] = useState(false);
 
   const [errors, setErrors] = useState<{
     message: string | null;
@@ -41,13 +41,18 @@ function AppointmentDetails({
     link: null,
   });
 
-  const apiClient = useApiClient();
   const { userData } = useUserData();
+  const updateAppointmentMutation = useUpdateAppointmentSettings();
+
+  useEffect(() => {
+    setAppointmentEnabled(initialEnabled);
+    setMessage(appointmentMessage);
+    setLink(schedulingLink);
+  }, [initialEnabled, appointmentMessage, schedulingLink]);
 
   const handleSave = async () => {
-    const validationErrors: any = {};
+    const validationErrors: Partial<Record<"message" | "link", string>> = {};
 
-    // ✅ Required ONLY when appointment is enabled
     if (appointmentEnabled) {
       if (!message.trim()) {
         validationErrors.message = "Text message is required.";
@@ -58,11 +63,10 @@ function AppointmentDetails({
     }
 
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+      setErrors((prev) => ({ ...prev, ...validationErrors }));
       return;
     }
 
-    // ✅ Check if values changed
     const messageToSend = appointmentEnabled ? message : null;
     const linkToSend = appointmentEnabled ? link : null;
 
@@ -76,39 +80,37 @@ function AppointmentDetails({
     }
 
     setErrors({ message: null, link: null });
-    setLoading(true);
+
     try {
-      const response = await apiClient.patch(
-        `/businesses/appointment/${userData?.businessId}`,
-        {
+      const response = await updateAppointmentMutation.mutateAsync({
+        businessId: userData?.businessId || "",
+        data: {
           appointmentEnabled,
           appointmentMessage: message,
           schedulingLink: link,
         },
-      );
-
-      setBusinessDetails((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          appointmentSettings: {
-            appointmentEnabled,
-            appointmentMessage: message,
-            schedulingLink: link,
-          },
-        };
       });
 
-      successToast(response.data?.message || "Appointment settings updated");
+      successToast(response.message || "Appointment settings updated");
       setIsEditing(false);
-    } catch (error: any) {
-      errorToast(
-        error?.response?.data?.error || "Failed to update appointment settings",
-      );
-    } finally {
-      setLoading(false);
+      if (refetch) await refetch();
+    } catch (error: unknown) {
+      let errorMessage = "Failed to update appointment settings";
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response: { data: { error?: string } };
+        };
+        errorMessage =
+          axiosError.response?.data?.error ||
+          "Failed to update appointment settings";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      errorToast(errorMessage);
     }
   };
+
+  const loading = updateAppointmentMutation.isPending;
 
   useEffect(() => {
     if (!appointmentEnabled) {
@@ -137,14 +139,15 @@ function AppointmentDetails({
           </h5>
         </div>
 
+        {/* Premium Banner */}
+        <PlanBanner />
+
         {/* Info */}
-        <div className="flex gap-2 px-4 py-3">
-          <img src={infoIcon} alt="Info" className="h-6 w-6" />
-          <p className="text-sm text-gray-700">
-            Allow your agent to send a text message with your appointment
-            scheduling link to callers.
-          </p>
-        </div>
+        <InfoCard
+          className="flex gap-2 px-4 py-3"
+          message="Allow your agent to send a text message with your appointment
+            scheduling link to callers."
+        />
 
         {/* Content */}
         <div className="flex flex-col gap-4 px-4 py-3">
@@ -171,9 +174,6 @@ function AppointmentDetails({
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
             <span className="text-md shrink-0 font-bold text-gray-800 sm:w-40">
               Text Message
-              {/* {appointmentEnabled && (
-                <span className="ml-1 text-red-500">*</span>
-              )} */}
             </span>
 
             <div className="flex-1">
@@ -200,9 +200,6 @@ function AppointmentDetails({
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
             <span className="text-md shrink-0 font-bold text-gray-800 sm:w-40">
               Scheduling Link
-              {/* {appointmentEnabled && (
-                <span className="ml-1 text-red-500">*</span>
-              )} */}
             </span>
 
             <div className="flex-1">
@@ -237,13 +234,23 @@ function AppointmentDetails({
                 <img src={saveIcon} className="h-5 w-5" />
                 {loading ? "Saving..." : "Save"}
               </button>
-            ) : (
+            ) : hasAccess ? (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 rounded-lg bg-purple-600 px-6 py-2 text-sm font-semibold text-white hover:bg-purple-700"
+                className="flex items-center gap-2 rounded-lg px-6 py-2 text-sm font-semibold text-white hover:bg-purple-700"
+                style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
               >
                 <img src={editIcon} className="h-5 w-5" />
                 Edit
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate("/admin/dashboard/account/billing")}
+                className="flex items-center gap-2 rounded-lg px-6 py-2 text-sm font-semibold text-white hover:bg-purple-700"
+                style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
+              >
+                Upgrade Plan
+                <i className="fa-solid fa-arrow-right" />
               </button>
             )}
           </div>

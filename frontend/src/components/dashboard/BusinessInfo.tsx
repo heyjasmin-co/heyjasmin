@@ -1,17 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { AxiosError } from "axios";
 import { useState } from "react";
 import ReactGoogleAutocomplete from "react-google-autocomplete";
+import { useUpdateBusinessDetails } from "../../api/hooks/useBusinessQueries";
 import editIcon from "../../assets/image/editIcon.png";
-import infoIcon from "../../assets/image/infoIcon.png";
 import nextIcon from "../../assets/image/nextIcon.png";
 import saveIcon from "../../assets/image/saveIcon.png";
 import { useUserData } from "../../context/UserDataContext";
-import { useApiClient } from "../../lib/axios";
 import { appName } from "../../theme/appName";
 import { colorTheme } from "../../theme/colorTheme";
 import { BusinessDetailsType } from "../../types/BusinessTypes";
 import { errorToast, successToast } from "../../utils/react-toast";
-import { convertTo24Hour, formatTime } from "../../utils/time";
+import { convertTo24Hour } from "../../utils/time";
+import BusinessHoursSelector from "../shared/BusinessHoursSelector";
+import InfoCard from "../shared/InfoCard";
 
 type BusinessInfoProps = {
   businessDetails: BusinessDetailsType;
@@ -28,12 +29,16 @@ function BusinessInfo({
 }: BusinessInfoProps) {
   //States
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState<string>(businessDetails.name ?? "");
+  const [name, setName] = useState<string>(businessDetails?.name ?? "");
   const [overview, setOverview] = useState<string>(
-    businessDetails.overview ?? "",
+    businessDetails?.overview ?? "",
   );
-  const [address, setAddress] = useState<string>(businessDetails.address ?? "");
-  const [services, setServices] = useState<string[]>(businessDetails.services);
+  const [address, setAddress] = useState<string>(
+    businessDetails?.address ?? "",
+  );
+  const [services, setServices] = useState<string[]>(
+    businessDetails?.services ?? [],
+  );
   const [newService, setNewService] = useState("");
   const [errors, setErrors] = useState<{
     businessName: string | null;
@@ -45,21 +50,14 @@ function BusinessInfo({
     address: null,
   });
   const [businessHours, setBusinessHours] = useState(
-    businessDetails.businessHours.map((hour) => ({
+    (businessDetails?.businessHours || []).map((hour) => ({
       ...hour,
-      start:
-        hour.start.includes("AM") || hour.start.includes("PM")
-          ? convertTo24Hour(hour.start)
-          : hour.start,
-      end:
-        hour.end.includes("AM") || hour.end.includes("PM")
-          ? convertTo24Hour(hour.end)
-          : hour.end,
+      start: convertTo24Hour(hour.start) || "09:00",
+      end: convertTo24Hour(hour.end) || "17:00",
     })),
   );
-  const [loading, setLoading] = useState(false);
-  // Hooks
-  const apiClient = useApiClient();
+  const { mutate: updateBusiness, isPending: loading } =
+    useUpdateBusinessDetails();
   const { userData, setUserData } = useUserData();
 
   // Handles
@@ -74,80 +72,62 @@ function BusinessInfo({
     setServices(services.filter((_, i) => i !== index));
   };
 
-  const handleToggleDay = (index: number) => {
-    if (!isEditing) return;
-    const updated = [...businessHours];
-    updated[index].isOpen = !updated[index].isOpen;
-    setBusinessHours(updated);
-  };
-
-  const handleTimeChange = (
-    index: number,
-    field: "start" | "end",
-    value: string,
-  ) => {
-    const updated = [...businessHours];
-    updated[index][field] = value;
-    setBusinessHours(updated);
-  };
-
   const handleTalkToAgent = async () => {
-    try {
-      setLoading(true);
-      const errors: any = {};
-      if (name.trim() === "") {
-        errors.businessName = "Business name is required.";
-      }
-      if (overview.trim() === "") {
-        errors.overview = "Business description is required.";
-      }
-      if (address.trim() === "") {
-        errors.address = "Business address is required.";
-      }
-      if (Object.keys(errors).length) {
-        setErrors(errors);
-        const showError = Object.keys(errors)[0];
-        errorToast(errors[showError]);
-        return;
-      } else {
-        setErrors({
-          businessName: null,
-          overview: null,
-          address: null,
-        });
-      }
-      const updateData = {
-        name,
-        overview,
-        address,
-        services,
-        businessHours,
-      };
-      const response = await apiClient.patch<{
-        success: boolean;
-        message: string;
-        data: BusinessDetailsType;
-      }>("/businesses/" + userData?.businessId, updateData);
-      setUserData((pv) => ({
-        ...pv!,
-        businessName: response.data.data.name,
-        dbUserId: pv?.dbUserId ?? null,
-        clerkId: pv?.clerkId ?? null,
-        businessId: pv?.businessId ?? null,
-        isSetupComplete: pv?.isSetupComplete ?? false,
-        role: pv?.role ?? null,
-        assistantNumber:
-          response.data.data.aiAgentSettings.twilioNumber ?? null,
-        subscription: pv?.subscription ?? null,
-      }));
-      setBusinessDetails(response.data.data);
-      successToast(response.data.message);
-    } catch (error: any) {
-      console.error(error);
-      errorToast(error.response.data.error);
-    } finally {
-      setLoading(false);
+    const errorList: Partial<Record<keyof typeof errors, string>> = {};
+    if (name.trim() === "") {
+      errorList.businessName = "Business name is required.";
     }
+    if (overview.trim() === "") {
+      errorList.overview = "Business description is required.";
+    }
+    if (address.trim() === "") {
+      errorList.address = "Business address is required.";
+    }
+    if (Object.keys(errorList).length) {
+      setErrors((prev) => ({ ...prev, ...errorList }));
+      const firstErrorKey = Object.keys(errorList)[0] as keyof typeof errorList;
+      errorToast(errorList[firstErrorKey]!);
+      return;
+    } else {
+      setErrors({
+        businessName: null,
+        overview: null,
+        address: null,
+      });
+    }
+
+    const updateData = {
+      name,
+      overview,
+      address,
+      services,
+      businessHours,
+    };
+
+    updateBusiness(
+      { businessId: userData?.businessId || "", data: updateData },
+      {
+        onSuccess: (response) => {
+          const updatedBusiness = response.data;
+          setUserData((pv) => ({
+            ...pv!,
+            businessName: updatedBusiness.name,
+            assistantNumber:
+              updatedBusiness.aiAgentSettings.twilioNumber ?? null,
+          }));
+          setBusinessDetails(updatedBusiness);
+          successToast(response.message);
+          setIsEditing(false);
+        },
+        onError: (err: unknown) => {
+          const axiosError = err as AxiosError<{ error: string }>;
+          console.error(axiosError);
+          errorToast(
+            axiosError.response?.data?.error || "Failed to update business",
+          );
+        },
+      },
+    );
   };
 
   return (
@@ -170,16 +150,16 @@ function BusinessInfo({
         </div>
 
         {/* Info Text */}
-        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start">
-          <img src={infoIcon} alt="Info Icon" className="h-6 w-6 shrink-0" />
-          <p className="text-sm text-gray-700">{`This business information gives ${appName} the context to handle your calls. You can update or add to it anytime — this is just the starting point.`}</p>
-        </div>
+        <InfoCard
+          className="flex gap-2 px-4 py-3"
+          message={`This business information gives ${appName} the context to handle your calls. You can update or add to it anytime — this is just the starting point.`}
+        />
 
         {/* Form Section */}
         <div className="flex flex-col gap-5 px-4 py-4">
           {/* Business Name */}
           <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
-            <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
+            <span className="text-md shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
               Business Name:
             </span>
             <div className="w-full">
@@ -202,7 +182,7 @@ function BusinessInfo({
 
           {/* Business Overview */}
           <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
-            <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
+            <span className="text-md shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
               Business Overview:
             </span>
             <div className="w-full">
@@ -225,15 +205,15 @@ function BusinessInfo({
 
           {/* Primary Address */}
           <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-3">
-            <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
+            <span className="text-md shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-2">
               Business Address:
             </span>
             <ReactGoogleAutocomplete
               apiKey={import.meta.env.VITE_GOOGLE_MAP_API}
-              onChange={(e: any) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setAddress(e.target.value);
               }}
-              onPlaceSelected={(place) => {
+              onPlaceSelected={(place: google.maps.places.PlaceResult) => {
                 if (!place?.formatted_address) {
                   return;
                 }
@@ -304,76 +284,11 @@ function BusinessInfo({
           <span className="text-md flex-shrink-0 font-bold text-gray-800 sm:w-40 sm:pt-3">
             Business Hours:
           </span>
-          <div className="flex flex-1 flex-col gap-3">
-            {businessHours.map((hour, index) => (
-              <div
-                key={index}
-                className="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-all sm:flex-row sm:items-center sm:justify-between"
-                style={{
-                  opacity: hour.isOpen ? 1 : 0.6,
-                  backgroundColor: hour.isOpen ? "#F9FAFB" : "#F3F4F6",
-                }}
-              >
-                <div className="flex items-center gap-3">
-                  {isEditing && (
-                    <button
-                      onClick={() => handleToggleDay(index)}
-                      className="relative h-6 w-11 rounded-full transition-colors"
-                      style={{
-                        backgroundColor: hour.isOpen
-                          ? colorTheme.secondaryColor(1)
-                          : "#D1D5DB",
-                      }}
-                    >
-                      <span
-                        className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-md transition-transform"
-                        style={{
-                          left: hour.isOpen ? "calc(100% - 22px)" : "2px",
-                        }}
-                      />
-                    </button>
-                  )}
-                  <span className="min-w-[100px] text-sm font-semibold text-gray-800">
-                    {hour.day}
-                  </span>
-                </div>
-
-                {hour.isOpen ? (
-                  <div className="flex flex-wrap items-center gap-2">
-                    {isEditing ? (
-                      <>
-                        <input
-                          type="time"
-                          value={hour.start}
-                          onChange={(e) =>
-                            handleTimeChange(index, "start", e.target.value)
-                          }
-                          className="w-full max-w-[120px] rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none sm:w-auto"
-                        />
-                        <span className="text-gray-500">to</span>
-                        <input
-                          type="time"
-                          value={hour.end}
-                          onChange={(e) =>
-                            handleTimeChange(index, "end", e.target.value)
-                          }
-                          className="w-full max-w-[120px] rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-400 focus:outline-none sm:w-auto"
-                        />
-                      </>
-                    ) : (
-                      <span className="text-sm text-gray-700">
-                        {formatTime(hour.start)} - {formatTime(hour.end)}
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <span className="text-sm font-medium text-gray-500">
-                    Closed
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
+          <BusinessHoursSelector
+            businessHours={businessHours}
+            onChange={setBusinessHours}
+            isEditing={isEditing}
+          />
         </div>
 
         {/* Save / Edit Buttons */}
@@ -409,8 +324,10 @@ function BusinessInfo({
             <button
               disabled={loading}
               onClick={handleTalkToAgent}
-              className={`flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95 sm:w-auto ${
-                loading && "cursor-not-allowed bg-gray-100 text-gray-400"
+              className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-md transition-all active:scale-95 sm:w-auto ${
+                loading
+                  ? "cursor-not-allowed bg-gray-400"
+                  : "bg-purple-600 hover:bg-purple-700"
               }`}
             >
               <span className="text-xl font-bold">

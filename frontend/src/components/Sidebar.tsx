@@ -1,9 +1,9 @@
 import { useClerk } from "@clerk/clerk-react";
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useLogout } from "../api/hooks/useUserQueries";
 import websiteLogo from "../assets/image/websiteLogo.png";
 import { useUserData } from "../context/UserDataContext";
-import { useApiClient } from "../lib/axios";
 import { colorTheme } from "../theme/colorTheme";
 import { errorToast, successToast } from "../utils/react-toast";
 import { formatPhoneNumber } from "../utils/string-utils";
@@ -13,26 +13,23 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const location = useLocation();
-  const apiClient = useApiClient();
+  const { mutate: logout, isPending: loading } = useLogout();
   const toggleSidebar = () => setIsOpen(!isOpen);
   const { userData } = useUserData();
   const isPathActive = (path: string) => location.pathname.startsWith(path);
 
-  const handleSignOut = async () => {
-    setLoading(true);
-    try {
-      await apiClient.post("/users/logout");
-      successToast("User logged out successfully.");
-
-      await new Promise((res) => setTimeout(res, 2000));
-      await signOut({ redirectUrl: "/admin/sign-in" });
-    } catch {
-      errorToast("Failed to log out. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+  const handleSignOut = () => {
+    logout(undefined, {
+      onSuccess: async () => {
+        successToast("User logged out successfully.");
+        await new Promise((res) => setTimeout(res, 2000));
+        await signOut({ redirectUrl: "/admin/sign-in" });
+      },
+      onError: () => {
+        errorToast("Failed to log out. Please try again.");
+      },
+    });
   };
 
   return (
@@ -197,6 +194,23 @@ export default function Sidebar() {
                     >
                       <i className="fa-solid fa-calendar-days text-sm sm:text-base"></i>
                       <span className="ml-2 sm:ml-3">Appointments</span>
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/admin/dashboard/settings/transfer-calls"
+                      className="group flex items-center rounded-lg px-3 py-2 text-xs sm:text-sm"
+                      style={({ isActive }) => ({
+                        backgroundColor: isActive
+                          ? colorTheme.secondaryColor(0.9)
+                          : "transparent",
+                        color: isActive ? "white" : "#374151",
+                        fontWeight: 500,
+                      })}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <i className="fa-solid fa-phone-volume text-sm sm:text-base"></i>
+                      <span className="ml-2 sm:ml-3">Transfer Calls</span>
                     </NavLink>
                   </li>
                 </ul>

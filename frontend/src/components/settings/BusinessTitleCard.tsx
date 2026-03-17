@@ -1,26 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useUserData } from "@/context/UserDataContext";
-import { isEqual } from "lodash";
 import { useState } from "react";
 import { BusinessDetailsType } from "../../types/BusinessTypes";
 
 function BusinessTitleCard({
   title,
   subtitle,
-  checkBusinessDetails,
   businessDetails,
   canEdit,
   handleUpdateAgent,
 }: {
   title: string;
   subtitle: string;
-  checkBusinessDetails: BusinessDetailsType;
   businessDetails: BusinessDetailsType;
   canEdit: boolean;
   handleUpdateAgent: () => Promise<void>;
 }) {
   const [loading, setLoading] = useState(false);
-  const hasChanges = !isEqual(businessDetails, checkBusinessDetails);
+  const hasChanges = businessDetails.hasPublish;
   const { userData } = useUserData();
   const handlePublishAgent = async () => {
     setLoading(true);

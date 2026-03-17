@@ -8,7 +8,11 @@ export const updateBusinessHoursById = async (
 ): Promise<UpdateBusinessHoursByIdOutput> => {
 	const { businessId, businessHours } = args
 
-	const updated = await Business.findByIdAndUpdate(businessId, { $set: { businessHours } }, { new: true, runValidators: true })
+	const updated = await Business.findByIdAndUpdate(
+		businessId,
+		{ $set: { businessHours, hasPublish: true } },
+		{ new: true, runValidators: true }
+	)
 		.select('businessHours')
 		.lean()
 

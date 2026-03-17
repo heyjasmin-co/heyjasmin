@@ -67,7 +67,8 @@ function TalkToAgent({ handleLaunchAgent, businessDetails }: TalkToAgentProps) {
             >
               <span className="text-md text-center font-bold text-white">
                 {formatPhoneNumber(
-                  businessDetails.aiAgentSettings.twilioNumber!,
+                  businessDetails?.aiAgentSettings?.twilioNumber ||
+                    "Assigning Number...",
                 )}
               </span>
             </div>
