@@ -55,7 +55,7 @@ function HowWorks() {
 
   return (
     <section
-      id="features"
+      id="how-it-works"
       className="px-6 py-24"
       style={{ backgroundColor: colorTheme.primary(0.3) }}
     >
