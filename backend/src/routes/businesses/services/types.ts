@@ -1,7 +1,9 @@
 import { IBusiness } from '../../../models'
 import {
 	CreateBusinessGoogleProfileSchemaInput,
+	CreateCallTransferToolByIdBodySchemaInput,
 	GetBusinessDetailsByIdParamsSchemaInput,
+	GetCallTransferToolByIdParamsSchemaInput,
 	UpdateBusinessAppointmentByIdBodySchemaInput,
 	UpdateBusinessAssistantByIdSchemaInput,
 	UpdateBusinessAssistantSetupByIdBodySchemaInput,
@@ -9,6 +11,7 @@ import {
 	UpdateBusinessHoursByIdBodySchemaInput,
 	UpdateBusinessInformationByIdBodySchemaInput,
 	UpdateBusinessServicesByIdBodySchemaInput,
+	UpdateCallTransferToolByIdBodySchemaInput,
 } from '../handlers/types'
 
 export type GetBusinessDetailsInput = GetBusinessDetailsByIdParamsSchemaInput
@@ -54,3 +57,15 @@ export type CreateBusinessGoogleProfileOutput = {
 //
 export type UpdateBusinessAppointmentByIdInput = UpdateBusinessAppointmentByIdBodySchemaInput
 export type UpdateBusinessAppointmentByIdOutput = IBusiness['appointmentSettings'] | null
+
+//
+export type CreateCallTransferToolByIdInput = CreateCallTransferToolByIdBodySchemaInput
+export type CreateCallTransferToolByIdOutput = IBusiness['callTransferSettings'] | null
+
+//
+export type UpdateCallTransferToolByIdInput = UpdateCallTransferToolByIdBodySchemaInput
+export type UpdateCallTransferToolByIdOutput = IBusiness['callTransferSettings'] | null
+
+//
+export type GetCallTransferToolByIdInput = GetCallTransferToolByIdParamsSchemaInput
+export type GetCallTransferToolByIdOutput = IBusiness['callTransferSettings']['scenarios'] | null

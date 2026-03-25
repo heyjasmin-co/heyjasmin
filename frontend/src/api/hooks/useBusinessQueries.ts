@@ -4,6 +4,8 @@ import {
   BusinessDetailsType,
   IBusinessHour,
   ITransferScenario,
+  ICreateCallTransferTool,
+  IUpdateCallTransferTool,
 } from "../../types/BusinessTypes";
 import { queryKeys } from "../QueryKeys";
 import { businessService } from "../services/businessService";
@@ -231,6 +233,65 @@ export const useCreateBusinessFromGoogle = () => {
         queryKey: queryKeys.business.all,
       });
       return response;
+    },
+  });
+};
+
+export const useCallTransferTool = (businessId: string | null | undefined) => {
+  const apiClient = useApiClient();
+  const service = businessService(apiClient);
+
+  return useQuery({
+    queryKey: queryKeys.business.callTransferTool(businessId || ""),
+    queryFn: () => service.getCallTransferTool(businessId || ""),
+    enabled: !!businessId,
+  });
+};
+
+export const useCreateCallTransferTool = () => {
+  const apiClient = useApiClient();
+  const service = businessService(apiClient);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      businessId,
+      data,
+    }: {
+      businessId: string;
+      data: ICreateCallTransferTool;
+    }) => service.createCallTransferTool(businessId, data),
+    onSuccess: (_, { businessId }) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.business.callTransferTool(businessId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.business.details(businessId),
+      });
+    },
+  });
+};
+
+export const useUpdateCallTransferTool = () => {
+  const apiClient = useApiClient();
+  const service = businessService(apiClient);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      businessId,
+      data,
+    }: {
+      businessId: string;
+      data: IUpdateCallTransferTool;
+    }) => service.updateCallTransferTool(businessId, data),
+    onSuccess: (_, { businessId }) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.business.callTransferTool(businessId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.business.details(businessId),
+      });
     },
   });
 };

@@ -1,5 +1,7 @@
 import { CreateBusinessGoogleProfile } from './create-business-google-profile'
+import { createCallTransferToolById } from './create-call-transfer-tool-by-id'
 import { getBusinessDetailsById } from './get-business-details-by-id'
+import { getCallTransferToolById } from './get-call-transfer-tool-by-id'
 import { updateBusinessAppointmentById } from './update-business-appointment'
 import { updateBusinessAssistantById } from './update-business-assistance-by-id'
 import { updateBusinessAssistantSetupById } from './update-business-assistant-setup-by-id'
@@ -7,6 +9,7 @@ import { updateBusinessDetailsById } from './update-business-details-by-id'
 import { updateBusinessHoursById } from './update-business-hours-by-id'
 import { updateBusinessInformationById } from './update-business-information-by-id'
 import { updateBusinessServicesById } from './update-business-services-by-id'
+import { updateCallTransferToolById } from './update-call-transfer-tool-by-id'
 
 export class BusinessService {
 	getBusinessDetailsById = getBusinessDetailsById
@@ -18,4 +21,7 @@ export class BusinessService {
 	updateBusinessAssistantById = updateBusinessAssistantById
 	createBusinessGoogleProfile = CreateBusinessGoogleProfile
 	updateBusinessAppointmentById = updateBusinessAppointmentById
+	createCallTransferToolById = createCallTransferToolById
+	updateCallTransferToolById = updateCallTransferToolById
+	getCallTransferToolById = getCallTransferToolById
 }

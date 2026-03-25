@@ -149,3 +149,56 @@ export const updateBusinessAppointmentByIdParamsSchema = z.object({
 })
 export type UpdateBusinessAppointmentByIdBodySchemaInput = z.infer<typeof updateBusinessAppointmentByIdBodySchema> &
 	z.infer<typeof updateBusinessAppointmentByIdParamsSchema>
+
+// Create Business Call Transfer Tool
+export const createCallTransferToolByIdBodySchema = z.object({
+	scenario: z.string(),
+	transferTo: z.string(),
+	warmTransfer: z.boolean(),
+	availability: z.enum(['always', 'business_hours', 'custom', 'none']),
+	customHours: z
+		.array(
+			z.object({
+				day: z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']),
+				start: z.string(),
+				end: z.string(),
+				isOpen: z.boolean(),
+			})
+		)
+		.optional(),
+})
+export const createCallTransferToolByIdParamsSchema = z.object({
+	businessId: z.string(),
+})
+export type CreateCallTransferToolByIdBodySchemaInput = z.infer<typeof createCallTransferToolByIdBodySchema> &
+	z.infer<typeof createCallTransferToolByIdParamsSchema>
+
+// Update Business Call Transfer Tool
+export const updateCallTransferToolByIdBodySchema = z.object({
+	scenarioId: z.string(),
+	scenario: z.string().optional(),
+	transferTo: z.string().optional(),
+	warmTransfer: z.boolean().optional(),
+	availability: z.enum(['always', 'business_hours', 'custom', 'none']).optional(),
+	customHours: z
+		.array(
+			z.object({
+				day: z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']),
+				start: z.string(),
+				end: z.string(),
+				isOpen: z.boolean(),
+			})
+		)
+		.optional(),
+})
+export const updateCallTransferToolByIdParamsSchema = z.object({
+	businessId: z.string(),
+})
+export type UpdateCallTransferToolByIdBodySchemaInput = z.infer<typeof updateCallTransferToolByIdBodySchema> &
+	z.infer<typeof updateCallTransferToolByIdParamsSchema>
+
+// Get Business Call Transfer Tool
+export const getCallTransferToolByIdParamsSchema = z.object({
+	businessId: z.string(),
+})
+export type GetCallTransferToolByIdParamsSchemaInput = z.infer<typeof getCallTransferToolByIdParamsSchema>

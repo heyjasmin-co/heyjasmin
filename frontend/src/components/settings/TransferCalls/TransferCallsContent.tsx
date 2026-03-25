@@ -1,3 +1,4 @@
+import { useCallTransferTool } from "@/api/hooks/useBusinessQueries";
 import InfoCard from "@/components/shared/InfoCard";
 import PlanBanner from "@/components/shared/PlanBanner";
 import { appName } from "@/theme/appName";
@@ -21,6 +22,8 @@ export default function TransferCallsContent({
   refetch,
 }: TransferCallsContentProps) {
   const [showModal, setShowModal] = useState(false);
+  const businessId = businessDetails._id;
+  const { data: callTransferTool } = useCallTransferTool(businessId!);
   const [editingScenario, setEditingScenario] =
     useState<ITransferScenario | null>(null);
   const scenarios = businessDetails.callTransferSettings?.scenarios || [];
@@ -35,6 +38,7 @@ export default function TransferCallsContent({
     setShowModal(true);
   };
 
+  const maxScenarios = callTransferTool?.data?.length ?? 0;
   return (
     <div
       className="flex w-full flex-col gap-6"
@@ -69,7 +73,7 @@ export default function TransferCallsContent({
             <h6 className="text-md font-bold text-gray-800">
               Transfer Scenarios
             </h6>
-            {hasAccess && canEdit && (
+            {maxScenarios < 1 && hasAccess && canEdit && (
               <button
                 onClick={handleAdd}
                 className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-purple-100"
@@ -97,9 +101,9 @@ export default function TransferCallsContent({
                   className="group flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-colors hover:bg-gray-50"
                 >
                   <div className="flex flex-col gap-1">
-                    <span className="font-bold text-gray-900">{s.name}</span>
+                    <span className="font-bold text-gray-900">{s.scenario}</span>
                     <span className="text-sm text-gray-500">
-                      {s.phoneNumber}
+                      {s.transferTo}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">

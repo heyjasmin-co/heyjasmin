@@ -3,13 +3,13 @@ import { FastifyRequest } from 'fastify'
 import { Business } from '../../../models'
 import { getTwilioAvailableNumbers, releaseTwilioNumber } from '../../../services/twilio.service'
 import {
+	attachToolToAssistant,
 	createAIAssistant,
 	createSendSMSTool,
 	deleteAIAssistant,
 	deleteSendSMSTool,
 	linkTwilioNumberToAIAssistant,
 	unlinkTwilioNumberFromAIAssistant,
-	updateAIAssistantWithSendSMSTool,
 } from '../../../services/vapi.service'
 import { runTransaction } from '../../../utils/transaction'
 import { UpdateBusinessDetailsByIdInput, UpdateBusinessDetailsByIdOutput } from './types'
@@ -67,8 +67,7 @@ export const updateBusinessDetailsById = async (
 			}
 
 			// Step 6: Update AI Assistant with Send SMS tool
-			await updateAIAssistantWithSendSMSTool({
-				businessData,
+			await attachToolToAssistant({
 				toolId: sendSMSTool.id,
 				assistantId: aIAssistant.id,
 			})
@@ -83,7 +82,7 @@ export const updateBusinessDetailsById = async (
 							assistantName: aIAssistant.name,
 							assistantSetup: 'testing',
 							assistantPhoneNumberId: linkedPhoneNumber.id,
-							assistantToolId: sendSMSTool.id,
+							assistantSmsToolId: sendSMSTool.id,
 							twilioNumber: twilioNumber.phoneNumber,
 							twilioId: twilioNumber.sid,
 						},

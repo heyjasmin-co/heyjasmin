@@ -63,11 +63,30 @@ export interface IBusinessHour {
 }
 
 export interface ITransferScenario {
-  _id?: string;
-  name: string;
-  phoneNumber: string;
+  scenarioId?: string;
+  scenario: string;
+  transferTo: string;
   warmTransfer: boolean;
   availability: "always" | "business_hours" | "custom" | "none";
+  customHours?: IBusinessHour[];
+}
+
+export type ICallTransferScenario = ITransferScenario & { scenarioId: string };
+
+export interface ICreateCallTransferTool {
+  scenario: string;
+  transferTo: string;
+  warmTransfer: boolean;
+  availability: "always" | "business_hours" | "custom" | "none";
+  customHours?: IBusinessHour[];
+}
+
+export interface IUpdateCallTransferTool {
+  scenarioId: string;
+  scenario?: string;
+  transferTo?: string;
+  warmTransfer?: boolean;
+  availability?: "always" | "business_hours" | "custom" | "none";
   customHours?: IBusinessHour[];
 }
 
