@@ -21,6 +21,11 @@ export const updateBusinessAssistantById = async (
 		throw new Error('Business subscription is inactive or expired. Please renew.')
 	}
 
+	const assistantId = updated?.aiAgentSettings?.assistantId
+	if (!assistantId) {
+		throw new Error('AI Assistant has not been created yet. Please complete the business setup first.')
+	}
+
 	await updateAIAssistant(
 		{
 			businessName: updated?.name,
@@ -31,7 +36,7 @@ export const updateBusinessAssistantById = async (
 			availability_scenario: updated?.callTransferSettings?.scenarios?.[0]?.availability ?? 'none',
 			customHours: updated?.callTransferSettings?.scenarios?.[0]?.customHours ?? [],
 		},
-		updated?.aiAgentSettings?.assistantId!
+		assistantId
 	)
 
 	updated.hasPublish = false

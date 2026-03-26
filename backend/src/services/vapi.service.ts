@@ -440,6 +440,9 @@ export async function createAIAssistant(businessData: AssistantBusinessData): Pr
  */
 export async function updateAIAssistant(businessData: AssistantBusinessData, assistantId: string): Promise<Assistant> {
 	try {
+		if (!assistantId || assistantId === 'null') {
+			throw new Error('Valid assistant ID is required')
+		}
 		const currentAssistant = await vapiClient.assistants.get(assistantId)
 		if (!currentAssistant.model) {
 			throw new Error('Assistant has no model configuration')
@@ -474,6 +477,9 @@ export async function linkTwilioNumberToAIAssistant(args: {
 }): Promise<PhoneNumbersCreateResponse> {
 	try {
 		const { mobileNumber, assistantId, businessName } = args
+		if (!assistantId || assistantId === 'null') {
+			throw new Error('Valid assistant ID is required')
+		}
 		const response = await vapiClient.phoneNumbers.create({
 			assistantId,
 			name: businessName,
@@ -495,6 +501,9 @@ export async function linkTwilioNumberToAIAssistant(args: {
  */
 export async function deleteAIAssistant(assistantId: string) {
 	try {
+		if (!assistantId || assistantId === 'null') {
+			throw new Error('Valid assistant ID is required')
+		}
 		return await vapiClient.assistants.delete(assistantId)
 	} catch (error: any) {
 		console.error('✗ Error deleting assistant:', error?.response?.data || error?.message || error)
@@ -506,6 +515,9 @@ export async function deleteAIAssistant(assistantId: string) {
  */
 export async function getAssistantPhoneNumber(assistantId: string): Promise<string | null> {
 	try {
+		if (!assistantId || assistantId === 'null') {
+			return null
+		}
 		// Fetch all phone numbers
 		const phoneNumbers = await vapiClient.phoneNumbers.list()
 
