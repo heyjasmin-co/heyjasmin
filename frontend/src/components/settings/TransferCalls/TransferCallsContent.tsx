@@ -1,7 +1,6 @@
 import { useCallTransferTool } from "@/api/hooks/useBusinessQueries";
 import InfoCard from "@/components/shared/InfoCard";
 import PlanBanner from "@/components/shared/PlanBanner";
-import { useUserData } from "@/context/UserDataContext";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
 import { BusinessDetailsType, ITransferScenario } from "@/types/BusinessTypes";
@@ -22,7 +21,6 @@ export default function TransferCallsContent({
   hasAccess,
   refetch,
 }: TransferCallsContentProps) {
-  const { userData } = useUserData();
   const [showModal, setShowModal] = useState(false);
   const businessId = businessDetails._id;
   const { data: callTransferTool } = useCallTransferTool(businessId!);
