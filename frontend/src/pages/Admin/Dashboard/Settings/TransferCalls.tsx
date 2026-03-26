@@ -45,7 +45,7 @@ export default function TransferCalls() {
 
   const subscriptionPlan = userData?.subscription?.plan;
   const hasAccess = subscriptionPlan === "pro" || subscriptionPlan === "plus";
-
+  const canEdit = !!userData?.assistantNumber && userData?.role !== "viewer";
   return (
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-2 py-6 shadow-lg sm:px-6">
       {businessDetails && (
@@ -53,14 +53,14 @@ export default function TransferCalls() {
           <BusinessTitleCard
             businessDetails={businessDetails}
             title="Transfer Calls"
-            canEdit={hasAccess && userData?.role !== "viewer"}
+            canEdit={canEdit}
             handleUpdateAgent={handleUpdateAgent}
             subtitle={`Allow ${appName} to transfer a call.`}
           />
 
           <TransferCallsContent
             businessDetails={businessDetails}
-            canEdit={userData?.role !== "viewer"}
+            canEdit={canEdit}
             hasAccess={hasAccess}
             refetch={handleRefetch}
           />
