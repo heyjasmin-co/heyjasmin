@@ -1,6 +1,7 @@
 import { useCallTransferTool } from "@/api/hooks/useBusinessQueries";
 import InfoCard from "@/components/shared/InfoCard";
 import PlanBanner from "@/components/shared/PlanBanner";
+import { useUserData } from "@/context/UserDataContext";
 import { appName } from "@/theme/appName";
 import { colorTheme } from "@/theme/colorTheme";
 import { BusinessDetailsType, ITransferScenario } from "@/types/BusinessTypes";
@@ -21,6 +22,7 @@ export default function TransferCallsContent({
   hasAccess,
   refetch,
 }: TransferCallsContentProps) {
+  const { userData } = useUserData();
   const [showModal, setShowModal] = useState(false);
   const businessId = businessDetails._id;
   const { data: callTransferTool } = useCallTransferTool(businessId!);
@@ -87,7 +89,7 @@ export default function TransferCallsContent({
             )}
           </div>
 
-          {scenarios.length === 0 ? (
+          {scenarios.length === 0 || !hasAccess ? (
             <EmptyScenarios
               onAdd={handleAdd}
               canEdit={canEdit}
@@ -101,7 +103,9 @@ export default function TransferCallsContent({
                   className="group flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-colors hover:bg-gray-50"
                 >
                   <div className="flex flex-col gap-1">
-                    <span className="font-bold text-gray-900">{s.scenario}</span>
+                    <span className="font-bold text-gray-900">
+                      {s.scenario}
+                    </span>
                     <span className="text-sm text-gray-500">
                       {s.transferTo}
                     </span>

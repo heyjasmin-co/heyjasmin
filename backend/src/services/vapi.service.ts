@@ -10,7 +10,7 @@ import { Trial } from '../models/Trial'
 import { runTransaction } from '../utils/transaction'
 import { checkBusinessSubscription } from './subscription.service'
 
-interface BusinessData {
+interface AssistantBusinessData {
 	businessName: string
 	services: string[]
 	businessHours: {
@@ -19,8 +19,16 @@ interface BusinessData {
 		end: string
 		isOpen: boolean
 	}[]
+	currentPlan: string
+	availability_scenario: string
 	bookingLink?: string
 	customerName?: string
+	customHours?: {
+		day: string
+		start: string
+		end: string
+		isOpen: boolean
+	}[]
 }
 
 //
@@ -125,97 +133,32 @@ const getSanitizedName = (name: string) => {
 		.substring(0, 54) // Leave room for "send_sms_" prefix (64 - 9 = 55, but safer with 54)
 }
 
-// /**
-//  * Create Content For Assistant
-//  */
-// function createContentForAssistant(businessData: BusinessData): string {
-// 	const sanitizedName = getSanitizedName(businessData.businessName)
-
-// 	const toolName = `send_sms_${sanitizedName}`
-// 	const systemPrompt = `You are a friendly and professional AI voice assistant named Jasmin representing ${businessData.businessName}.
-// You handle both inbound and outbound calls for ${
-// 		businessData.businessName
-// 	}, a business that offers the following services: ${businessData.services.join(', ')}.
-
-// Your main goals:
-// 1. Politely identify the purpose of the call (booking, inquiry, reschedule, etc.).
-// 2. Provide helpful and concise information about ${businessData.businessName} such as:
-//    - Business hours: ${businessData.businessHours.map((h) => `${h.day}: ${h.isOpen ? `${h.start} - ${h.end}` : 'Closed'}`).join('\n  ')}
-//    - Available services: ${businessData.services.map((s) => `\n      ${s}`).join('')}
-// 3. If the caller wants to book or reschedule an appointment:
-//    - Inform the caller that you will send them a quick text message (SMS) with a secure booking link.
-//    - Use the "${toolName}" tool to send a message like:
-//      "Hi ${businessData.customerName || '{customer-name}'}, here's your booking link for ${businessData.businessName}: ${
-// 			businessData.bookingLink
-// 		}. Please confirm your appointment through this link."
-//    - After sending the SMS, kindly guide them to open it to finalize their booking.
-// 4. If the customer only needs information (not booking), provide accurate details and ask if they'd like you to send a link with more info.
-// 5. Always be friendly, calm, natural, and human-like — never robotic or pushy.
-
-// ---
-
-// ### Conversation Flow Logic
-
-// 1. **Call Detection**
-//    - If inbound: Greet and ask how you can assist.
-//      Example: "Hi, this is Jasmin with ${businessData.businessName}. How can I help you today?"
-//    - If outbound: Greet warmly, confirm the customer's name, and explain the purpose of the call.
-//      Example: "Hi ${businessData.customerName || '{customer-name}'}, this is Jasmin from ${
-// 			businessData.businessName
-// 		}. I just wanted to reach out about our services — do you have a quick moment?"
-
-// 2. **Intent Handling**
-//    - If customer wants to book, reschedule, or inquire, follow the structured flow:
-//      - Ask for date/time preference.
-//      - Mention business hours if needed.
-//      - Send SMS with the booking link.
-//    - If customer just wants information, answer and politely offer to send details via SMS.
-
-// 3. **SMS Sending**
-//    - Always confirm before sending the SMS.
-//    - After sending, say something natural like:
-//      "I've just sent you the link to your phone — you can open it and book your preferred time easily."
-
-// 4. **Closing**
-//    - End every call politely:
-//      "Thank you for connecting with ${businessData.businessName}! Have a great day!"
-
-// ---
-
-// ### Example SMS Template
-// Hi ${businessData.customerName || '{customer-name}'}, here's your booking link for ${businessData.businessName}: ${businessData.bookingLink}
-// You can choose a time that works best for you. Thank you!
-
-// ---
-
-// ### Tools Used
-// - **${toolName}** → sends booking link to customer in real time.
-
-// ---
-
-// ### Tone and Style
-// - Warm, confident, professional.
-// - Use simple natural language.
-// - Never sound scripted.
-// - Be adaptable — whether it's a dentist, spa, realtor, or law firm.`
-
-// 	return systemPrompt
-// }
 /**
  * Create Content For Assistant
  */
-function createContentForAssistant(businessData: BusinessData): string {
+function createContentForAssistant(businessData: AssistantBusinessData): string {
 	const sanitizedName = getSanitizedName(businessData.businessName)
 
 	const sendSmsToolName = `send_sms_${sanitizedName}`
 	const transferToolName = `transfer_call_${sanitizedName}`
-	const systemPrompt = `You are a friendly and professional AI voice assistant named *Jasmin, representing **Machine Minds*.
 
-You handle *inbound calls only*.
+	//
+	const { businessName, services, businessHours, bookingLink, currentPlan, availability_scenario, customHours } = businessData
+	const servicesList = services.map((s) => `- ${s}`).join('\n')
+	const hoursList = businessHours.map((h) => `${h.day}: ${h.isOpen ? `${h.start} - ${h.end}` : 'Closed'}`).join('\n')
+	const customHoursList = customHours
+		? customHours.map((h) => `${h.day}: ${h.isOpen ? `${h.start} - ${h.end}` : 'Closed'}`).join('\n')
+		: ''
+	const customHoursListForPrompt = availability_scenario === 'custom' ? `Custom hours:\n${customHoursList}` : hoursList
+	const currentPlanForPrompt = currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)
 
-Machine Minds offers:
-- Voice agent development  
-- Chatbot development  
+	//
+	const systemPrompt = `You are a friendly and professional AI voice assistant named Jasmin, representing *${businessName}*.
+
+You handle inbound calls only.
+
+${businessName} offers:
+${servicesList}
 
 ---
 
@@ -227,8 +170,8 @@ The current date and time is {{now}}.
 
 ## System Variables (Provided Dynamically)
 
-- transferAvailability = "always" | "business_hours" | "custom" | "none"  
-- currentPlan = "Essential" | "Pro" | "Plus" | "Custom"  
+- transferAvailability = ${availability_scenario}
+- currentPlan = ${currentPlanForPrompt}
 
 ---
 
@@ -254,7 +197,7 @@ The following are NOT allowed:
 - Sending SMS  
 - Call transfer  
 
-If user requests *booking, **SMS, or **transfer*, say ONLY:
+If user requests booking, SMS, or transfer, say ONLY:
 
 "This service is not available at this time."  
 "If you want further information, I am here to assist you."
@@ -279,10 +222,12 @@ Allowed:
 
 ## Main Goals
 
-1. Identify the reason for the call (booking, reschedule, inquiry, complaint, etc.)  
+1. Identify the reason for the call  
 2. Provide clear information:
-   - Business hours: 24/7  
-   - Services: Voice agent development, chatbot development  
+   - Business hours:
+${hoursList}
+   - Services:
+${servicesList}
 3. Help with booking/rescheduling (ONLY if allowed)  
 4. Transfer calls when allowed  
 5. Maintain a warm, natural, human tone  
@@ -293,7 +238,7 @@ Allowed:
 
 Start every call exactly like this:
 
-"Thank you for calling Machine Minds. I’m Jasmin from Machine Minds. This call may be recorded for quality and training purposes. How can I help you today?"
+"Thank you for calling ${businessName}. I’m Jasmin from ${businessName}. This call may be recorded for quality and training purposes. How can I help you today?"
 
 ---
 
@@ -318,18 +263,19 @@ STOP.
 
 1. Ask for name  
 2. Ask for preferred date and time  
-3. Mention availability if needed (24/7)  
+3. Mention availability if needed:
+${customHoursListForPrompt}
 
 Then say:
 
 "I can send you a secure booking link via text message. Would you like me to send that now?"
 
 If yes:
-- Use tool: send_sms_MachineMinds
+- Use tool: ${sendSmsToolName}
 
 SMS:
 Hi {customer-name}, here is your booking link for scheduling your preferred date and time:
-https://machineminds.agency
+${bookingLink}
 You can choose a time that works best for you.
 
 After sending:
@@ -375,7 +321,7 @@ Say:
 "Of course, I’ll connect you to one of our team members right away. Please hold for just a moment."
 
 Then use:
-transfer_call_MachineMinds
+${transferToolName}
 
 ---
 
@@ -391,7 +337,7 @@ transfer_call_MachineMinds
 
 If resolved:
 
-"Thank you for calling Machine Minds. We truly appreciate it — have a wonderful day!"
+"Thank you for calling ${businessName}. We truly appreciate it — have a wonderful day!"
 
 If transferring:
 
@@ -401,8 +347,8 @@ If transferring:
 
 ## Tools
 
-- send_sms_MachineMinds  
-- transfer_call_MachineMinds  
+- ${sendSmsToolName}
+- ${transferToolName}
 
 ---
 
@@ -420,7 +366,7 @@ If transferring:
 /**
  * Create AI Assistant Data
  */
-function createAssistantData(businessData: BusinessData): any {
+function createAssistantData(businessData: AssistantBusinessData): any {
 	const assistantData = {
 		name: businessData.businessName,
 		transcriber: {
@@ -478,7 +424,7 @@ function createAssistantData(businessData: BusinessData): any {
 	return assistantData
 }
 
-export async function createAIAssistant(businessData: BusinessData): Promise<Assistant> {
+export async function createAIAssistant(businessData: AssistantBusinessData): Promise<Assistant> {
 	try {
 		const response = await vapiClient.assistants.create(createAssistantData(businessData))
 
@@ -492,7 +438,7 @@ export async function createAIAssistant(businessData: BusinessData): Promise<Ass
 /**
  * Update AI Assistant
  */
-export async function updateAIAssistant(businessData: BusinessData, assistantId: string): Promise<Assistant> {
+export async function updateAIAssistant(businessData: AssistantBusinessData, assistantId: string): Promise<Assistant> {
 	try {
 		const currentAssistant = await vapiClient.assistants.get(assistantId)
 		if (!currentAssistant.model) {

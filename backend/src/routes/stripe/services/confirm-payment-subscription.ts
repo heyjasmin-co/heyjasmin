@@ -4,6 +4,7 @@ import { Business } from '../../../models'
 import { Trial } from '../../../models/Trial'
 import { createBusinessPlan } from '../../../services/businessPlan.service'
 import { runTransaction } from '../../../utils/transaction'
+import { BusinessService } from '../../businesses/services'
 import { ConfirmPaymentSubscriptionInput, ConfirmPaymentSubscriptionOutput } from './types'
 
 export const confirmPaymentSubscription = async (
@@ -195,6 +196,12 @@ export const confirmPaymentSubscription = async (
 			},
 			session
 		)
+
+		// Create or update business assistant
+		const businessService = new BusinessService()
+		await businessService.updateBusinessAssistantById(request, {
+			businessId,
+		})
 
 		request.log.info(
 			{
