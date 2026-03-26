@@ -3,6 +3,9 @@ import {
   BusinessDetailsType,
   IBusinessHour,
   ITransferScenario,
+  ICallTransferScenario,
+  ICreateCallTransferTool,
+  IUpdateCallTransferTool,
 } from "../../types/BusinessTypes";
 
 export const businessService = (apiClient: AxiosInstance) => ({
@@ -131,6 +134,39 @@ export const businessService = (apiClient: AxiosInstance) => ({
       message: string;
       data: BusinessDetailsType;
     }>("/businesses", data);
+    return response.data;
+  },
+
+  getCallTransferTool: async (businessId: string) => {
+    const response = await apiClient.get<{
+      success: boolean;
+      message: string;
+      data: ICallTransferScenario[];
+    }>(`/businesses/call-transfer-tool/${businessId}`);
+    return response.data;
+  },
+
+  createCallTransferTool: async (
+    businessId: string,
+    data: ICreateCallTransferTool,
+  ) => {
+    const response = await apiClient.post<{
+      success: boolean;
+      message: string;
+      data: ICallTransferScenario;
+    }>(`/businesses/call-transfer-tool/${businessId}`, data);
+    return response.data;
+  },
+
+  updateCallTransferTool: async (
+    businessId: string,
+    data: IUpdateCallTransferTool,
+  ) => {
+    const response = await apiClient.patch<{
+      success: boolean;
+      message: string;
+      data: ICallTransferScenario;
+    }>(`/businesses/call-transfer-tool/${businessId}`, data);
     return response.data;
   },
 });

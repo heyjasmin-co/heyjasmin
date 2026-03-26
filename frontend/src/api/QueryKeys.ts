@@ -7,6 +7,8 @@ export const queryKeys = {
       [...queryKeys.business.all, "appointment", id] as const,
     transfer: (id: string) =>
       [...queryKeys.business.all, "transfer", id] as const,
+    callTransferTool: (id: string) =>
+      [...queryKeys.business.all, "call-transfer-tool", id] as const,
   },
   users: {
     all: ["users"] as const,

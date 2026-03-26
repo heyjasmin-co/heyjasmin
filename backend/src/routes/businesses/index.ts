@@ -6,7 +6,10 @@ import { createBusinessGoogleProfileHandler } from './handlers/create-business-g
 import { getBusinessDetailsByIdHandler } from './handlers/get-business-details-by-id'
 import {
 	createBusinessGoogleProfileBodySchema,
+	createCallTransferToolByIdBodySchema,
+	createCallTransferToolByIdParamsSchema,
 	getBusinessDetailsByIdParamsSchema,
+	getCallTransferToolByIdParamsSchema,
 	updateBusinessAppointmentByIdBodySchema,
 	updateBusinessAppointmentByIdParamsSchema,
 	updateBusinessAssistantByIdParamsSchema,
@@ -20,6 +23,8 @@ import {
 	updateBusinessInformationByIdParamsSchema,
 	updateBusinessServicesByIdBodySchema,
 	updateBusinessServicesByIdParamsSchema,
+	updateCallTransferToolByIdBodySchema,
+	updateCallTransferToolByIdParamsSchema,
 } from './handlers/types'
 import { updateBusinessAppointmentByIdHandler } from './handlers/update-business-appointment'
 import { updateBusinessAssistantByIdHandler } from './handlers/update-business-assistance-by-id'
@@ -28,6 +33,9 @@ import { updateBusinessDetailsByIdHandler } from './handlers/update-business-det
 import { updateBusinessHoursByIdHandler } from './handlers/update-business-hours-by-id'
 import { updateBusinessInformationByIdHandler } from './handlers/update-business-information-by-id'
 import { updateBusinessServicesByIdHandler } from './handlers/update-business-services-by-id'
+import { createCallTransferToolByIdHandler } from './handlers/create-call-transfer-tool-by-id'
+import { getCallTransferToolByIdHandler } from './handlers/get-call-transfer-tool-by-id'
+import { updateCallTransferToolByIdHandler } from './handlers/update-call-transfer-tool-by-id'
 
 export default async function businessRoute(fastify: FastifyInstance) {
 	// Get Business Details by Id
@@ -132,5 +140,40 @@ export default async function businessRoute(fastify: FastifyInstance) {
 			params: updateBusinessAppointmentByIdParamsSchema,
 		},
 		handler: updateBusinessAppointmentByIdHandler,
+	})
+
+	//Create Call Transfer Tool by Id
+	fastify.post('/call-transfer-tool/:businessId', {
+		preHandler: [createContext, authenticate, requireActiveSubscription],
+		schema: {
+			tags: ['businesses'],
+			description: 'Create Call Transfer Tool',
+			body: createCallTransferToolByIdBodySchema,
+			params: createCallTransferToolByIdParamsSchema,
+		},
+		handler: createCallTransferToolByIdHandler,
+	})
+
+	//Get Call Transfer Tool by Id
+	fastify.get('/call-transfer-tool/:businessId', {
+		preHandler: [createContext, authenticate, requireActiveSubscription],
+		schema: {
+			tags: ['businesses'],
+			description: 'Get Call Transfer Tool',
+			params: getCallTransferToolByIdParamsSchema,
+		},
+		handler: getCallTransferToolByIdHandler,
+	})
+
+	//Update Call Transfer Tool by Id
+	fastify.patch('/call-transfer-tool/:businessId', {
+		preHandler: [createContext, authenticate, requireActiveSubscription],
+		schema: {
+			tags: ['businesses'],
+			description: 'Update Call Transfer Tool',
+			body: updateCallTransferToolByIdBodySchema,
+			params: updateCallTransferToolByIdParamsSchema,
+		},
+		handler: updateCallTransferToolByIdHandler,
 	})
 }

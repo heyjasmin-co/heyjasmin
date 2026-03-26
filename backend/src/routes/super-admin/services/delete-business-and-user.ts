@@ -3,7 +3,7 @@ import { ClientSession } from 'mongoose'
 import stripe from '../../../config/stripe'
 import { Business, BusinessPlan, BusinessUser, Call, Trial } from '../../../models'
 import { releaseTwilioNumber } from '../../../services/twilio.service'
-import { deleteAIAssistant, deleteSendSMSTool, deleteVapiPhoneNumber } from '../../../services/vapi.service'
+import { deleteAIAssistant, deleteCallTransferTool, deleteSendSMSTool, deleteVapiPhoneNumber } from '../../../services/vapi.service'
 import { runTransaction } from '../../../utils/transaction'
 import { DeleteBusinessServiceInput, DeleteBusinessServiceOutput } from './types'
 
@@ -44,11 +44,19 @@ export const deleteBusinessAndUser = async (
 			}
 		}
 
-		if (business.aiAgentSettings?.assistantToolId) {
+		if (business.aiAgentSettings?.assistantSmsToolId) {
 			try {
-				await deleteSendSMSTool(business.aiAgentSettings.assistantToolId)
+				await deleteSendSMSTool(business.aiAgentSettings.assistantSmsToolId)
 			} catch (error: any) {
-				request.log.warn(`Vapi tool delete failed for business ${id}: ${error.message}`)
+				request.log.warn(`Vapi SMS tool delete failed for business ${id}: ${error.message}`)
+			}
+		}
+
+		if (business.aiAgentSettings?.assistantCallTransferToolId) {
+			try {
+				await deleteCallTransferTool(business.aiAgentSettings.assistantCallTransferToolId)
+			} catch (error: any) {
+				request.log.warn(`Vapi Call Transfer tool delete failed for business ${id}: ${error.message}`)
 			}
 		}
 

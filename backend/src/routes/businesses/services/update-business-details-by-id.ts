@@ -1,15 +1,16 @@
 // Avoid importing SDK types directly to prevent type-resolution issues; use local 'any' types for external resources.
 import { FastifyRequest } from 'fastify'
 import { Business } from '../../../models'
+import { checkBusinessSubscription } from '../../../services/subscription.service'
 import { getTwilioAvailableNumbers, releaseTwilioNumber } from '../../../services/twilio.service'
 import {
+	attachToolToAssistant,
 	createAIAssistant,
 	createSendSMSTool,
 	deleteAIAssistant,
 	deleteSendSMSTool,
 	linkTwilioNumberToAIAssistant,
 	unlinkTwilioNumberFromAIAssistant,
-	updateAIAssistantWithSendSMSTool,
 } from '../../../services/vapi.service'
 import { runTransaction } from '../../../utils/transaction'
 import { UpdateBusinessDetailsByIdInput, UpdateBusinessDetailsByIdOutput } from './types'
@@ -28,14 +29,21 @@ export const updateBusinessDetailsById = async (
 		return await runTransaction(async (session) => {
 			// Step 1: Update business info
 			const updatedBusinessInfo = await Business.findByIdAndUpdate(businessId, { $set: { ...updateData } }, { new: true, session })
-
 			if (!updatedBusinessInfo) {
 				throw new Error(`No business found with the provided ID: ${businessId}`)
+			}
+
+			const subscription = await checkBusinessSubscription(businessId)
+			if (!subscription.isTrial && !subscription.isActive) {
+				throw new Error('Business subscription is inactive or expired. Please renew.')
 			}
 			const businessData = {
 				businessName: updatedBusinessInfo.name,
 				services: updatedBusinessInfo.services,
 				businessHours: updatedBusinessInfo.businessHours,
+				currentPlan: subscription.plan ?? 'essential',
+				availability_scenario: updatedBusinessInfo?.callTransferSettings?.scenarios?.[0]?.availability ?? 'none',
+				customHours: updatedBusinessInfo?.callTransferSettings?.scenarios?.[0]?.customHours ?? [],
 			}
 
 			// Step 2: Create AI Assistant (VAPI)
@@ -67,8 +75,7 @@ export const updateBusinessDetailsById = async (
 			}
 
 			// Step 6: Update AI Assistant with Send SMS tool
-			await updateAIAssistantWithSendSMSTool({
-				businessData,
+			await attachToolToAssistant({
 				toolId: sendSMSTool.id,
 				assistantId: aIAssistant.id,
 			})
@@ -83,7 +90,7 @@ export const updateBusinessDetailsById = async (
 							assistantName: aIAssistant.name,
 							assistantSetup: 'testing',
 							assistantPhoneNumberId: linkedPhoneNumber.id,
-							assistantToolId: sendSMSTool.id,
+							assistantSmsToolId: sendSMSTool.id,
 							twilioNumber: twilioNumber.phoneNumber,
 							twilioId: twilioNumber.sid,
 						},

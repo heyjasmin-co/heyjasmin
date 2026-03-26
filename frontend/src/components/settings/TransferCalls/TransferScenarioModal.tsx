@@ -5,7 +5,10 @@ import { errorToast, successToast } from "@/utils/react-toast";
 import { ToggleSwitch } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUpdateTransferScenario } from "../../../api/hooks/useBusinessQueries";
+import {
+  useCreateCallTransferTool,
+  useUpdateCallTransferTool,
+} from "../../../api/hooks/useBusinessQueries";
 import { useUserData } from "../../../context/UserDataContext";
 
 interface TransferScenarioModalProps {
@@ -41,13 +44,14 @@ export default function TransferScenarioModal({
   refetch,
 }: TransferScenarioModalProps) {
   const { userData } = useUserData();
-  const updateScenarioMutation = useUpdateTransferScenario();
+  const createScenarioMutation = useCreateCallTransferTool();
+  const updateScenarioMutation = useUpdateCallTransferTool();
 
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<ITransferScenario>({
-    name: "",
-    phoneNumber: "",
+    scenario: "",
+    transferTo: "",
     warmTransfer: false,
     availability: "always",
     customHours: [...defaultHours],
@@ -65,8 +69,8 @@ export default function TransferScenarioModal({
       });
     } else {
       setFormData({
-        name: "",
-        phoneNumber: "",
+        scenario: "",
+        transferTo: "",
         warmTransfer: false,
         availability: "always",
         customHours: [...defaultHours],
@@ -94,9 +98,9 @@ export default function TransferScenarioModal({
 
   const validate = () => {
     const newErrors: Partial<Record<keyof ITransferScenario, string>> = {};
-    if (!formData.name.trim()) newErrors.name = "Scenario is required";
-    if (!formData.phoneNumber.trim())
-      newErrors.phoneNumber = "Phone number is required";
+    if (!formData.scenario.trim()) newErrors.scenario = "Scenario is required";
+    if (!formData.transferTo.trim())
+      newErrors.transferTo = "Phone number is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -105,12 +109,38 @@ export default function TransferScenarioModal({
     if (!validate()) return;
 
     try {
-      await updateScenarioMutation.mutateAsync({
-        businessId: userData?.businessId || "",
-        scenario: formData,
-      });
+      const businessId = userData?.businessId || "";
+      if (!businessId) throw new Error("No business ID found");
 
-      successToast(scenario ? "Scenario updated" : "Scenario added");
+      if (scenario?.scenarioId) {
+        // Update existing scenario
+        await updateScenarioMutation.mutateAsync({
+          businessId,
+          data: {
+            scenarioId: scenario.scenarioId,
+            scenario: formData.scenario,
+            transferTo: formData.transferTo,
+            warmTransfer: formData.warmTransfer,
+            availability: formData.availability,
+            customHours: formData.customHours,
+          },
+        });
+        successToast("Scenario updated");
+      } else {
+        // Create new scenario
+        await createScenarioMutation.mutateAsync({
+          businessId,
+          data: {
+            scenario: formData.scenario,
+            transferTo: formData.transferTo,
+            warmTransfer: formData.warmTransfer,
+            availability: formData.availability,
+            customHours: formData.customHours,
+          },
+        });
+        successToast("Scenario added");
+      }
+
       onClose();
       if (refetch) await refetch();
     } catch (error: unknown) {
@@ -128,7 +158,8 @@ export default function TransferScenarioModal({
     }
   };
 
-  const loading = updateScenarioMutation.isPending;
+  const loading =
+    createScenarioMutation.isPending || updateScenarioMutation.isPending;
 
   const availabilityTabs: { id: AvailabilityType; label: string }[] = [
     { id: "always", label: "Always" },
@@ -189,16 +220,16 @@ export default function TransferScenarioModal({
               <div className="w-2/3">
                 <input
                   type="text"
-                  className={`w-full rounded-xl border ${errors.name ? "border-red-500" : "border-gray-200"} px-4 py-2.5 text-sm outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200`}
+                  className={`w-full rounded-xl border ${errors.scenario ? "border-red-500" : "border-gray-200"} px-4 py-2.5 text-sm outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200`}
                   placeholder='i.e. "Sam" or "Billing" or "all transfer requests"'
-                  value={formData.name}
+                  value={formData.scenario}
                   onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
+                    setFormData({ ...formData, scenario: e.target.value })
                   }
                 />
-                {errors.name && (
+                {errors.scenario && (
                   <span className="mt-1 block text-[10px] text-red-500">
-                    {errors.name}
+                    {errors.scenario}
                   </span>
                 )}
               </div>
@@ -220,16 +251,16 @@ export default function TransferScenarioModal({
               <div className="w-2/3">
                 <input
                   type="text"
-                  className={`w-full rounded-xl border ${errors.phoneNumber ? "border-red-500" : "border-gray-200"} px-4 py-2.5 text-sm outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200`}
+                  className={`w-full rounded-xl border ${errors.transferTo ? "border-red-500" : "border-gray-200"} px-4 py-2.5 text-sm outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200`}
                   placeholder="(000) 000-0000"
-                  value={formData.phoneNumber}
+                  value={formData.transferTo}
                   onChange={(e) =>
-                    setFormData({ ...formData, phoneNumber: e.target.value })
+                    setFormData({ ...formData, transferTo: e.target.value })
                   }
                 />
-                {errors.phoneNumber && (
+                {errors.transferTo && (
                   <span className="mt-1 block text-[10px] text-red-500">
-                    {errors.phoneNumber}
+                    {errors.transferTo}
                   </span>
                 )}
               </div>

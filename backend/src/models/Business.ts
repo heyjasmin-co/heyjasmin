@@ -27,7 +27,8 @@ interface IBusiness extends Document {
 		assistantName?: string
 		assistantPhoneNumberId?: string | null
 		assistantSetup?: string
-		assistantToolId?: string | null
+		assistantCallTransferToolId?: string | null
+		assistantSmsToolId?: string | null
 		twilioNumber?: string
 		twilioId?: string
 	}
@@ -35,6 +36,21 @@ interface IBusiness extends Document {
 		appointmentEnabled: boolean
 		appointmentMessage: string | null
 		schedulingLink: string | null
+	}
+	callTransferSettings: {
+		scenarios: {
+			scenarioId: string
+			scenario: string
+			transferTo: string
+			warmTransfer: boolean
+			availability: 'always' | 'business_hours' | 'custom' | 'none'
+			customHours?: {
+				day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
+				start: string
+				end: string
+				isOpen: boolean
+			}[]
+		}[]
 	}
 	isSetupComplete: boolean
 	createdAt: Date
@@ -89,7 +105,8 @@ const businessSchema = new Schema<IBusiness>(
 			assistantPhoneNumberId: { type: String, default: null },
 			assistantSetup: { type: String, default: null },
 			assistantName: { type: String, default: null },
-			assistantToolId: { type: String, default: null },
+			assistantCallTransferToolId: { type: String, default: null },
+			assistantSmsToolId: { type: String, default: null },
 			twilioNumber: { type: String, default: null },
 			twilioId: { type: String, default: null },
 		},
@@ -101,6 +118,34 @@ const businessSchema = new Schema<IBusiness>(
 			schedulingLink: { type: String, default: null },
 		},
 
+		//Call Transfer Settings
+		callTransferSettings: {
+			scenarios: [
+				{
+					scenarioId: { type: String, required: true },
+					scenario: { type: String, required: true },
+					transferTo: { type: String, required: true },
+					warmTransfer: { type: Boolean, default: false },
+					availability: {
+						type: String,
+						enum: ['always', 'business_hours', 'custom', 'none'],
+						default: 'always',
+					},
+					customHours: [
+						{
+							day: {
+								type: String,
+								enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+								required: true,
+							},
+							start: { type: String },
+							end: { type: String },
+							isOpen: { type: Boolean, default: true },
+						},
+					],
+				},
+			],
+		},
 		// Setup Status
 		isSetupComplete: { type: Boolean, default: false },
 	},
