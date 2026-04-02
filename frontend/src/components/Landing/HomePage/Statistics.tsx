@@ -94,7 +94,7 @@ export default function Statistics() {
             <div
               className="relative h-full min-h-[280px] overflow-hidden rounded-[32px] p-8 shadow-lg transition-all duration-500 hover:shadow-2xl"
               style={{
-                backgroundColor: colorTheme.secondaryColor(0.8),
+                backgroundColor: colorTheme.secondaryColor(0.9),
               }}
             >
               <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-white/10 blur-3xl"></div>
@@ -169,7 +169,7 @@ export default function Statistics() {
                   style={{
                     width: "5rem",
                     height: "5rem",
-                    background: `radial-gradient(circle, ${colorTheme.secondaryColor(1)} 0%, ${colorTheme.secondaryColor(0.8)} 60%)`,
+                    background: `radial-gradient(circle, ${colorTheme.secondaryColor(1)} 0%, ${colorTheme.secondaryColor(0.9)} 60%)`,
                     boxShadow: `0 0 30px 10px ${colorTheme.secondaryColor(0.4)}`,
                   }}
                 />
@@ -193,7 +193,7 @@ export default function Statistics() {
             <div
               className="relative h-full min-h-[280px] overflow-hidden rounded-[32px] p-8 shadow-lg transition-all duration-500 hover:shadow-2xl"
               style={{
-                backgroundColor: colorTheme.secondaryColor(0.8),
+                backgroundColor: colorTheme.secondaryColor(0.9),
               }}
             >
               <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-white/10 blur-3xl"></div>

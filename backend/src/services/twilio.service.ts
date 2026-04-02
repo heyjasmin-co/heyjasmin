@@ -41,14 +41,12 @@ export async function getAddressDetails(address: string): Promise<AddressDetails
 		const countryCode = countryComponent?.short_name || 'US'
 
 		// Extract state/province
-		const stateComponent = addressComponents.find((c: any) => 
-			c.types.includes('administrative_area_level_1')
-		)
+		const stateComponent = addressComponents.find((c: any) => c.types.includes('administrative_area_level_1'))
 		const state = stateComponent?.short_name // e.g., "PA", "CA", "ON"
 
 		// Extract city
-		const cityComponent = addressComponents.find((c: any) => 
-			c.types.includes('locality') || c.types.includes('administrative_area_level_2')
+		const cityComponent = addressComponents.find(
+			(c: any) => c.types.includes('locality') || c.types.includes('administrative_area_level_2')
 		)
 		const city = cityComponent?.long_name
 
@@ -72,12 +70,10 @@ export async function getTwilioAvailableNumbers(address: string): Promise<Incomi
 	try {
 		// Step 1: Get detailed address information
 		const addressDetails = await getAddressDetails(address)
-		
+
 		const LOCAL_SUPPORTED_COUNTRIES = ['US', 'CA', 'GB', 'AU']
-		const effectiveCountryCode = LOCAL_SUPPORTED_COUNTRIES.includes(addressDetails.countryCode) 
-			? addressDetails.countryCode 
-			: 'US'
- 
+		const effectiveCountryCode = LOCAL_SUPPORTED_COUNTRIES.includes(addressDetails.countryCode) ? addressDetails.countryCode : 'US'
+
 		// Step 2: Build search parameters for local numbers
 		let searchParams: any = {
 			smsEnabled: true,
@@ -87,7 +83,6 @@ export async function getTwilioAvailableNumbers(address: string): Promise<Incomi
 
 		// For US and CA, we can search by area or coordinates
 		if (effectiveCountryCode === 'US' || effectiveCountryCode === 'CA') {
-			
 			// Priority 1: Search by coordinates (most accurate)
 			if (addressDetails.latitude && addressDetails.longitude) {
 				searchParams.nearLatLong = `${addressDetails.latitude},${addressDetails.longitude}`
@@ -100,29 +95,23 @@ export async function getTwilioAvailableNumbers(address: string): Promise<Incomi
 		}
 
 		// Step 3: Try to fetch available numbers with location preference
-		let availableNumbers = await twilioClient
-			.availablePhoneNumbers(effectiveCountryCode)
-			.local.list(searchParams)
+		let availableNumbers = await twilioClient.availablePhoneNumbers(effectiveCountryCode).local.list(searchParams)
 
 		// Step 4: Fallback - if no numbers found near location, expand search
 		if (!availableNumbers.length && searchParams.nearLatLong) {
 			console.log('⚠️ No numbers found within 50 miles, expanding search to 100 miles...')
 			searchParams.distance = 100
-			availableNumbers = await twilioClient
-				.availablePhoneNumbers(effectiveCountryCode)
-				.local.list(searchParams)
+			availableNumbers = await twilioClient.availablePhoneNumbers(effectiveCountryCode).local.list(searchParams)
 		}
 
 		// Step 5: Fallback - remove location filters if still no numbers
 		if (!availableNumbers.length && (searchParams.nearLatLong || searchParams.inRegion)) {
 			console.log('⚠️ No regional numbers found, searching anywhere in', effectiveCountryCode)
-			availableNumbers = await twilioClient
-				.availablePhoneNumbers(effectiveCountryCode)
-				.local.list({
-					smsEnabled: true,
-					voiceEnabled: true,
-					limit: 10,
-				})
+			availableNumbers = await twilioClient.availablePhoneNumbers(effectiveCountryCode).local.list({
+				smsEnabled: true,
+				voiceEnabled: true,
+				limit: 10,
+			})
 		}
 
 		// Step 6: Check if we found any numbers
@@ -134,7 +123,7 @@ export async function getTwilioAvailableNumbers(address: string): Promise<Incomi
 
 		// Step 7: Pick a random number from available options
 		const pickedNumber = pickRandomNumber(availableNumbers)
-		
+
 		console.log('✓ Selected number:', pickedNumber.phoneNumber)
 
 		// Step 8: Purchase the number
@@ -183,6 +172,22 @@ export async function releaseTwilioNumber(numberSid: string) {
 		return await twilioClient.incomingPhoneNumbers(numberSid).remove()
 	} catch (error: any) {
 		console.error('✗ Error releasing Twilio number:', error?.response?.data || error?.message || error)
+		throw error
+	}
+}
+
+/**
+ * Twilio Send SMS
+ */
+export async function sendTwilioSMS(to: string, body: string) {
+	try {
+		return await twilioClient.messages.create({
+			to,
+			body,
+			from: config.TWILIO_PHONE_NUMBER,
+		})
+	} catch (error: any) {
+		console.error('✗ Error sending SMS:', error?.response?.data || error?.message || error)
 		throw error
 	}
 }

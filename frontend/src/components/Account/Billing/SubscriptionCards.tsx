@@ -69,7 +69,7 @@ function SubscriptionCards({
         <div className="flex items-center gap-3">
           <div
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
-            style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+            style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
           >
             <i className="fa-solid fa-credit-card text-sm text-white"></i>
           </div>

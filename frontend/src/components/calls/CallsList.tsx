@@ -59,7 +59,7 @@ export default function CallsList() {
               <div className="flex w-full max-w-sm flex-col items-center rounded-xl bg-purple-50 p-8 text-center shadow-sm">
                 <div
                   className="flex h-12 w-12 items-center justify-center rounded-full shadow-inner"
-                  style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+                  style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
                 >
                   <i className="fa-solid fa-phone-volume text-lg text-white" />
                 </div>

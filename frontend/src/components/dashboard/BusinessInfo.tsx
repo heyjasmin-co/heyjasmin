@@ -140,7 +140,7 @@ function BusinessInfo({
         <div className="flex items-center gap-3 px-4 py-4">
           <div
             className="flex h-10 w-10 items-center justify-center rounded-full"
-            style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+            style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
           >
             <i className="fa-solid fa-briefcase text-white"></i>
           </div>
