@@ -95,7 +95,7 @@ const Settings = () => {
               <div className="flex items-center space-x-3 px-4 py-4">
                 <div
                   className="flex h-10 w-10 items-center justify-center rounded-full"
-                  style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+                  style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
                 >
                   <i className="fa-solid fa-lock text-white"></i>
                 </div>
@@ -230,7 +230,7 @@ const Settings = () => {
               <div className="flex items-center space-x-3 px-4 py-4">
                 <div
                   className="flex h-10 w-10 items-center justify-center rounded-full"
-                  style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+                  style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
                 >
                   <i className="fa-solid fa-envelope text-white"></i>
                 </div>

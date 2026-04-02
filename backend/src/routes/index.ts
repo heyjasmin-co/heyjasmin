@@ -10,6 +10,7 @@ import userRoutes from './users/index'
 import clerkWebhook from './webhooks/clerk'
 import stripeWebhook from './webhooks/stripe'
 import vapiWebhook from './webhooks/vapi'
+import businessCallNotificationsRoute from './business-call-notifications'
 
 export default async function routes(fastify: FastifyInstance) {
 	fastify.get(
@@ -51,4 +52,5 @@ export default async function routes(fastify: FastifyInstance) {
 	await fastify.register(businessUserInvitationsRoute, { prefix: '/api/v1/business-user-invitations' })
 	await fastify.register(websiteScrapeRoutes, { prefix: '/api/v1/scrape' })
 	await fastify.register(superAdminRoutes, { prefix: '/api/v1/super-admin' })
+	await fastify.register(businessCallNotificationsRoute, { prefix: '/api/v1/business-call-notifications' })
 }

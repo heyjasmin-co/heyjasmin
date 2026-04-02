@@ -316,7 +316,7 @@ export default function Sidebar() {
                 <li className="pb-8">
                   <div
                     className="flex flex-col items-center justify-center rounded-2xl text-center text-sm shadow-md sm:text-base"
-                    style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+                    style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
                   >
                     {/* Business Name */}
                     <div className="w-full border-b border-white/30 py-2 font-semibold text-white">
