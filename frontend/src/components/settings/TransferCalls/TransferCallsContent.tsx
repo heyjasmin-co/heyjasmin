@@ -50,7 +50,7 @@ export default function TransferCallsContent({
           <div className="flex items-center gap-3">
             <div
               className="flex h-8 w-8 items-center justify-center rounded-full"
-              style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+              style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
             >
               <i className="fa-solid fa-phone-volume text-sm text-white"></i>
             </div>
@@ -76,7 +76,7 @@ export default function TransferCallsContent({
             {maxScenarios < 1 && hasAccess && canEdit && (
               <button
                 onClick={handleAdd}
-                className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-purple-100"
+                className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-95"
                 style={{
                   backgroundColor: colorTheme.secondaryColor(0.9),
                 }}

@@ -33,7 +33,7 @@ function AccountDetails({ accountInformation }: AccountDetailsProps) {
         <div className="flex items-center space-x-3 px-4 py-4">
           <div
             className="flex h-10 w-10 items-center justify-center rounded-full"
-            style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+            style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
           >
             <i className="fa-solid fa-envelope text-white"></i>
           </div>
@@ -57,10 +57,11 @@ function AccountDetails({ accountInformation }: AccountDetailsProps) {
           <button
             onClick={handleSignOut}
             disabled={loading}
+            style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
             className={`flex items-center justify-center gap-2 rounded-lg px-5 py-2 text-sm font-semibold shadow-md transition-all sm:text-base ${
               loading
                 ? "cursor-not-allowed bg-gray-300 text-gray-500"
-                : "bg-purple-600 text-white hover:bg-purple-700 focus:ring-2 focus:ring-purple-400 focus:ring-offset-1 active:scale-95"
+                : "text-white hover:opacity-90 active:scale-95"
             }`}
           >
             {loading ? (

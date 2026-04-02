@@ -50,8 +50,7 @@ export const handleUserCreated = async (request: FastifyRequest, clerkUser: any,
 		//Store User in Business
 		const businessId = unsafeMetadata?.businessId
 		const invitationToken = unsafeMetadata?.invitationToken
-		console.log('businessId', businessId)
-		console.log('invitationToken', invitationToken)
+
 		if (businessId && !invitationToken) {
 			const business = await Business.findById(businessId).session(session)
 			if (!business) {

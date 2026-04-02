@@ -17,9 +17,9 @@ export default function EmptyScenarios({
     <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/30 px-6 py-12 text-center">
       <div
         className="mb-4 flex h-16 w-16 items-center justify-center rounded-full"
-        style={{ backgroundColor: colorTheme.secondaryColor(0.1) }}
+        style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
       >
-        <i className="fa-solid fa-phone text-3xl text-purple-600" />
+        <i className="fa-solid fa-phone text-3xl text-white" />
       </div>
       <h3 className="mb-2 text-lg font-bold text-gray-900">
         No Transfer Scenarios
@@ -28,20 +28,20 @@ export default function EmptyScenarios({
         Add some scenarios to help {appName} know when to transfer calls.
       </p>
       {canEdit && hasAccess ? (
-        <button
+         <button
           onClick={onAdd}
-          className="flex items-center gap-2 rounded-lg bg-purple-600 px-6 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95"
-          style={{ backgroundColor: colorTheme.secondaryColor(1) }}
+          className="flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-95"
+          style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
         >
           <i className="fa-solid fa-plus text-xs"></i>
           <span>Add Transfer Scenario</span>
         </button>
       ) : (
-        <button
+         <button
           onClick={() => {
             navigate("/admin/dashboard/account/billing");
           }}
-          className="flex items-center gap-2 rounded-lg px-6 py-2 text-sm font-semibold text-white hover:bg-purple-700"
+          className="flex items-center gap-2 rounded-lg px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:opacity-90 active:scale-95"
           style={{
             backgroundColor: colorTheme.secondaryColor(0.9),
           }}  
