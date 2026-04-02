@@ -24,6 +24,9 @@ const BillingPage = lazy(
 const UsersPage = lazy(
   () => import("../pages/Admin/Dashboard/Account/UsersPage"),
 );
+const NotificationsPage = lazy(
+  () => import("../pages/Admin/Dashboard/Account/NotificationsPage"),
+);
 const CallsPage = lazy(() => import("../pages/Admin/Dashboard/Calls"));
 const CallInfo = lazy(() => import("../pages/Admin/Dashboard/Calls/CallInfo"));
 const Dashboard = lazy(() => import("../pages/Admin/Dashboard/GuidedStep"));
@@ -93,6 +96,7 @@ const AdminRoutes = () => {
           <Route path="account" element={<AccountPage />}>
             <Route index element={<Navigate to="account-settings" replace />} />
             <Route path="account-settings" element={<AccountDetailsPage />} />
+            <Route path="notifications" element={<NotificationsPage />} />
             <Route path="users" element={<UsersPage />} />
             <Route path="billing" element={<BillingPage />} />
           </Route>

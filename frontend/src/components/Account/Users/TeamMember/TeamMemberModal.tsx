@@ -72,7 +72,7 @@ function TeamMemberModal({
           <div className="flex items-center space-x-3">
             <div
               className="flex h-8 w-8 items-center justify-center rounded-full"
-              style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+              style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
             >
               <i className="fa-solid fa-user-plus text-sm text-white"></i>
             </div>
@@ -145,7 +145,8 @@ function TeamMemberModal({
               onClick={() => {
                 handleAddMember(memberData?._id!);
               }}
-              className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-md transition-all sm:w-auto ${loading ? "cursor-not-allowed bg-purple-400" : "bg-purple-600 hover:bg-purple-700 active:scale-95"}`}
+              style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
+              className={`flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:opacity-90 active:scale-95 sm:w-auto ${loading ? "cursor-not-allowed opacity-50" : ""}`}
             >
               <i className="fa-solid fa-plus text-white"></i>
               <span>

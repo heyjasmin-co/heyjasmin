@@ -18,6 +18,7 @@ interface Config {
 	VAPI_API_KEY: string
 	TWILIO_ACCOUNT_SID: string
 	TWILIO_AUTH_TOKEN: string
+	TWILIO_PHONE_NUMBER: string
 	BACKEND_URL: string
 	ELEVENLABS_API_KEY: string
 	NODEMAILER_EMAIL_USER: string
@@ -57,9 +58,10 @@ const config: Config = {
 	//VAPI
 	VAPI_API_KEY: process.env.VAPI_API_KEY!,
 
-	//VAPI
+	//TWILIO
 	TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID!,
 	TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN!,
+	TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER!,
 
 	//ELEVENLABS
 	ELEVENLABS_API_KEY: process.env.ELEVENLABS_API_KEY!,

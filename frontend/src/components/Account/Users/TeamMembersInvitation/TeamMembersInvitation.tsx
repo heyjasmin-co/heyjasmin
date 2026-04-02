@@ -106,7 +106,7 @@ function TeamMembersInvitation({
           <div className="flex items-center space-x-3 px-4 py-3">
             <div
               className="flex h-8 w-8 items-center justify-center rounded-full"
-              style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+              style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
             >
               <i className="fa-solid fa-users text-white"></i>
             </div>
@@ -132,7 +132,8 @@ function TeamMembersInvitation({
                 <div className="flex w-full justify-end sm:w-auto">
                   <button
                     onClick={handleModal}
-                    className="flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 active:scale-95"
+                    style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
+                    className="flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:opacity-90 active:scale-95"
                   >
                     <i className="fa-solid fa-plus text-white"></i>
                     <span>Add</span>

@@ -28,7 +28,7 @@ function TalkToAgent({ handleLaunchAgent, businessDetails }: TalkToAgentProps) {
         <div className="flex items-center gap-3 px-4 py-3">
           <div
             className="flex h-10 w-10 items-center justify-center rounded-full"
-            style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+            style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
           >
             <img src={phoneIcon} alt="phone Icon" className="h-6 w-6" />
           </div>

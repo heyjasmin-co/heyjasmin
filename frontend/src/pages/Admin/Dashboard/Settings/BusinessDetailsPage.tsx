@@ -56,7 +56,8 @@ export default function BusinessDetailsPage() {
         <Loading />
       </div>
     );
-
+  
+  const canEdit = userData?.role !== "viewer";
   return (
     <div className="h-full flex-1 overflow-y-auto rounded-2xl bg-white px-6 py-6 shadow-lg">
       <div className="flex flex-col gap-5">
@@ -65,7 +66,7 @@ export default function BusinessDetailsPage() {
             <BusinessTitleCard
               businessDetails={businessDetails}
               title="Business Information"
-              canEdit={userData?.role !== "viewer"}
+              canEdit={canEdit}
               handleUpdateAgent={handleUpdateAgent}
               subtitle={`This business information gives ${appName} the context to handle your calls.`}
             />
@@ -74,17 +75,17 @@ export default function BusinessDetailsPage() {
               businessOverview={businessDetails.overview!}
               businessName={businessDetails.name}
               businessAddress={businessDetails.address!}
-              canEdit={userData?.role !== "viewer"}
+              canEdit={canEdit}
               refetch={handleRefetch}
             />
             <CoreService
               businessServices={businessDetails.services}
-              canEdit={userData?.role !== "viewer"}
+              canEdit={canEdit}
               refetch={handleRefetch}
             />
             <BusinessHours
               hours={businessDetails.businessHours}
-              canEdit={userData?.role !== "viewer"}
+              canEdit={canEdit}
               refetch={handleRefetch}
             />
           </>

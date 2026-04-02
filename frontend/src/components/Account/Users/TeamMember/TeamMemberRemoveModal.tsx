@@ -42,7 +42,7 @@ function TeamMemberRemoveModal({
           <div className="flex items-center space-x-3">
             <div
               className="flex h-8 w-8 items-center justify-center rounded-full"
-              style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+              style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
             >
               <i className="fa-solid fa-user-minus text-sm text-white"></i>
             </div>

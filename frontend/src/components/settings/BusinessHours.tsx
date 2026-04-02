@@ -71,7 +71,7 @@ function BusinessHours({ hours, canEdit, refetch }: BusinessHoursProps) {
         <div className="flex flex-col px-4 py-3 sm:flex-row sm:items-center sm:space-x-3">
           <div
             className="mb-2 flex h-8 w-8 items-center justify-center rounded-full sm:mb-0"
-            style={{ backgroundColor: colorTheme.secondaryColor(0.8) }}
+            style={{ backgroundColor: colorTheme.secondaryColor(0.9) }}
           >
             <i className="fa-solid fa-clock text-white"></i>
           </div>

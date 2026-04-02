@@ -12,9 +12,22 @@ export default function AccountMenu() {
   const isPathActive = (path: string) => location.pathname.startsWith(path);
 
   const menuItems = [
-    { name: "Account Settings", icon: "address-card", to: "/admin/dashboard/account/account-settings" },
+    {
+      name: "Account Settings",
+      icon: "address-card",
+      to: "/admin/dashboard/account/account-settings",
+    },
+    {
+      name: "Notifications",
+      icon: "bell",
+      to: "/admin/dashboard/account/notifications",
+    },
     { name: "Users", icon: "users", to: "/admin/dashboard/account/users" },
-    { name: "Billing", icon: "credit-card", to: "/admin/dashboard/account/billing" },
+    {
+      name: "Billing",
+      icon: "credit-card",
+      to: "/admin/dashboard/account/billing",
+    },
   ];
 
   return (
@@ -60,7 +73,7 @@ export default function AccountMenu() {
       >
         <div className="flex h-full flex-col gap-8 px-5 py-6">
           {/* Menu */}
-          <ul className="flex flex-grow flex-col space-y-4">
+          <ul className="flex grow flex-col space-y-4">
             {menuItems.map((item) => (
               <li key={item.name}>
                 <NavLink

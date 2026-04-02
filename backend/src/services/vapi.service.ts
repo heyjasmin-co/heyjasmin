@@ -3,12 +3,17 @@ import axios from 'axios'
 import Decimal from 'decimal.js'
 import { FastifyRequest } from 'fastify'
 import config from '../config'
+import transporter from '../config/nodemailer'
 import { vapiClient } from '../lib/vapiAgent'
 import { Business, Call } from '../models'
+import { BusinessCallNotification } from '../models/BusinessNotification'
 import { BusinessPlan } from '../models/BusinessPlan'
 import { Trial } from '../models/Trial'
+import { sendEmailNotificationTemplate } from '../template/sendEmailNotificationTemplate'
+import { sendSmsNotificationTemplate } from '../template/sendSmsNotificationTemplate'
 import { runTransaction } from '../utils/transaction'
 import { checkBusinessSubscription } from './subscription.service'
+import { sendTwilioSMS } from './twilio.service'
 
 interface AssistantBusinessData {
 	businessName: string
@@ -618,6 +623,23 @@ export async function handleCreateAssistantCall(request: FastifyRequest, vapiMes
 		business.totalCallMinutes = new Decimal(business.totalCallMinutes ?? 0).plus(durationMinutes).toDecimalPlaces(2).toNumber()
 		const businessSubscription = await checkBusinessSubscription((business._id as any).toString())
 
+		const callNotification = await BusinessCallNotification.findOne({
+			businessId: business._id,
+		})
+
+		const callEmailTemplate = sendEmailNotificationTemplate({
+			businessName: business.name,
+			callSummary: data.summary,
+			callRecordingUrl: data.recordingUrl,
+			customerPhoneNumber: data.customerPhoneNumber ?? 'Unknown',
+			dashboardUrl: `${config.FRONTEND_URL}/admin/dashboard/calls`,
+		})
+		const callSmsTemplate = sendSmsNotificationTemplate({
+			businessName: business.name,
+			callSummary: data.summary,
+			customerPhoneNumber: data.customerPhoneNumber ?? 'Unknown',
+		})
+
 		return await runTransaction(async (session) => {
 			if (
 				businessSubscription.remainingMinutes !== 'unlimited' &&
@@ -666,6 +688,23 @@ export async function handleCreateAssistantCall(request: FastifyRequest, vapiMes
 			await business.save({ session })
 
 			request.log.info(`✅ Call record created for business ${business._id}`)
+			if (callNotification?.emailNotificationsEnabled) {
+				callNotification.emailRecipients.forEach(async (recipient) => {
+					await transporter.sendMail({
+						from: config.NODEMAILER_EMAIL_USER,
+						to: recipient.value,
+						subject: `New Call for ${business.name}`,
+						html: callEmailTemplate,
+					})
+				})
+				request.log.info(`✅ Call email notification sent for business ${business.name}`)
+			}
+			if (callNotification?.textNotificationsEnabled) {
+				callNotification.textRecipients.forEach(async (recipient) => {
+					await sendTwilioSMS(recipient.value, callSmsTemplate)
+				})
+				request.log.info(`✅ Call text notification sent for business ${business.name}`)
+			}
 			return call
 		})
 	} catch (error: any) {
