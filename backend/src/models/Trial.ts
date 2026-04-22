@@ -6,6 +6,7 @@ export interface ITrial extends Document {
 	trialStartedAt: Date
 	trialEndDate?: Date
 	trialStatus: string
+	expiryReminderSent?: boolean
 	createdAt: Date
 	updatedAt: Date
 }
@@ -30,6 +31,10 @@ const trialSchema = new Schema<ITrial>(
 			type: String,
 			enum: ['trial_active', 'trial_ended'],
 			default: 'trial_active',
+		},
+		expiryReminderSent: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	{

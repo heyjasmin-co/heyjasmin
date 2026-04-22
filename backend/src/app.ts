@@ -7,6 +7,7 @@ import config from './config/index'
 import mongoosePlugin from './plugins/mongoose'
 import swaggerPlugin from './plugins/swagger'
 import routes from './routes/index'
+import { initCronJobs } from './services/cron.service'
 import { AppError } from './utils/errors'
 dotenv.config()
 
@@ -51,6 +52,10 @@ export const createApp = async () => {
 	await app.register(mongoosePlugin)
 	await app.register(swaggerPlugin)
 	await app.register(routes)
+
+	// Initialize cron jobs
+	initCronJobs()
+
 	app.setErrorHandler((error, request, reply) => {
 		if (error.validation) {
 			return reply.code(400).send({
