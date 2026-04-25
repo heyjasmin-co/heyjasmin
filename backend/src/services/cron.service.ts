@@ -37,9 +37,13 @@ export const handleTrialExpiries = async () => {
 		console.log(`[CRON] Marked ${expiredTrials.modifiedCount} trials as ended.`)
 	}
 
-	// 2. Find trials that ended but reminder hasn't been sent
+	// 2. Find trials that ended at least 7 days ago but reminder hasn't been sent
+	const sevenDaysAgo = new Date()
+	sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
 	const trialsToNotify = await Trial.find({
 		trialStatus: 'trial_ended',
+		trialEndDate: { $lte: sevenDaysAgo },
 		expiryReminderSent: { $ne: true },
 	})
 
