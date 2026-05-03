@@ -391,8 +391,8 @@ function createAssistantData(businessData: AssistantBusinessData): any {
 			temperature: 0.2,
 		},
 		voice: {
-			model: 'eleven_turbo_v2_5',
-			voiceId: 'jBzLvP03992lMFEkj2kJ',
+			model: 'eleven_flash_v2',
+			voiceId: 'dOH0XAoGHoc4a487cs6i',
 			provider: '11labs',
 			stability: 0.5,
 			similarityBoost: 0.75,
