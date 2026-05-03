@@ -178,13 +178,9 @@ const IndustryHeroSection: React.FC<IndustryHeroSectionProps> = ({
               className="w-full rounded-full border border-gray-300 bg-white px-4 py-3 text-center text-sm text-gray-800 shadow-sm transition-all duration-300 focus:ring-2 focus:ring-purple-400 focus:outline-none sm:text-left"
             />{" "}
             <div
-              className={`flex w-50 items-center justify-center rounded-full px-5 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95 ${
-                input
-                  ? "bg-purple-600 text-white hover:bg-purple-700"
-                  : "cursor-not-allowed bg-gray-200 text-gray-600"
-              }`}
+              className={`flex w-50 items-center justify-center rounded-full px-5 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95 ${"bg-purple-600 text-white hover:bg-purple-700"}`}
               style={{
-                backgroundColor: input ? colorTheme.secondaryColor(0.9) : "",
+                backgroundColor: colorTheme.secondaryColor(0.9),
               }}
             >
               <button
