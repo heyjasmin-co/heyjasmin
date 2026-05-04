@@ -9,7 +9,7 @@ export const subscriptionCards: SubscriptionCard[] = [
 	{
 		name: 'essential',
 		price: 49,
-		priceId: 'price_1SdwUS3RWlFXmQKIZuvy03K2',
+		priceId: 'price_1TTRLcAbBqwqWDpRycrJsG8L',
 		features: [
 			'Solo pros and small teams – every call answered',
 			'Includes 200 minutes per month',
@@ -21,7 +21,7 @@ export const subscriptionCards: SubscriptionCard[] = [
 	{
 		name: 'pro',
 		price: 125,
-		priceId: 'price_1SdwUk3RWlFXmQKIPnSwdaGm',
+		priceId: 'price_1TTRLKAbBqwqWDpR8opPY4uG',
 		features: [
 			'Fast-growing teams – automate scheduling 24/7',
 			'Everything in Essential plus',
@@ -33,7 +33,7 @@ export const subscriptionCards: SubscriptionCard[] = [
 	{
 		name: 'plus',
 		price: 299,
-		priceId: 'price_1SdwV03RWlFXmQKIVFUPznvl',
+		priceId: 'price_1TTRL2AbBqwqWDpRA4eRSlZ7',
 		features: [
 			'Established businesses – deeper insights & support',
 			'Everything in Pro plus',
