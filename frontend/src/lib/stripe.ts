@@ -4,9 +4,8 @@ let stripePromise: Promise<Stripe | null>;
 
 export const getStripe = () => {
   if (!stripePromise) {
-    stripePromise = loadStripe(
-      import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "",
-    );
+    const key = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
+    stripePromise = loadStripe(key);
   }
   return stripePromise;
 };
