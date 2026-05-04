@@ -158,7 +158,7 @@ function createContentForAssistant(businessData: AssistantBusinessData): string 
 	const currentPlanForPrompt = currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)
 
 	//
-	const systemPrompt = `You are a friendly and professional AI voice assistant named Jasmin, representing *${businessName}*.
+	const systemPrompt = `You are a friendly and professional AI voice assistant named Jasmin, representing ${businessName}.
 
 You handle inbound calls only.
 
@@ -243,7 +243,7 @@ ${servicesList}
 
 Start every call exactly like this:
 
-"Thank you for calling ${businessName}. I’m Jasmin from ${businessName}. This call may be recorded for quality and training purposes. How can I help you today?"
+"Thank you for calling ${businessName}. This call may be recorded for quality and training purposes. How can I help you today?"
 
 ---
 
