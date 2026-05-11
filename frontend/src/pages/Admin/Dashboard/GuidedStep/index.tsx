@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   useBusinessDetails,
   useUpdateAssistantSetup,
@@ -18,6 +19,7 @@ import { BusinessDetailsType } from "../../../../types/BusinessTypes";
 import { errorToast, successToast } from "../../../../utils/react-toast";
 
 export default function Dashboard() {
+  const [searchParams] = useSearchParams();
   const [guideStep, setGuideStep] = useState(0);
   const { userData } = useUserData();
   const {
@@ -29,6 +31,17 @@ export default function Dashboard() {
 
   const [businessDetails, setBusinessDetails] =
     useState<BusinessDetailsType | null>(null);
+
+  useEffect(() => {
+    const signup = searchParams.get("signup");
+    if (signup === "true") {
+      if (typeof window !== "undefined" && (window as any).gtag) {
+        (window as any).gtag("event", "conversion", {
+          send_to: "AW-18115114221/tRDxCJiVyKkcEO3p-r1D",
+        });
+      }
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (businessDetailsResponse?.data) {

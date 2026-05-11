@@ -92,9 +92,9 @@ export default function Register() {
             </p>
           </div>
 
-          {/* Clerk Sign Up */}
           <SignUp
             afterSignInUrl="/admin/dashboard"
+            afterSignUpUrl="/admin/dashboard?signup=true"
             unsafeMetadata={{
               invitationToken,
             }}

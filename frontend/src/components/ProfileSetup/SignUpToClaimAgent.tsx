@@ -80,6 +80,7 @@ export default function SignUpToClaimAgent({
       <div className="flex w-full items-center justify-center px-6 py-10 lg:w-1/2">
         <SignUp
           afterSignInUrl="/admin/dashboard"
+          afterSignUpUrl="/admin/dashboard?signup=true"
           unsafeMetadata={{ businessId }}
           appearance={{
             elements: {
