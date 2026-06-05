@@ -68,7 +68,7 @@ const IndustryHeroSection: React.FC<IndustryHeroSectionProps> = ({
     },
     options: {
       types: ["establishment"],
-      componentRestrictions: { country: "ca" },
+      componentRestrictions: { country: ["ca", "us", "gb", "de", "fr"] },
     },
   });
   const handleContinue = () => {

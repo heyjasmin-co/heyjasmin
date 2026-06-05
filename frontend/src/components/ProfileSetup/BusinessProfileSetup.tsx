@@ -38,7 +38,7 @@ export default function BusinessProfileSetup({
     },
     options: {
       types: ["establishment"],
-      componentRestrictions: { country: "ca" },
+      componentRestrictions: { country: ["ca", "us", "gb", "de", "fr"] },
     },
   }) as any;
 

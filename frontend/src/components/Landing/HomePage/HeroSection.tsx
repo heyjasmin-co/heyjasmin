@@ -25,7 +25,7 @@ export default function HeroSection() {
     },
     options: {
       types: ["establishment"],
-      componentRestrictions: { country: "ca" },
+      componentRestrictions: { country: ["ca", "us", "gb", "de", "fr"] },
     },
   });
 
