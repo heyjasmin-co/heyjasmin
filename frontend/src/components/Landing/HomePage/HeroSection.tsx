@@ -96,6 +96,17 @@ export default function HeroSection() {
           <p className="text-bold text-lg">
             Start risk-free: 7-day trial with all features
           </p>
+
+          <button
+            onClick={() =>
+              navigate("/admin/setup?scrapeType=website", {
+                state: { useWebsite: true },
+              })
+            }
+            className="mt-3 text-sm text-gray-500 underline underline-offset-2 transition-colors duration-200 hover:text-purple-600"
+          >
+            Use my website instead →
+          </button>
         </div>
 
         {/* Right Side — Animated Phone */}

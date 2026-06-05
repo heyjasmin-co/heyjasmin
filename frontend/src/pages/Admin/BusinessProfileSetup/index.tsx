@@ -14,25 +14,19 @@ import { colorTheme } from "../../../theme/colorTheme";
 import { BusinessCreationType } from "../../../types/BusinessTypes";
 import { errorToast, successToast } from "../../../utils/react-toast";
 export default function Index() {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const scrapeTypeFromUrl = searchParams.get("scrapeType") || "business";
+  const state = location.state || {};
+  const placeId = state?.business;
+
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 5;
   const scrapeApiClient = useScrapeApiClient();
   const [loading, setLoading] = useState(false);
-  const [scrapeType, setScrapeType] = useState("business");
-  // const { userData } = useUserData();
+  const [scrapeType, setScrapeType] = useState(scrapeTypeFromUrl);
   const [businessDetails, setBusinessDetails] =
     useState<BusinessCreationType | null>(null);
-  // const navigate = useNavigate();
-  const location = useLocation();
-
-  const state = location.state || {};
-  const placeId = state?.business;
-
-  // useLayoutEffect(() => {
-  //   if (userData?.businessId) {
-  //     navigate("/admin/dashboard", { replace: true });
-  //   }
-  // }, [userData, navigate]);
 
   const handleScrapeData = async (websiteUrl: string) => {
     setLoading(true);

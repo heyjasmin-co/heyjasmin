@@ -194,6 +194,13 @@ const IndustryHeroSection: React.FC<IndustryHeroSectionProps> = ({
             </div>
           </div>{" "}
           <p className="text-bold mt-3 text-lg">{trialNote}</p>
+
+          <button
+            onClick={() => navigate("/admin/setup?scrapeType=website", { state: { useWebsite: true } })}
+            className="mt-2 text-sm text-gray-300 underline underline-offset-2 transition-colors duration-200 hover:text-white"
+          >
+            Use my website instead →
+          </button>
         </div>
 
         {/* RIGHT SIDE */}
