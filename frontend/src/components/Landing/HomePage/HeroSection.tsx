@@ -103,7 +103,7 @@ export default function HeroSection() {
                 state: { useWebsite: true },
               })
             }
-            className="mt-3 text-sm text-gray-500 underline underline-offset-2 transition-colors duration-200 hover:text-purple-600"
+            className="mt-3 text-base font-medium text-purple-600 transition-colors duration-200 hover:text-purple-700 hover:underline"
           >
             Use my website instead →
           </button>
